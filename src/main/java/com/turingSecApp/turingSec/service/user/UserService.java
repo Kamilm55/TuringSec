@@ -20,6 +20,8 @@ import org.springframework.stereotype.Service;
 import javax.ws.rs.NotFoundException;
 import java.util.*;
 
+import static com.turingSecApp.turingSec.util.GlobalConstants.ROOT_LINK;
+
 @Service
 public class UserService {
     @Autowired
@@ -108,7 +110,7 @@ public class UserService {
         userRepository.save(user);
 
         // Send activation email
-        String activationLink = "https://turingsec-production.up.railway.app/api/auth/activate?token=" + activationToken;
+        String activationLink = ROOT_LINK + "/api/auth/activate?token=" + activationToken;
         String subject = "Activate Your Account";
         String content = "Dear " + user.getFirst_name() + ",\n\n"
                 + "Thank you for registering with our application. Please click the link below to activate your account:\n\n"

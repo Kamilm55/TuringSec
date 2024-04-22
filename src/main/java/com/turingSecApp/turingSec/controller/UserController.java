@@ -10,6 +10,7 @@ import com.turingSecApp.turingSec.dao.repository.RoleRepository;
 import com.turingSecApp.turingSec.dao.repository.UserRepository;
 import com.turingSecApp.turingSec.exception.*;
 import com.turingSecApp.turingSec.filter.JwtUtil;
+import com.turingSecApp.turingSec.payload.RegisterPayload;
 import com.turingSecApp.turingSec.service.BugBountyReportService;
 import com.turingSecApp.turingSec.service.ProgramsService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
@@ -28,6 +29,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -63,37 +65,67 @@ public class UserController {
 
 
     @PostMapping("/register/hacker")
-    public ResponseEntity<Map<String, String>> registerHacker(@RequestBody UserEntity user) {
+    @Transactional
+     public ResponseEntity<Map<String, String>> registerHacker(@RequestBody RegisterPayload payload) {
         // Ensure the user doesn't exist
-        if (userRepository.findByUsername(user.getUsername()) != null) {
+        if (userRepository.findByUsername(payload.getUsername()) != null) {
             throw new UserAlreadyExistsException("Username is already taken.");
         }
 
-        if (userRepository.findByEmail(user.getEmail()) != null) {
+        if (userRepository.findByEmail(payload.getEmail()) != null) {
             throw new EmailAlreadyExistsException("Email is already taken.");
         }
 
-        // Encode the password
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+       UserEntity user = UserEntity.builder()
+                .first_name(payload.getFirstName())
+                .last_name(payload.getLastName())
+                .country(payload.getCountry())
+                .username(payload.getUsername())
+                .email(payload.getEmail())
+                .password(
+                        // Encode the password
+                       passwordEncoder.encode(payload.getPassword())
+                ).activated(true)
+                .build();
 
         // Set user roles
         Set<Role> roles = new HashSet<>();
         roles.add(roleRepository.findByName("HACKER"));
         user.setRoles(roles);
 
-        // Save the user
-        user = userRepository.save(user);
 
-        // Create and associate a hackerEntity entity
+        // Save the user
+        userRepository.save(user);
+
+        //Note: To fetch user explicitly to avoid save process instead it updates because there is user entity with actual id not null
+        UserEntity fetchedUser = userRepository.findByUsername(user.getUsername());
+
+        // Create and associate , populate hackerEntity entity
         HackerEntity hackerEntity = new HackerEntity();
-        hackerEntity.setUser(user);
-        hackerEntity.setFirst_name(user.getFirst_name()); // Set the username in the hackerEntity entity
-        hackerEntity.setLast_name(user.getLast_name()); // Set the age in the hackerEntity entity
-        hackerEntity.setCountry(user.getCountry()); // Set the age in the hackerEntity entity
+        hackerEntity.setUser(fetchedUser);
+        hackerEntity.setFirst_name(fetchedUser.getFirst_name()); // Set the username in the hackerEntity entity
+        hackerEntity.setLast_name(fetchedUser.getLast_name()); // Set the age in the hackerEntity entity
+        hackerEntity.setCountry(fetchedUser.getCountry()); // Set the age in the hackerEntity entity
+        hackerEntity.setBackground_pic(payload.getBackground_pic());
+        hackerEntity.setBio(payload.getBio());
+        hackerEntity.setWebsite(payload.getWebsite());
+        hackerEntity.setProfile_pic(payload.getBackground_pic());
+        hackerEntity.setLinkedin(payload.getLinkedin());
+        hackerEntity.setTwitter(payload.getTwitter());
+        hackerEntity.setGithub(payload.getGithub());
+        hackerEntity.setCity(payload.getCity());
+
+
         hackerRepository.save(hackerEntity);
 
+        // Accomplish associations between
+        fetchedUser.setHacker(hackerEntity);
+
+        userRepository.save(fetchedUser);
+
         // Send activation email
-        userService.sendActivationEmail(user);
+        userService.sendActivationEmail(fetchedUser);
 
         // Generate token for the registered user
         UserDetails userDetails = new CustomUserDetails(user);
@@ -149,8 +181,6 @@ public class UserController {
             return new ResponseEntity<>("Invalid activation token.", HttpStatus.BAD_REQUEST);
         }
     }
-
-
 
 
 
