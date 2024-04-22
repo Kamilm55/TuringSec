@@ -1,0 +1,127 @@
+package com.turingSecApp.turingSec.controller;
+
+import com.turingSecApp.turingSec.Request.ReportsByUserDTO;
+import com.turingSecApp.turingSec.Request.ReportsByUserWithCompDTO;
+import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
+import com.turingSecApp.turingSec.dao.entities.CollaboratorEntity;
+import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
+import com.turingSecApp.turingSec.dao.entities.ReportsEntity;
+import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
+import com.turingSecApp.turingSec.dao.repository.UserRepository;
+import com.turingSecApp.turingSec.service.BugBountyReportService;
+import com.turingSecApp.turingSec.service.user.CustomUserDetails;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/bug-bounty-reports")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
+public class BugBountyReportController {
+
+    private final UserRepository userRepository;
+
+    private final BugBountyReportService bugBountyReportService;
+
+    @Autowired
+    public BugBountyReportController(UserRepository userRepository, BugBountyReportService bugBountyReportService) {
+        this.userRepository = userRepository;
+        this.bugBountyReportService = bugBountyReportService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ReportsEntity>> getAllBugBountyReports() {
+        List<ReportsEntity> bugBountyReports = bugBountyReportService.getAllBugBountyReports();
+        return new ResponseEntity<>(bugBountyReports, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ReportsEntity> getBugBountyReportById(@PathVariable Long id) {
+        ReportsEntity bugBountyReport = bugBountyReportService.getBugBountyReportById(id);
+        return new ResponseEntity<>(bugBountyReport, HttpStatus.OK);
+    }
+
+
+    @PostMapping("/submit")
+    public ResponseEntity<?> submitBugBountyReport(@RequestBody ReportsEntity report, @RequestParam Long bugBountyProgramId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            String username = authentication.getName();
+            UserEntity user = userRepository.findByUsername(username);
+
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+            }
+
+            // Set the user for the bug bounty report
+            report.setUser(user);
+
+            // Set the bug bounty program for the bug bounty report
+            BugBountyProgramEntity program = new BugBountyProgramEntity();
+            program.setId(bugBountyProgramId);
+            report.setBugBountyProgram(program);
+
+            // Set the bug bounty report for each collaborator
+            for (CollaboratorEntity collaborator : report.getCollaborators()) {
+                collaborator.setBugBountyReport(report);
+            }
+
+            // Save the bug bounty report
+            bugBountyReportService.submitBugBountyReport(report);
+
+            return ResponseEntity.ok("Bug bounty report submitted successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+    }
+
+
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ReportsEntity> updateBugBountyReport(@PathVariable Long id,
+                                                                  @RequestBody ReportsEntity bugBountyReport) {
+        ReportsEntity updatedReport = bugBountyReportService.updateBugBountyReport(id, bugBountyReport);
+        return new ResponseEntity<>(updatedReport, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteBugBountyReport(@PathVariable Long id) {
+        bugBountyReportService.deleteBugBountyReport(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<List<ReportsByUserWithCompDTO>> getAllBugBountyReportsByUser() {
+        List<ReportsByUserWithCompDTO> userReports = bugBountyReportService.getAllReportsByUser();
+        return new ResponseEntity<>(userReports, HttpStatus.OK);
+    }
+
+    @GetMapping("/reports/company")
+    public ResponseEntity<List<ReportsByUserDTO>> getBugBountyReportsForCompanyPrograms() {
+        // Retrieve the authenticated user details
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+        // Extract the company from the authenticated user details
+        Object user = userDetails.getUser();
+        CompanyEntity company = null;
+        if (user instanceof CompanyEntity) {
+            company = (CompanyEntity) user;
+        } else {
+            // Handle the case where the user is not a company (e.g., throw an exception or return an error response)
+            // For example:
+            throw new IllegalStateException("Authenticated user is not a company");
+        }
+
+        // Retrieve bug bounty reports submitted for the company's programs
+        List<ReportsByUserDTO> reportsForCompanyPrograms = bugBountyReportService.getBugBountyReportsForCompanyPrograms(company);
+
+        return ResponseEntity.ok(reportsForCompanyPrograms);
+    }
+}
