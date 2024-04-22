@@ -4,6 +4,7 @@ package com.turingSecApp.turingSec.config;
 import com.turingSecApp.turingSec.filter.JwtAuthenticationFilter;
 import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.service.user.UserDetailsServiceImpl;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,13 +18,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
-
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-
-    @Autowired
-    private JwtUtil jwtTokenProvider;
+    private final UserDetailsServiceImpl userDetailsService;
+    private final JwtUtil jwtTokenProvider;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
