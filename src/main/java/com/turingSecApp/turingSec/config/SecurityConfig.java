@@ -9,9 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -28,63 +30,64 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-
-    @Bean
-    public JwtAuthenticationFilter jwtTokenFilter() {
-        return new JwtAuthenticationFilter(jwtTokenProvider, userDetailsService);
-    }
-
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
-    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http , JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
-                .authorizeHttpRequests(authorizeRequests ->
-                        authorizeRequests
-                                .requestMatchers("/api/background-image-for-hacker/**", "/api/image-for-hacker/**", "/api/hacker/**").permitAll()
-
-                                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
-                                .requestMatchers("/api/auth/allUsers").permitAll() // Public endpoints for registration and login
-
-
-                                .requestMatchers("/api/auth/activate").permitAll() // Public endpoints for registration and login
-                                .requestMatchers("/api/auth/login").permitAll() // Public endpoints for registration and login
-                                .requestMatchers("/api/auth/register/hacker").permitAll()
-                                .requestMatchers("/api/auth/register/company").permitAll()
-                                .requestMatchers("/api/auth/current-user").authenticated()
-                                .requestMatchers("/api/auth/users/**").permitAll()
-                                .requestMatchers("/api/companies/current-user").authenticated()
-                                .requestMatchers("/api/auth/programs").authenticated()
-                                .requestMatchers("/api/auth/programsById/{id}").authenticated()
-
-                                .requestMatchers("/api/admin/register").permitAll()
-                                .requestMatchers("/api/admin/approve-company/{companyId}").hasRole("ADMIN")
-                                .requestMatchers("/api/admin/login").permitAll()
-                                .requestMatchers("/api/auth/update-profile").authenticated()
-
-                                .requestMatchers("/api/bug-bounty-reports/reports/company").hasRole("COMPANY")
-                                .requestMatchers("/api/bug-bounty-reports/submit").hasRole("HACKER")
-                                .requestMatchers("/api/bug-bounty-reports/user").hasRole("HACKER")
-                                .requestMatchers("/api/bug-bounty-reports/{id}").hasRole("HACKER")
-
-
-
-                                .requestMatchers("/api/bug-bounty-programs/**").hasRole("COMPANY")
-                                .requestMatchers("/api/companies/**").permitAll()
-
-                                .requestMatchers("/api/auth/test").authenticated()
-
-
-                                .requestMatchers("/api/auth/change-email").authenticated()
-                                .requestMatchers("/api/auth/change-password").authenticated()
-                                .requestMatchers("/api/auth/delete-user").authenticated()
-
-                )
                 .csrf(AbstractHttpConfigurer::disable)
-                .addFilterBefore(jwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+                .headers(AbstractHttpConfigurer::disable)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests(request -> {
+                    request.requestMatchers("/api/background-image-for-hacker/**", "/api/image-for-hacker/**", "/api/hacker/**").permitAll();
+                    request.requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll();
+
+                 // User Controller
+                    request
+                            .requestMatchers("/api/auth/register/hacker").permitAll()
+                            .requestMatchers("/api/auth/login").permitAll() // Public endpoints for registration and login
+                            .requestMatchers("/api/auth/change-password").authenticated()
+                            .requestMatchers("/api/auth/change-email").authenticated()
+                            .requestMatchers("/api/auth/allUsers").permitAll() // Public endpoints for registration and login
+
+
+                            .requestMatchers("/api/auth/activate").permitAll() // Public endpoints for registration and login
+                            .requestMatchers("/api/auth/register/company").permitAll()
+                            .requestMatchers("/api/auth/current-user").authenticated()
+                            .requestMatchers("/api/auth/update-profile").authenticated() //todo: it must be admin
+
+                            .requestMatchers("/api/auth/users/**").permitAll()
+                            .requestMatchers("/api/companies/current-user").authenticated()
+                            .requestMatchers("/api/auth/programs").authenticated()
+                            .requestMatchers("/api/auth/programsById/{id}").authenticated()
+
+                            .requestMatchers("/api/admin/register").permitAll()
+                            .requestMatchers("/api/admin/approve-company/{companyId}").hasRole("ADMIN")
+                            .requestMatchers("/api/admin/login").permitAll()
+
+
+                            .requestMatchers("/api/bug-bounty-reports/reports/company").hasRole("COMPANY")
+                            .requestMatchers("/api/bug-bounty-reports/submit").hasRole("HACKER")
+                            .requestMatchers("/api/bug-bounty-reports/user").hasRole("HACKER")
+                            .requestMatchers("/api/bug-bounty-reports/{id}").hasRole("HACKER")
+
+
+                            .requestMatchers("/api/bug-bounty-programs/**").hasRole("COMPANY")
+                            .requestMatchers("/api/companies/**").permitAll()
+
+                            .requestMatchers("/api/auth/test").authenticated()
+
+
+                            .requestMatchers("/api/auth/delete-user").authenticated();
+
+                    request.anyRequest().permitAll();//todo: fix this
+
+                })
+                .sessionManagement(sm->sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+//                .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }

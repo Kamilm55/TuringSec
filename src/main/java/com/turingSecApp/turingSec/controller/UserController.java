@@ -141,49 +141,6 @@ public class UserController {
 
         return ResponseEntity.ok(response);
     }
-
-    @GetMapping("/current-user")
-    public UserEntity getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication != null && authentication.isAuthenticated()) {
-            String username = authentication.getName();
-            // Retrieve user details from the database
-            return userRepository.findByUsername(username);
-        } else {
-            // Handle case where user is not authenticated
-            // You might return an error response or throw an exception
-            return null;
-        }
-    }
-
-
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<UserEntity> getUserById(@PathVariable Long userId) {
-        // Retrieve user information by ID
-        Optional<UserEntity> userOptional = userRepository.findById(userId);
-
-        if (userOptional.isPresent()) {
-            UserEntity user = userOptional.get();
-            return ResponseEntity.ok(user);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-
-    @GetMapping("/activate")
-    public ResponseEntity<String> activateAccount(@RequestParam("token") String token) {
-        boolean activationResult = userService.activateAccount(token);
-        if (activationResult) {
-            return new ResponseEntity<>("Account activated successfully!", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Invalid activation token.", HttpStatus.BAD_REQUEST);
-        }
-    }
-
-
-
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> loginUser(@RequestBody LoginRequest user) {
         // Check if the input is an email
@@ -220,16 +177,62 @@ public class UserController {
         }
     }
 
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+        if (authentication != null && authentication.isAuthenticated()) {
+            String username = authentication.getName();
+            UserEntity user = userRepository.findByUsername(username);
 
-    @GetMapping("/test")
-    public String test() {
+            // Validate current password
+            if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect current password");
+            }
 
-        return "test passed";
+            // Validate new password and confirm new password
+            if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("New password and confirm new password do not match");
+            }
+
+            // Update password
+            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+            userRepository.save(user);
+
+            return ResponseEntity.ok("Password updated successfully");
+        } else {
+            // Handle case where user is not authenticated
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated"); //todo:It must be throw 401 instead of 403
+        }
     }
 
+    @PostMapping("/change-email")
+    public ResponseEntity<?> changeEmail(@RequestBody ChangeEmailRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+        if (authentication != null && authentication.isAuthenticated()) {
+            String username = authentication.getName();
+            UserEntity user = userRepository.findByUsername(username);
 
+            // Validate password
+            if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect password");
+            }
+
+            if (userRepository.findByEmail(request.getNewEmail()) != null) {
+                throw new EmailAlreadyExistsException("Email is already taken.");
+            }
+
+            // Update email
+            user.setEmail(request.getNewEmail());
+            userRepository.save(user);
+
+            return ResponseEntity.ok("Email updated successfully");
+        } else {
+            // Handle case where user is not authenticated
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+    }
 
 
     @PostMapping("/update-profile")
@@ -273,74 +276,69 @@ public class UserController {
             hackerEntity.setTwitter(profileUpdateRequest.getTwitter());
             hackerEntity.setGithub(profileUpdateRequest.getGithub());
 
+            hackerEntity.setUser(userEntity);
+
             hackerRepository.save(hackerEntity);
         }
+
+        userEntity.setHacker(hackerEntity);
+        userRepository.save(userEntity);
 
         return ResponseEntity.ok("Profile updated successfully.");
     }
 
 
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<UserEntity> getUserById(@PathVariable Long userId) {
+        // Retrieve user information by ID
+        Optional<UserEntity> userOptional = userRepository.findById(userId);
 
-
-
-
-    @PostMapping("/change-email")
-    public ResponseEntity<?> changeEmail(@RequestBody ChangeEmailRequest request) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication != null && authentication.isAuthenticated()) {
-            String username = authentication.getName();
-            UserEntity user = userRepository.findByUsername(username);
-
-            // Validate password
-            if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect password");
-            }
-
-            // Update email
-            user.setEmail(request.getNewEmail());
-            userRepository.save(user);
-
-            return ResponseEntity.ok("Email updated successfully");
+        if (userOptional.isPresent()) {
+            UserEntity user = userOptional.get();
+            return ResponseEntity.ok(user);
         } else {
-            // Handle case where user is not authenticated
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            return ResponseEntity.notFound().build();
         }
     }
 
-
-    @PostMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+    @GetMapping("/current-user")
+    public UserEntity getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.isAuthenticated()) {
             String username = authentication.getName();
-            UserEntity user = userRepository.findByUsername(username);
-
-            // Validate current password
-            if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect current password");
-            }
-
-            // Validate new password and confirm new password
-            if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("New password and confirm new password do not match");
-            }
-
-            // Update password
-            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-            userRepository.save(user);
-
-            return ResponseEntity.ok("Password updated successfully");
+            // Retrieve user details from the database
+            return userRepository.findByUsername(username);
         } else {
             // Handle case where user is not authenticated
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            // You might return an error response or throw an exception
+            return null;
         }
     }
 
 
 
 
+    @GetMapping("/activate")
+    public ResponseEntity<String> activateAccount(@RequestParam("token") String token) {
+        boolean activationResult = userService.activateAccount(token);
+        if (activationResult) {
+            return new ResponseEntity<>("Account activated successfully!", HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>("Invalid activation token.", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+
+
+
+
+
+    @GetMapping("/test")
+    public String test() {
+
+        return "test passed";
+    }
 
     @DeleteMapping("/delete-user")
     public ResponseEntity<String> deleteUser() {

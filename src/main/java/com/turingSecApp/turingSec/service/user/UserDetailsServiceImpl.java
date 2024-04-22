@@ -31,16 +31,20 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (user != null) {
             return new CustomUserDetails(user);
         }
-
-        AdminEntity admin = adminRepository.findByUsername(username);
-        if (admin != null) {
-            return new CustomUserDetails(admin);
+        else {
+            throw new UsernameNotFoundException("User is not found with this username:"+username );
         }
 
-        CompanyEntity companyEntity = companyRepository.findByEmail(username);
-        if (companyEntity != null) {
-            return new CustomUserDetails(companyEntity);
-        }
-        throw new UsernameNotFoundException("Company does not found.");
+//        AdminEntity admin = adminRepository.findByUsername(username);
+//        if (admin != null) {
+//            return new CustomUserDetails(admin);
+//        }
+//
+//        CompanyEntity companyEntity = companyRepository.findByEmail(username);
+//        if (companyEntity != null) {
+//            return new CustomUserDetails(companyEntity);
+//        }
+
+
     }
 }
