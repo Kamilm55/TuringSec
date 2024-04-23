@@ -15,6 +15,7 @@ import com.turingSecApp.turingSec.service.BugBountyReportService;
 import com.turingSecApp.turingSec.service.ProgramsService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import com.turingSecApp.turingSec.service.user.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,31 +39,16 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
+@RequiredArgsConstructor
 public class UserController {
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private RoleRepository roleRepository;
 
-    @Autowired
-    private UserRepository userRepository;
-
-
-    @Autowired
-    private JwtUtil jwtTokenProvider;
-
-    @Autowired
-    private ProgramsService programsService;
-
-
-    @Autowired
-    private HackerRepository hackerRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-
-
+    private final UserService userService;
+    private final RoleRepository roleRepository;
+    private final UserRepository userRepository;
+    private final JwtUtil jwtTokenProvider;
+    private final ProgramsService programsService;
+    private final HackerRepository hackerRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/register/hacker")
     @Transactional
@@ -297,8 +283,13 @@ public class UserController {
             UserEntity user = userOptional.get();
             return ResponseEntity.ok(user);
         } else {
-            return ResponseEntity.notFound().build();
+            throw new UserNotFoundException("User is not found with id:" + userId);
         }
+    }
+
+    @GetMapping("/test")
+    public String test() {
+        return "test passed";
     }
 
     @GetMapping("/current-user")
@@ -312,34 +303,26 @@ public class UserController {
         } else {
             // Handle case where user is not authenticated
             // You might return an error response or throw an exception
-            return null;
+            throw new UnauthorizedException();
         }
     }
 
-
-
+    @GetMapping("/allUsers")
+    public ResponseEntity<List<UserEntity>> getAllUsers() {
+        List<UserEntity> userEntities = userService.getAllUsers();
+        return new ResponseEntity<>(userEntities, HttpStatus.OK);
+    }
 
     @GetMapping("/activate")
     public ResponseEntity<String> activateAccount(@RequestParam("token") String token) {
         boolean activationResult = userService.activateAccount(token);
+
         if (activationResult) {
             return new ResponseEntity<>("Account activated successfully!", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Invalid activation token.", HttpStatus.BAD_REQUEST);
         }
     }
-
-
-
-
-
-
-    @GetMapping("/test")
-    public String test() {
-
-        return "test passed";
-    }
-
     @DeleteMapping("/delete-user")
     public ResponseEntity<String> deleteUser() {
         // Get the authenticated user's username from the security context
@@ -358,8 +341,6 @@ public class UserController {
         return ResponseEntity.ok("User deleted successfully");
     }
 
-
-
     @GetMapping("/programs")
     public ResponseEntity<List<BugBountyProgramWithAssetTypeDTO>> getAllBugBountyPrograms() {
         List<BugBountyProgramEntity> programs = programsService.getAllBugBountyPrograms();
@@ -375,6 +356,13 @@ public class UserController {
 
         return ResponseEntity.ok(programDTOs);
     }
+    @GetMapping("programsById/{id}")
+    public ResponseEntity<BugBountyProgramEntity> getBugBountyProgramById(@PathVariable Long id) {
+        BugBountyProgramEntity program = programsService.getBugBountyProgramById(id);
+        return ResponseEntity.ok(program);
+    }
+
+    ///////// Util methods
     private BugBountyProgramWithAssetTypeDTO mapToDTO(BugBountyProgramEntity programEntity) {
         BugBountyProgramWithAssetTypeDTO dto = new BugBountyProgramWithAssetTypeDTO();
         dto.setId(programEntity.getId());
@@ -405,17 +393,9 @@ public class UserController {
 
         return dto;
     }
-    @GetMapping("programsById/{id}")
-    public ResponseEntity<BugBountyProgramEntity> getBugBountyProgramById(@PathVariable Long id) {
-        BugBountyProgramEntity program = programsService.getBugBountyProgramById(id);
-        return ResponseEntity.ok(program);
-    }
 
 
-    @GetMapping("/allUsers")
-    public ResponseEntity<List<UserEntity>> getAllUsers() {
-        List<UserEntity> userEntities = userService.getAllUsers();
-        return new ResponseEntity<>(userEntities, HttpStatus.OK);
-    }
+
+
 
 }

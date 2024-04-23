@@ -30,7 +30,6 @@ public class AdminService {
         // Ensure the user doesn't exist
         if (adminRepository.findByUsername(admin.getUsername()) != null) {
             throw new UserAlreadyExistsException("Username is already taken.");
-
         }
 
         if (adminRepository.findByEmail(admin.getEmail()) != null) {
@@ -44,12 +43,7 @@ public class AdminService {
             throw new NotFoundException("Admin role not found.");
         }
 
-
         admin.setRoles(Collections.singleton(adminRole));
-
-
-
-
         admin.setPassword(passwordEncoder.encode(admin.getPassword()));
 
 

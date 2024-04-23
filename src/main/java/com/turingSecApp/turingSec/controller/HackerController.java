@@ -18,7 +18,7 @@ public class HackerController {
         this.hackerService = hackerService;
     }
 
-    @GetMapping("/get-hacker-by-id/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<HackerResponse> getById(@PathVariable Long id) throws FileNotFoundException {
         return hackerService.findById(id);
     }

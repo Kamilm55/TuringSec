@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -51,18 +53,24 @@ public class SecurityConfig {
                             .requestMatchers("/api/auth/login").permitAll() // Public endpoints for registration and login
                             .requestMatchers("/api/auth/change-password").authenticated()
                             .requestMatchers("/api/auth/change-email").authenticated()
-                            .requestMatchers("/api/auth/allUsers").permitAll() // Public endpoints for registration and login
-
-
-                            .requestMatchers("/api/auth/activate").permitAll() // Public endpoints for registration and login
-                            .requestMatchers("/api/auth/register/company").permitAll()
+                            .requestMatchers("/api/auth/update-profile").authenticated() //todo: it must be admin or currentUser
+                            .requestMatchers("/api/auth/test").authenticated()
                             .requestMatchers("/api/auth/current-user").authenticated()
-                            .requestMatchers("/api/auth/update-profile").authenticated() //todo: it must be admin
-
-                            .requestMatchers("/api/auth/users/**").permitAll()
-                            .requestMatchers("/api/companies/current-user").authenticated()
+                            .requestMatchers("/api/auth/allUsers").permitAll() // Public endpoints for registration and login
+                            .requestMatchers("/api/auth/activate").permitAll() // Public endpoints for registration and login
+                            .requestMatchers("/api/auth/delete-user").authenticated()
                             .requestMatchers("/api/auth/programs").authenticated()
                             .requestMatchers("/api/auth/programsById/{id}").authenticated()
+                            .requestMatchers("/api/auth/users/**").permitAll()
+
+
+
+                            .requestMatchers("/api/auth/register/company").permitAll()
+
+                            .requestMatchers("/api/companies/current-user").authenticated()
+                            .requestMatchers("/api/companies/**").permitAll()
+
+
 
                             .requestMatchers("/api/admin/register").permitAll()
                             .requestMatchers("/api/admin/approve-company/{companyId}").hasRole("ADMIN")
@@ -75,15 +83,18 @@ public class SecurityConfig {
                             .requestMatchers("/api/bug-bounty-reports/{id}").hasRole("HACKER")
 
 
-                            .requestMatchers("/api/bug-bounty-programs/**").hasRole("COMPANY")
-                            .requestMatchers("/api/companies/**").permitAll()
-
-                            .requestMatchers("/api/auth/test").authenticated()
+                            .requestMatchers("/api/bug-bounty-programs/**").hasRole("COMPANY");
 
 
-                            .requestMatchers("/api/auth/delete-user").authenticated();
 
-                    request.anyRequest().permitAll();//todo: fix this
+
+//                            .anyRequest().access((authentication, object) ->{
+//                                if(authentication.get() instanceof AnonymousAuthenticationToken)
+//                                    return new AuthorizationDecision(false);
+//
+//                                return new AuthorizationDecision(true);
+//                            });
+                   // request.anyRequest().permitAll();//todo: fix this
 
                 })
                 .sessionManagement(sm->sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

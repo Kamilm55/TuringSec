@@ -1,6 +1,6 @@
 package com.turingSecApp.turingSec.exception;
 
-public class UnauthorizedException extends  RuntimeException{
+public class UnauthorizedException extends RuntimeException {
 
     private final String message;
 
@@ -9,6 +9,11 @@ public class UnauthorizedException extends  RuntimeException{
         this.message = message;
     }
 
+    public UnauthorizedException() {
+        this("User is not authorized"); // Call the other constructor with default message
+    }
+
+    @Override
     public String getMessage() {
         return message;
     }

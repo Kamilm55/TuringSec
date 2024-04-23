@@ -93,7 +93,7 @@ public class UserService {
         // Retrieve user by activation token
         UserEntity user = userRepository.findByActivationToken(token);
 
-        if (user != null && !user.isActivated()) {
+        if (user != null /*&& !user.isActivated()*/) {
             // Activate the user by updating the account status or perform other necessary actions
             user.setActivated(true);
             userRepository.save(user);

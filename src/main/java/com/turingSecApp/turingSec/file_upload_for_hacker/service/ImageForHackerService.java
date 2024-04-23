@@ -1,6 +1,7 @@
 package com.turingSecApp.turingSec.file_upload_for_hacker.service;
 
 import com.turingSecApp.turingSec.file_upload_for_hacker.entity.ImageForHacker;
+import com.turingSecApp.turingSec.file_upload_for_hacker.exception.FileNotFoundException;
 import com.turingSecApp.turingSec.file_upload_for_hacker.repository.ImageForHackerRepository;
 import com.turingSecApp.turingSec.file_upload_for_hacker.response.ImageForHackerResponse;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -47,7 +47,7 @@ public class ImageForHackerService {
 
     public ResponseEntity<?> getVideoById(Long id) throws FileNotFoundException {
         ImageForHacker fileOptional = imageForHackerRepository.findById(id).orElseThrow(
-                () -> new FileNotFoundException("File not found"));
+                () -> new FileNotFoundException("File not found by id:" + id));
         return ResponseEntity.status(HttpStatus.OK)
                 .header("Content-Type", fileOptional.getContentType())
                 .body(fileOptional.getFileData());

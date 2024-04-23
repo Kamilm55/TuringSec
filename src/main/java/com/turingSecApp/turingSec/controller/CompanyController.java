@@ -59,8 +59,8 @@ public class CompanyController {
         // Check if the input is an email
         CompanyEntity companyEntity = companyRepository.findByEmail(companyRequest.getEmail());
 
-
-
+        System.out.println(companyRequest);
+        System.out.println(companyEntity);
         // Authenticate user if found
         if (companyEntity != null && passwordEncoder.matches(companyRequest.getPassword(), companyEntity.getPassword())) {
             // Generate token using the user details

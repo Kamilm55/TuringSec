@@ -8,6 +8,7 @@ import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.service.AdminService;
 import com.turingSecApp.turingSec.service.CompanyService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,26 +28,14 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
+@RequiredArgsConstructor
 public class AdminController {
-    @Autowired
-    private AdminService adminService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-
-    @Autowired
-    private AdminRepository adminRepository;
-
-    @Autowired
-    private CompanyService companyService;
-
-
-    @Autowired
-    private JwtUtil jwtTokenProvider;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AdminService adminService;
+    private final PasswordEncoder passwordEncoder;
+    private final AdminRepository adminRepository;
+    private final CompanyService companyService;
+    private final JwtUtil jwtTokenProvider;
+    private final AuthenticationManager authenticationManager;
     
     @PostMapping("/register")
     public ResponseEntity<?> registerAdmin(@RequestBody AdminEntity admin) {

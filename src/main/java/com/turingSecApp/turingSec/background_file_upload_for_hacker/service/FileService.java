@@ -4,8 +4,6 @@ import com.turingSecApp.turingSec.background_file_upload_for_hacker.entity.Backg
 import com.turingSecApp.turingSec.background_file_upload_for_hacker.exception.FileNotFoundException;
 import com.turingSecApp.turingSec.background_file_upload_for_hacker.repository.FileRepository;
 import com.turingSecApp.turingSec.background_file_upload_for_hacker.response.FileResponse;
-import com.turingSecApp.turingSec.file_upload_for_hacker.entity.ImageForHacker;
-import com.turingSecApp.turingSec.file_upload_for_hacker.response.ImageForHackerResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -33,6 +31,7 @@ public class FileService {
             existingFile.setContentType(multipartFile.getContentType());
             existingFile.setFileData(multipartFile.getBytes());
             BackgroundImageForHacker saved = fileRepository.save(existingFile);
+
             FileResponse response = modelMapper.map(saved, FileResponse.class);
             return response;
         } else {
@@ -42,6 +41,7 @@ public class FileService {
             file.setFileData(multipartFile.getBytes());
             file.setHackerId(hackerId);
             BackgroundImageForHacker saved = fileRepository.save(file);
+
             FileResponse response = modelMapper.map(saved, FileResponse.class);
             return response;
         }
@@ -49,10 +49,12 @@ public class FileService {
 
     public ResponseEntity<?> getVideoById(Long id) throws FileNotFoundException {
         BackgroundImageForHacker backgroundImageForHackerOptional = fileRepository.findById(id).orElseThrow(
-                () -> new FileNotFoundException("sd"));
+                () -> new FileNotFoundException("File cannot found by id:" + id));
         return ResponseEntity.status(HttpStatus.OK)
                 .header("Content-Type", backgroundImageForHackerOptional.getContentType())
-                .body(backgroundImageForHackerOptional.getFileData());
+                .body(
+                        backgroundImageForHackerOptional.getFileData()
+                );
     }
 
 }

@@ -35,16 +35,40 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException em) {
-        return new ResponseEntity<>(em.getMessage(), HttpStatus.CONFLICT);
+        return new ResponseEntity<>(em.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<String> handleUnauthorizedException(UnauthorizedException em) {
-        return new ResponseEntity<>(em.getMessage(), HttpStatus.CONFLICT);
+        return new ResponseEntity<>(em.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException em) {
         return new ResponseEntity<>(em.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(FileNotFoundException.class)
+    public ResponseEntity<String> handleFileNotFoundException(FileNotFoundException em) {
+        return new ResponseEntity<>(em.getMessage(), HttpStatus.NOT_FOUND);
+    }
+    // BackgroundImageForHackerController
+    @ExceptionHandler(com.turingSecApp.turingSec.background_file_upload_for_hacker.exception.FileNotFoundException.class)
+    public ResponseEntity<String> handleFileNotFoundException(com.turingSecApp.turingSec.background_file_upload_for_hacker.exception.FileNotFoundException em) {
+        return new ResponseEntity<>(em.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    // ImageForHackerController for Image download
+    @ExceptionHandler(com.turingSecApp.turingSec.file_upload_for_hacker.exception.FileNotFoundException.class)
+    public ResponseEntity<String> handleFileNotFoundExceptionForImage(com.turingSecApp.turingSec.file_upload_for_hacker.exception.FileNotFoundException em) {
+        return new ResponseEntity<>(em.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    // For unhandled exceptions:
+    @ExceptionHandler(value = Exception.class)
+    public ResponseEntity<?> generalExceptionHandler(Exception exception){
+        System.out.println("For unhandled exceptions");
+        System.out.println(exception.getClass());
+        return new ResponseEntity<>(exception.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

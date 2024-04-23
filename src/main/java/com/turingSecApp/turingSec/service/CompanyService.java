@@ -91,6 +91,7 @@ public class CompanyService {
     }
 
 
+    //
     private void notifyAdminsForApproval(CompanyEntity company) {
         // Get a list of administrators from the database or any other source
         List<AdminEntity> admins = adminRepository.findAll(); // Assuming you have an AdminRepository

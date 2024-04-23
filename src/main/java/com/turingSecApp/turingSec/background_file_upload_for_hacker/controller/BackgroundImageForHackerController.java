@@ -6,6 +6,8 @@ import com.turingSecApp.turingSec.background_file_upload_for_hacker.service.File
 import com.turingSecApp.turingSec.dao.entities.HackerEntity;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.UserRepository;
+import com.turingSecApp.turingSec.exception.UnauthorizedException;
+import com.turingSecApp.turingSec.exception.UserNotFoundException;
 import com.turingSecApp.turingSec.file_upload_for_hacker.response.ImageForHackerResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,8 @@ public class BackgroundImageForHackerController {
 
     @PostMapping("/upload")
     public FileResponse uploadVideo(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal UserDetails userDetails) throws IOException {
+        if(userDetails==null)throw new UnauthorizedException();
+
         // Extract username from the authenticated user details
         String username = userDetails.getUsername();
 
@@ -50,7 +54,7 @@ public class BackgroundImageForHackerController {
         // Check if hackerId is available
         if (hackerId == null) {
             // Handle case where hackerId is not found
-            throw new NotFoundException("Hacker ID not found for the authenticated user.");
+            throw new UserNotFoundException("Hacker ID not found for the authenticated user!");
         }
 
         // Call the service method to save the video
