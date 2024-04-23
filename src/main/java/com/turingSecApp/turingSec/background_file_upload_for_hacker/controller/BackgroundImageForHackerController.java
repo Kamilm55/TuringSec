@@ -1,14 +1,12 @@
 package com.turingSecApp.turingSec.background_file_upload_for_hacker.controller;
 
-import com.turingSecApp.turingSec.background_file_upload_for_hacker.entity.BackgroundImageForHacker;
 import com.turingSecApp.turingSec.background_file_upload_for_hacker.response.FileResponse;
 import com.turingSecApp.turingSec.background_file_upload_for_hacker.service.FileService;
 import com.turingSecApp.turingSec.dao.entities.HackerEntity;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.UserRepository;
-import com.turingSecApp.turingSec.exception.UnauthorizedException;
-import com.turingSecApp.turingSec.exception.UserNotFoundException;
-import com.turingSecApp.turingSec.file_upload_for_hacker.response.ImageForHackerResponse;
+import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
+import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +15,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.ws.rs.NotFoundException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 

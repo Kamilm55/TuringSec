@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.Response;
+package com.turingSecApp.turingSec.response;
 
 import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
 

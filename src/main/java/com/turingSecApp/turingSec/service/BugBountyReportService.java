@@ -91,7 +91,8 @@ public class BugBountyReportService {
 
             // Group reports by user
             Map<UserDTO, List<ReportsEntity>> reportsByUser = userReports.stream()
-                    .collect(Collectors.groupingBy(report -> new UserDTO(report.getUser().getId(), report.getUser().getUsername(), report.getUser().getEmail())));
+                    .collect(Collectors.groupingBy(report -> new UserDTO(report.getUser().getId(), report.getUser().getUsername(), report.getUser().getEmail(),null,null
+                    )));
 
             // Create ReportsByUserDTO objects for each user and add them to the list
             List<ReportsByUserWithCompDTO> reportsByUsers = reportsByUser.entrySet().stream()
@@ -132,7 +133,7 @@ public class BugBountyReportService {
 
         // Group reports by user
         Map<UserDTO, List<ReportsEntity>> reportsByUser = reports.stream()
-                .collect(Collectors.groupingBy(report -> new UserDTO(report.getUser().getId(), report.getUser().getUsername(), report.getUser().getEmail())));
+                .collect(Collectors.groupingBy(report -> new UserDTO(report.getUser().getId(), report.getUser().getUsername(), report.getUser().getEmail(),null,null)));
 
         // Fetch image URL for each user
         Map<Long, String> userImgUrls = reportsByUser.keySet().stream()

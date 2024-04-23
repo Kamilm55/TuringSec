@@ -1,19 +1,17 @@
 package com.turingSecApp.turingSec.service;
 
-import com.turingSecApp.turingSec.Response.HackerResponse;
+import com.turingSecApp.turingSec.response.HackerResponse;
 import com.turingSecApp.turingSec.background_file_upload_for_hacker.entity.BackgroundImageForHacker;
 import com.turingSecApp.turingSec.background_file_upload_for_hacker.repository.FileRepository;
 import com.turingSecApp.turingSec.dao.entities.HackerEntity;
 import com.turingSecApp.turingSec.dao.repository.HackerRepository;
-import com.turingSecApp.turingSec.exception.UserNotFoundException;
+import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.file_upload_for_hacker.entity.ImageForHacker;
 import com.turingSecApp.turingSec.file_upload_for_hacker.exception.FileNotFoundException;
 import com.turingSecApp.turingSec.file_upload_for_hacker.repository.ImageForHackerRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class HackerService {

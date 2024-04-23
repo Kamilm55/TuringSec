@@ -3,7 +3,7 @@ package com.turingSecApp.turingSec.file_upload_for_hacker.controller;
 import com.turingSecApp.turingSec.dao.entities.HackerEntity;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.UserRepository;
-import com.turingSecApp.turingSec.exception.UnauthorizedException;
+import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
 import com.turingSecApp.turingSec.file_upload_for_hacker.response.ImageForHackerResponse;
 import com.turingSecApp.turingSec.file_upload_for_hacker.service.ImageForHackerService;
 import lombok.RequiredArgsConstructor;

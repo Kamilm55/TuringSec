@@ -1,10 +1,8 @@
-package com.turingSecApp.turingSec.Response;
+package com.turingSecApp.turingSec.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
 import com.turingSecApp.turingSec.dao.entities.role.Role;
 import com.turingSecApp.turingSec.dao.entities.role.UserRoles;
-import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Set;

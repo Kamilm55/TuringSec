@@ -4,9 +4,8 @@ import com.turingSecApp.turingSec.dao.entities.AssetTypeEntity;
 import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
 import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
 import com.turingSecApp.turingSec.dao.entities.StrictEntity;
-import com.turingSecApp.turingSec.dao.repository.AssetTypeRepository;
 import com.turingSecApp.turingSec.dao.repository.ProgramsRepository;
-import com.turingSecApp.turingSec.exception.ResourceNotFoundException;
+import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

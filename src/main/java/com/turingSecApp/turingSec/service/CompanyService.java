@@ -1,13 +1,13 @@
 package com.turingSecApp.turingSec.service;
 
-import com.turingSecApp.turingSec.Response.RegistrationResponse;
+import com.turingSecApp.turingSec.response.RegistrationResponse;
 import com.turingSecApp.turingSec.dao.entities.AdminEntity;
 import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
 import com.turingSecApp.turingSec.dao.entities.role.Role;
 import com.turingSecApp.turingSec.dao.repository.AdminRepository;
 import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
 import com.turingSecApp.turingSec.dao.repository.RoleRepository;
-import com.turingSecApp.turingSec.exception.EmailAlreadyExistsException;
+import com.turingSecApp.turingSec.exception.custom.EmailAlreadyExistsException;
 import com.turingSecApp.turingSec.background_file_upload_for_hacker.repository.FileRepository;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;

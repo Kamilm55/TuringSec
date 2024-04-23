@@ -1,9 +1,6 @@
-package com.turingSecApp.turingSec.Response;
+package com.turingSecApp.turingSec.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.turingSecApp.turingSec.dao.entities.HackerEntity;
 import com.turingSecApp.turingSec.dao.entities.role.Role;
-import jakarta.persistence.*;
 
 import java.util.Set;
 

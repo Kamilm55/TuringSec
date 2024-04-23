@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.exception;
+package com.turingSecApp.turingSec.exception.custom;
 
 public class EmailAlreadyExistsException extends RuntimeException {
 

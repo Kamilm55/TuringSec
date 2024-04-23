@@ -8,26 +8,22 @@ import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.HackerRepository;
 import com.turingSecApp.turingSec.dao.repository.RoleRepository;
 import com.turingSecApp.turingSec.dao.repository.UserRepository;
-import com.turingSecApp.turingSec.exception.*;
+import com.turingSecApp.turingSec.exception.custom.*;
 import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.payload.RegisterPayload;
-import com.turingSecApp.turingSec.service.BugBountyReportService;
+import com.turingSecApp.turingSec.response.AuthResponse;
+import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.ProgramsService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import com.turingSecApp.turingSec.service.user.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,7 +48,7 @@ public class UserController {
 
     @PostMapping("/register/hacker")
     @Transactional
-     public ResponseEntity<Map<String, String>> registerHacker(@RequestBody RegisterPayload payload) {
+     public BaseResponse<AuthResponse> registerHacker(@RequestBody RegisterPayload payload) {
         // Ensure the user doesn't exist
         if (userRepository.findByUsername(payload.getUsername()) != null) {
             throw new UserAlreadyExistsException("Username is already taken.");
@@ -72,7 +68,7 @@ public class UserController {
                 .password(
                         // Encode the password
                        passwordEncoder.encode(payload.getPassword())
-                ).activated(true)
+                ).activated(false)
                 .build();
 
         // Set user roles
@@ -84,6 +80,7 @@ public class UserController {
         // Save the user
         userRepository.save(user);
 
+
         //Note: To fetch user explicitly to avoid save process instead it updates because there is user entity with actual id not null
         UserEntity fetchedUser = userRepository.findByUsername(user.getUsername());
 
@@ -93,15 +90,8 @@ public class UserController {
         hackerEntity.setFirst_name(fetchedUser.getFirst_name()); // Set the username in the hackerEntity entity
         hackerEntity.setLast_name(fetchedUser.getLast_name()); // Set the age in the hackerEntity entity
         hackerEntity.setCountry(fetchedUser.getCountry()); // Set the age in the hackerEntity entity
-        hackerEntity.setBackground_pic(payload.getBackground_pic());
-        hackerEntity.setBio(payload.getBio());
-        hackerEntity.setWebsite(payload.getWebsite());
-        hackerEntity.setProfile_pic(payload.getBackground_pic());
-        hackerEntity.setLinkedin(payload.getLinkedin());
-        hackerEntity.setTwitter(payload.getTwitter());
-        hackerEntity.setGithub(payload.getGithub());
-        hackerEntity.setCity(payload.getCity());
 
+        // There are fields  related to hacker will added after register...
 
         hackerRepository.save(hackerEntity);
 
@@ -114,19 +104,34 @@ public class UserController {
         userService.sendActivationEmail(fetchedUser);
 
         // Generate token for the registered user
-        UserDetails userDetails = new CustomUserDetails(user);
+        UserDetails userDetails = new CustomUserDetails(fetchedUser);
         String token = jwtTokenProvider.generateToken(userDetails);
 
         // Retrieve the user ID from CustomUserDetails
         Long userId = ((CustomUserDetails) userDetails).getId();
+        UserEntity userById = findUserById(userId);
+
 
         // Create a response map containing the token and user ID
-        Map<String, String> response = new HashMap<>();
-        response.put("access_token", token);
-        response.put("userId", String.valueOf(userId));
+        //refactorThis
+       AuthResponse authResponse = AuthResponse.builder()
+                .accessToken(token)
+                .userInfo(
+                        UserDTO.builder()
+                                .id(userById.getId())
+                                .email(userById.getEmail())
+                                .firstName(userById.getFirst_name())
+                                .lastName(user.getLast_name())
+                                .username(userById.getUsername())
+                                .build()
+                )
+                .build();
 
-        return ResponseEntity.ok(response);
+        return BaseResponse.success(authResponse,"You should receive gmail message for account activation");
     }
+
+
+
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> loginUser(@RequestBody LoginRequest user) {
         // Check if the input is an email
@@ -363,6 +368,9 @@ public class UserController {
     }
 
     ///////// Util methods
+    private UserEntity findUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User not found with this id: " + userId));
+    }
     private BugBountyProgramWithAssetTypeDTO mapToDTO(BugBountyProgramEntity programEntity) {
         BugBountyProgramWithAssetTypeDTO dto = new BugBountyProgramWithAssetTypeDTO();
         dto.setId(programEntity.getId());

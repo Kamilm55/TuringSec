@@ -1,17 +1,37 @@
 package com.turingSecApp.turingSec.exception;
 
+import com.turingSecApp.turingSec.exception.custom.*;
+import com.turingSecApp.turingSec.response.base.BaseException;
+import com.turingSecApp.turingSec.response.base.ExceptionResponseMessages;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.util.Arrays;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
-
+    // User Controller
     @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<String> handleUserAlreadyExistsException(UserAlreadyExistsException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+    public ResponseEntity<ExceptionResponseMessages> handleUserAlreadyExistsException(UserAlreadyExistsException ex) {
+
+        return new ResponseEntity<>(
+                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.CONFLICT) ,
+                HttpStatus.CONFLICT
+        );
+
+    }
+    //org.springframework.mail.MailSendException
+    @ExceptionHandler(org.springframework.mail.MailSendException.class)
+    public ResponseEntity<ExceptionResponseMessages> handleMailSendException(org.springframework.mail.MailSendException ex) {
+
+        return new ResponseEntity<>(
+                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.CONFLICT) ,
+                HttpStatus.CONFLICT
+        );
+
     }
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
@@ -49,7 +69,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(FileNotFoundException.class)
-    public ResponseEntity<String> handleFileNotFoundException(FileNotFoundException em) {
+    public ResponseEntity<String> handleFileNotFndException(FileNotFoundException em) {
         return new ResponseEntity<>(em.getMessage(), HttpStatus.NOT_FOUND);
     }
     // BackgroundImageForHackerController

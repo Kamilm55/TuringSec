@@ -1,23 +1,20 @@
 package com.turingSecApp.turingSec.service.user;
 
 
-import com.turingSecApp.turingSec.dao.entities.AdminEntity;
-import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
 import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
 import com.turingSecApp.turingSec.dao.entities.HackerEntity;
 import com.turingSecApp.turingSec.dao.entities.role.Role;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.*;
-import com.turingSecApp.turingSec.exception.EmailAlreadyExistsException;
-import com.turingSecApp.turingSec.exception.ResourceNotFoundException;
-import com.turingSecApp.turingSec.exception.UserAlreadyExistsException;
+import com.turingSecApp.turingSec.exception.custom.EmailAlreadyExistsException;
+import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
+import com.turingSecApp.turingSec.exception.custom.UserAlreadyExistsException;
 import com.turingSecApp.turingSec.service.EmailNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.NotFoundException;
 import java.util.*;
 
 import static com.turingSecApp.turingSec.util.GlobalConstants.ROOT_LINK;

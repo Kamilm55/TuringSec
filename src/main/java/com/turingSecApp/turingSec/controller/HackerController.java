@@ -1,7 +1,6 @@
 package com.turingSecApp.turingSec.controller;
 
-import com.turingSecApp.turingSec.Response.HackerResponse;
-import com.turingSecApp.turingSec.dao.entities.HackerEntity;
+import com.turingSecApp.turingSec.response.HackerResponse;
 import com.turingSecApp.turingSec.service.HackerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
