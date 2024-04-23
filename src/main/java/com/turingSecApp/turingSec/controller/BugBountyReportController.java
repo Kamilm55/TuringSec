@@ -8,6 +8,7 @@ import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
 import com.turingSecApp.turingSec.dao.entities.ReportsEntity;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.UserRepository;
+import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.service.BugBountyReportService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,7 @@ public class BugBountyReportController {
 
         if (authentication != null && authentication.isAuthenticated()) {
             String username = authentication.getName();
-            UserEntity user = userRepository.findByUsername(username);
+            UserEntity user = userRepository.findByUsername(username).orElseThrow(()-> new UserNotFoundException("User with username " + username + " not found"));
 
             if (user == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");

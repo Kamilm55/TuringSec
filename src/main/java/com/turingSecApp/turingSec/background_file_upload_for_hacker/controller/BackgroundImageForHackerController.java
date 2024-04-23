@@ -37,7 +37,7 @@ public class BackgroundImageForHackerController {
         String username = userDetails.getUsername();
 
         // Retrieve the user entity from the repository based on the username
-        UserEntity userEntity = userRepository.findByUsername(username);
+        UserEntity userEntity = userRepository.findByUsername(username).orElseThrow(()-> new UserNotFoundException("User with username " + username + " not found"));
 
         // Retrieve the hackerId associated with the user
         Long hackerId = null;

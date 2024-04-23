@@ -1,11 +1,9 @@
 package com.turingSecApp.turingSec.exception;
 
 import com.turingSecApp.turingSec.exception.custom.*;
-import com.turingSecApp.turingSec.response.base.BaseException;
 import com.turingSecApp.turingSec.response.base.ExceptionResponseMessages;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -28,67 +26,105 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponseMessages> handleMailSendException(org.springframework.mail.MailSendException ex) {
 
         return new ResponseEntity<>(
-                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.CONFLICT) ,
-                HttpStatus.CONFLICT
+                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.BAD_REQUEST) ,
+                HttpStatus.BAD_REQUEST
         );
 
     }
 
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<ExceptionResponseMessages> handleInvalidTokenException(InvalidTokenException ex) {
+        return new ResponseEntity<>(
+                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.BAD_REQUEST) ,
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
     @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<String> handleEmailAlreadyExistsException(EmailAlreadyExistsException em) {
-        return new ResponseEntity<>(em.getMessage(), HttpStatus.CONFLICT);
+    public ResponseEntity<ExceptionResponseMessages> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex) {
+        return new ResponseEntity<>(
+                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.BAD_REQUEST) ,
+                HttpStatus.BAD_REQUEST
+        );
     }
     //TODO
 
 
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<String> handleBadCredentials(BadCredentialsException em) {
-        return new ResponseEntity<>(em.getMessage(), HttpStatus.CONFLICT);
+    @ExceptionHandler(com.turingSecApp.turingSec.exception.custom.BadCredentialsException.class)
+    public ResponseEntity<ExceptionResponseMessages> handleBadCredentials(com.turingSecApp.turingSec.exception.custom.BadCredentialsException ex) {
+        return new ResponseEntity<>(
+                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.CONFLICT) ,
+                HttpStatus.CONFLICT
+        );
     }
 
 
     @ExceptionHandler(UserNotActivatedException.class)
-    public ResponseEntity<String> handleUserNotActivatedException(UserNotActivatedException em) {
-        return new ResponseEntity<>(em.getMessage(), HttpStatus.CONFLICT);
+    public ResponseEntity<ExceptionResponseMessages> handleUserNotActivatedException(UserNotActivatedException ex) {
+        return new ResponseEntity<>(
+                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.CONFLICT) ,
+                HttpStatus.CONFLICT
+        );
     }
 
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException em) {
-        return new ResponseEntity<>(em.getMessage(), HttpStatus.NOT_FOUND);
+    public ResponseEntity<ExceptionResponseMessages> handleUserNotFoundException(UserNotFoundException ex) {
+        return new ResponseEntity<>(
+                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.NOT_FOUND) ,
+                HttpStatus.NOT_FOUND
+        );
     }
 
     @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<String> handleUnauthorizedException(UnauthorizedException em) {
-        return new ResponseEntity<>(em.getMessage(), HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<ExceptionResponseMessages> handleUnauthorizedException(UnauthorizedException ex) {
+        return new ResponseEntity<>(
+                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.UNAUTHORIZED) ,
+                HttpStatus.UNAUTHORIZED
+        );
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException em) {
-        return new ResponseEntity<>(em.getMessage(), HttpStatus.CONFLICT);
+    public ResponseEntity<ExceptionResponseMessages> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        return new ResponseEntity<>(
+                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.CONFLICT) ,
+                HttpStatus.CONFLICT
+        );
     }
 
     @ExceptionHandler(FileNotFoundException.class)
-    public ResponseEntity<String> handleFileNotFndException(FileNotFoundException em) {
-        return new ResponseEntity<>(em.getMessage(), HttpStatus.NOT_FOUND);
+    public ResponseEntity<ExceptionResponseMessages> handleFileNotFndException(FileNotFoundException ex) {
+        return new ResponseEntity<>(
+                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.NOT_FOUND) ,
+                HttpStatus.NOT_FOUND
+        );
     }
     // BackgroundImageForHackerController
     @ExceptionHandler(com.turingSecApp.turingSec.background_file_upload_for_hacker.exception.FileNotFoundException.class)
-    public ResponseEntity<String> handleFileNotFoundException(com.turingSecApp.turingSec.background_file_upload_for_hacker.exception.FileNotFoundException em) {
-        return new ResponseEntity<>(em.getMessage(), HttpStatus.NOT_FOUND);
+    public ResponseEntity<ExceptionResponseMessages> handleFileNotFoundException(com.turingSecApp.turingSec.background_file_upload_for_hacker.exception.FileNotFoundException ex) {
+         return new ResponseEntity<>(
+                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.NOT_FOUND) ,
+                HttpStatus.NOT_FOUND
+        );
     }
 
-    // ImageForHackerController for Image download
+    // ImageForHackerController for Image and video download
     @ExceptionHandler(com.turingSecApp.turingSec.file_upload_for_hacker.exception.FileNotFoundException.class)
-    public ResponseEntity<String> handleFileNotFoundExceptionForImage(com.turingSecApp.turingSec.file_upload_for_hacker.exception.FileNotFoundException em) {
-        return new ResponseEntity<>(em.getMessage(), HttpStatus.NOT_FOUND);
+    public ResponseEntity<ExceptionResponseMessages> handleFileNotFoundExceptionForImage(com.turingSecApp.turingSec.file_upload_for_hacker.exception.FileNotFoundException ex) {
+        return new ResponseEntity<>(
+                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.NOT_FOUND) ,
+                HttpStatus.NOT_FOUND
+        );
     }
 
     // For unhandled exceptions:
     @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<?> generalExceptionHandler(Exception exception){
+    public ResponseEntity<ExceptionResponseMessages> generalExceptionHandler(Exception ex){
         System.out.println("For unhandled exceptions");
-        System.out.println(exception.getClass());
-        return new ResponseEntity<>(exception.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        System.out.println(ex.getClass());
+        return new ResponseEntity<>(
+                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR) ,
+                HttpStatus.INTERNAL_SERVER_ERROR
+        );
     }
 }

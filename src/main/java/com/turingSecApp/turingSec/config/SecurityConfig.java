@@ -49,8 +49,8 @@ public class SecurityConfig {
 
                  // User Controller
                     request
-                            .requestMatchers("/api/auth/register/hacker").permitAll()
-                            .requestMatchers("/api/auth/login").permitAll() // Public endpoints for registration and login
+                            .requestMatchers("/api/auth/register/hacker").anonymous()
+                            .requestMatchers("/api/auth/login").anonymous() // Public endpoints for registration and login
                             .requestMatchers("/api/auth/change-password").authenticated()
                             .requestMatchers("/api/auth/change-email").authenticated()
                             .requestMatchers("/api/auth/update-profile").authenticated() //todo: it must be admin or currentUser
@@ -59,8 +59,8 @@ public class SecurityConfig {
                             .requestMatchers("/api/auth/allUsers").permitAll() // Public endpoints for registration and login
                             .requestMatchers("/api/auth/activate").permitAll() // Public endpoints for registration and login
                             .requestMatchers("/api/auth/delete-user").authenticated()
-                            .requestMatchers("/api/auth/programs").authenticated()
-                            .requestMatchers("/api/auth/programsById/{id}").authenticated()
+                            .requestMatchers("/api/auth/programs").permitAll()
+                            .requestMatchers("/api/auth/programsById/{id}").permitAll()
                             .requestMatchers("/api/auth/users/**").permitAll()
 
 

@@ -10,6 +10,7 @@ import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
 import com.turingSecApp.turingSec.dao.repository.ReportsRepository;
 import com.turingSecApp.turingSec.dao.repository.UserRepository;
+import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -82,7 +83,7 @@ public class BugBountyReportService {
         String username = getUsernameFromToken();
 
         // Find the user by username
-        UserEntity user = userRepository.findByUsername(username);
+        UserEntity user = userRepository.findByUsername(username).orElseThrow(()-> new UserNotFoundException("User with username " + username + " not found"));
 
         // If user found, get all reports associated with that user
         if (user != null) {

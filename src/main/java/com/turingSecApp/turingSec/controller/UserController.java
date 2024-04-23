@@ -12,14 +12,16 @@ import com.turingSecApp.turingSec.exception.custom.*;
 import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.payload.RegisterPayload;
 import com.turingSecApp.turingSec.response.AuthResponse;
+import com.turingSecApp.turingSec.response.UserHackerDTO;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.ProgramsService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import com.turingSecApp.turingSec.service.user.UserService;
+import com.turingSecApp.turingSec.util.UserMapper;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -45,6 +47,7 @@ public class UserController {
     private final ProgramsService programsService;
     private final HackerRepository hackerRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
 
     @PostMapping("/register/hacker")
     @Transactional
@@ -82,7 +85,7 @@ public class UserController {
 
 
         //Note: To fetch user explicitly to avoid save process instead it updates because there is user entity with actual id not null
-        UserEntity fetchedUser = userRepository.findByUsername(user.getUsername());
+        UserEntity fetchedUser = userRepository.findByUsername(payload.getUsername()).orElseThrow(()-> new UserNotFoundException("User with username " + payload.getUsername() + " not found"));
 
         // Create and associate , populate hackerEntity entity
         HackerEntity hackerEntity = new HackerEntity();
@@ -121,7 +124,7 @@ public class UserController {
                                 .id(userById.getId())
                                 .email(userById.getEmail())
                                 .firstName(userById.getFirst_name())
-                                .lastName(user.getLast_name())
+                                .lastName(userById.getLast_name())
                                 .username(userById.getUsername())
                                 .build()
                 )
@@ -130,17 +133,25 @@ public class UserController {
         return BaseResponse.success(authResponse,"You should receive gmail message for account activation");
     }
 
+    @GetMapping("/activate")
+    public BaseResponse<?> activateAccount(@RequestParam("token") String token) {
+        boolean activationResult = userService.activateAccount(token);
 
+        if (!activationResult) {
+           throw new  InvalidTokenException();
+        }
+            return BaseResponse.success(null,"Account activated successfully!");
+    }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> loginUser(@RequestBody LoginRequest user) {
+    public BaseResponse<AuthResponse> loginUser(@RequestBody LoginRequest user) {
         // Check if the input is an email
         UserEntity userEntity = userRepository.findByEmail(user.getUsernameOrEmail());
 
         // If the input is not an email, check if it's a username
-        if (userEntity == null) {
-            userEntity = userRepository.findByUsername(user.getUsernameOrEmail());
-        }
+        if(userEntity==null)
+            userEntity = userRepository.findByUsername(user.getUsernameOrEmail()).orElseThrow(()-> new UserNotFoundException("User with username " + user.getUsernameOrEmail() +" not found"));
+
 
         // Authenticate user if found
         if (userEntity != null && passwordEncoder.matches(user.getPassword(), userEntity.getPassword())) {
@@ -155,13 +166,23 @@ public class UserController {
 
             // Retrieve the user ID from CustomUserDetails
             Long userId = ((CustomUserDetails) userDetails).getId();
+            UserEntity userById = findUserById(userId);
 
-            // Create a response map containing the token and user ID
-            Map<String, String> response = new HashMap<>();
-            response.put("access_token", token);
-            response.put("userId", String.valueOf(userId));
 
-            return ResponseEntity.ok(response);
+            AuthResponse authResponse = AuthResponse.builder()
+                    .accessToken(token)
+                    .userInfo(
+                            UserDTO.builder()
+                                    .id(userById.getId())
+                                    .email(userById.getEmail())
+                                    .firstName(userById.getFirst_name())
+                                    .lastName(userById.getLast_name())
+                                    .username(userById.getUsername())
+                                    .build()
+                    )
+                    .build();
+
+            return BaseResponse.success(authResponse);
         } else {
             // Authentication failed
             throw new BadCredentialsException("Invalid username/email or password.");
@@ -169,45 +190,46 @@ public class UserController {
     }
 
     @PostMapping("/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+    public BaseResponse<?> changePassword(@RequestBody ChangePasswordRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.isAuthenticated()) {
             String username = authentication.getName();
-            UserEntity user = userRepository.findByUsername(username);
+            UserEntity user = userRepository.findByUsername(username).orElseThrow(()-> new UserNotFoundException("User with username " + username + " not found"));
 
             // Validate current password
             if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect current password");
+                throw new BadCredentialsException("Incorrect current password");//todo: it must be in security layer
+                //return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect current password");
             }
 
             // Validate new password and confirm new password
             if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("New password and confirm new password do not match");
+                throw new BadCredentialsException("New password and confirm new password do not match");
             }
 
             // Update password
             user.setPassword(passwordEncoder.encode(request.getNewPassword()));
             userRepository.save(user);
 
-            return ResponseEntity.ok("Password updated successfully");
+            return BaseResponse.success(null,"Password updated successfully");
         } else {
             // Handle case where user is not authenticated
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated"); //todo:It must be throw 401 instead of 403
+            throw new UnauthorizedException(); //todo:It must be throw 401 instead of 403
         }
     }
 
     @PostMapping("/change-email")
-    public ResponseEntity<?> changeEmail(@RequestBody ChangeEmailRequest request) {
+    public BaseResponse<?>  changeEmail(@RequestBody ChangeEmailRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.isAuthenticated()) {
             String username = authentication.getName();
-            UserEntity user = userRepository.findByUsername(username);
+            UserEntity user = userRepository.findByUsername(username).orElseThrow(()-> new UserNotFoundException("User with username " + username + " not found"));
 
             // Validate password
             if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Incorrect password");
+                throw new BadCredentialsException("Incorrect current password");//todo: it must be in security layer
             }
 
             if (userRepository.findByEmail(request.getNewEmail()) != null) {
@@ -218,16 +240,16 @@ public class UserController {
             user.setEmail(request.getNewEmail());
             userRepository.save(user);
 
-            return ResponseEntity.ok("Email updated successfully");
+            return BaseResponse.success(null,"Email updated successfully");
         } else {
             // Handle case where user is not authenticated
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+            throw new UnauthorizedException(); //todo:It must be throw 401 instead of 403
         }
     }
 
 
     @PostMapping("/update-profile")
-    public ResponseEntity<?> updateProfile(@RequestBody UserUpdateRequest profileUpdateRequest) {
+    public BaseResponse<UserHackerDTO> updateProfile(@RequestBody UserUpdateRequest profileUpdateRequest) {
         // Get the authenticated user details from the security context
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -235,11 +257,7 @@ public class UserController {
         String username = userDetails.getUsername();
 
         // Retrieve the user entity from the repository based on the username
-        UserEntity userEntity = userRepository.findByUsername(username);
-        if (userEntity == null) {
-            // Handle case where user is not found
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
-        }
+        UserEntity userEntity = userRepository.findByUsername(username).orElseThrow(()-> new UserNotFoundException("User with username " + username + " not found"));
 
         // Update the user's first name and last name with the new values
         userEntity.setUsername(profileUpdateRequest.getUsername());
@@ -275,18 +293,23 @@ public class UserController {
         userEntity.setHacker(hackerEntity);
         userRepository.save(userEntity);
 
-        return ResponseEntity.ok("Profile updated successfully.");
+
+        UserHackerDTO userHackerDTO = UserMapper.INSTANCE.toDto(userEntity, hackerEntity);
+
+        return BaseResponse.success(
+                userHackerDTO,
+                "Profile updated successfully.");
     }
 
 
     @GetMapping("/users/{userId}")
-    public ResponseEntity<UserEntity> getUserById(@PathVariable Long userId) {
+    public BaseResponse<UserDTO> getUserById(@PathVariable Long userId) {
         // Retrieve user information by ID
         Optional<UserEntity> userOptional = userRepository.findById(userId);
 
         if (userOptional.isPresent()) {
             UserEntity user = userOptional.get();
-            return ResponseEntity.ok(user);
+            return BaseResponse.success(UserMapper.INSTANCE.convert(user));
         } else {
             throw new UserNotFoundException("User is not found with id:" + userId);
         }
@@ -298,13 +321,14 @@ public class UserController {
     }
 
     @GetMapping("/current-user")
-    public UserEntity getCurrentUser() {
+    public BaseResponse<UserDTO> getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.isAuthenticated()) {
             String username = authentication.getName();
             // Retrieve user details from the database
-            return userRepository.findByUsername(username);
+            return BaseResponse.success(UserMapper.INSTANCE.convert(userRepository.findByUsername(username).orElseThrow(()-> new UserNotFoundException("User with username " + username + " not found"))));
+
         } else {
             // Handle case where user is not authenticated
             // You might return an error response or throw an exception
@@ -313,41 +337,30 @@ public class UserController {
     }
 
     @GetMapping("/allUsers")
-    public ResponseEntity<List<UserEntity>> getAllUsers() {
+    public BaseResponse<List<UserDTO>> getAllUsers() {
         List<UserEntity> userEntities = userService.getAllUsers();
-        return new ResponseEntity<>(userEntities, HttpStatus.OK);
+
+        return BaseResponse.success(userEntities.stream().map(UserMapper.INSTANCE::convert).collect(Collectors.toList()));
     }
 
-    @GetMapping("/activate")
-    public ResponseEntity<String> activateAccount(@RequestParam("token") String token) {
-        boolean activationResult = userService.activateAccount(token);
 
-        if (activationResult) {
-            return new ResponseEntity<>("Account activated successfully!", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Invalid activation token.", HttpStatus.BAD_REQUEST);
-        }
-    }
     @DeleteMapping("/delete-user")
-    public ResponseEntity<String> deleteUser() {
+    public BaseResponse<?> deleteUser() {
         // Get the authenticated user's username from the security context
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
 
         // Find the user by username
-        UserEntity user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new UserNotFoundException("User with username " + username + " not found");
-        }
+        UserEntity user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
 
         // Delete the user
         userRepository.delete(user);
 
-        return ResponseEntity.ok("User deleted successfully");
+        return BaseResponse.success(null,"User deleted successfully");
     }
 
     @GetMapping("/programs")
-    public ResponseEntity<List<BugBountyProgramWithAssetTypeDTO>> getAllBugBountyPrograms() {
+    public BaseResponse<List<BugBountyProgramWithAssetTypeDTO>> getAllBugBountyPrograms() {
         List<BugBountyProgramEntity> programs = programsService.getAllBugBountyPrograms();
 
         // Map BugBountyProgramEntities to BugBountyProgramDTOs
@@ -359,12 +372,12 @@ public class UserController {
                 })
                 .collect(Collectors.toList());
 
-        return ResponseEntity.ok(programDTOs);
+        return BaseResponse.success(programDTOs);
     }
     @GetMapping("programsById/{id}")
-    public ResponseEntity<BugBountyProgramEntity> getBugBountyProgramById(@PathVariable Long id) {
+    public BaseResponse<BugBountyProgramEntity> getBugBountyProgramById(@PathVariable Long id) {
         BugBountyProgramEntity program = programsService.getBugBountyProgramById(id);
-        return ResponseEntity.ok(program);
+        return BaseResponse.success(program);
     }
 
     ///////// Util methods

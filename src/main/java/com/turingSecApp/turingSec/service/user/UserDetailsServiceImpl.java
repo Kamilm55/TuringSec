@@ -6,6 +6,7 @@ import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.AdminRepository;
 import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
 import com.turingSecApp.turingSec.dao.repository.UserRepository;
+import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,13 +28,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity user = userRepository.findByUsername(username);
-        if (user != null) {
+        UserEntity user = userRepository.findByUsername(username).orElseThrow(()-> new UserNotFoundException("User with username " + username + " not found"));
+
             return new CustomUserDetails(user);
-        }
-        else {
-            throw new UsernameNotFoundException("User is not found with this username:"+username );
-        }
+
 
 //        AdminEntity admin = adminRepository.findByUsername(username);
 //        if (admin != null) {

@@ -4,6 +4,7 @@ import com.turingSecApp.turingSec.dao.entities.HackerEntity;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.UserRepository;
 import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
+import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.file_upload_for_hacker.response.ImageForHackerResponse;
 import com.turingSecApp.turingSec.file_upload_for_hacker.service.ImageForHackerService;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +40,7 @@ public class ImageForHackerController {
         String username = userDetails.getUsername();
 
         // Retrieve the user entity from the repository based on the username
-        UserEntity userEntity = userRepository.findByUsername(username);
+        UserEntity userEntity = userRepository.findByUsername(username).orElseThrow(()-> new UserNotFoundException("User with username " + username + " not found"));
 
         // Retrieve the hackerId associated with the user
         Long hackerId = null;
