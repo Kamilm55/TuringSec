@@ -5,6 +5,7 @@ target/
 !**/src/test/**/target/
 
 C:\Users\User\IdeaProjects\Spring_Boot_Projects\TuringSec\src\main\resources\local.properties
+/local.properties
 
 ### STS ###
 .apt_generated
