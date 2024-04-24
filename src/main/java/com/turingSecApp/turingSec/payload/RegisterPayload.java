@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class RegisterPayload {
-   private String firstName;
+    private String firstName;
     private String lastName;
     private String username;
     private String password;

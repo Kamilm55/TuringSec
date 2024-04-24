@@ -6,10 +6,17 @@ import com.turingSecApp.turingSec.dao.entities.AdminEntity;
 import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
+import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
 import com.turingSecApp.turingSec.filter.JwtUtil;
+import com.turingSecApp.turingSec.payload.RegisterCompanyPayload;
+import com.turingSecApp.turingSec.response.AuthResponse;
+import com.turingSecApp.turingSec.response.CompanyDTO;
+import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.CompanyService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import com.turingSecApp.turingSec.service.user.UserService;
+import com.turingSecApp.turingSec.util.CompanyMapper;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,29 +35,20 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/companies")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
+@RequiredArgsConstructor
 public class CompanyController {
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private CompanyService companyService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private CompanyRepository companyRepository;
-
-
-    @Autowired
-    private JwtUtil jwtTokenProvider;
+    private final UserService userService;
+    private final CompanyService companyService;
+    private final PasswordEncoder passwordEncoder;
+    private final CompanyRepository companyRepository;
+    private final JwtUtil jwtTokenProvider;
 
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerCompany(@RequestBody CompanyEntity companyEntity) {
-        ResponseEntity<?> registerCompany = companyService.registerCompany(companyEntity);
-        return new ResponseEntity<>(registerCompany, HttpStatus.CREATED);
+    public BaseResponse<?> registerCompany(@RequestBody RegisterCompanyPayload registerCompanyPayload) {
+       companyService.registerCompany(registerCompanyPayload);
+
+        return BaseResponse.success(null,"Your request sent to admins. When any admin approve your request, you receive password for company from gmail!");
     }
 
 
@@ -83,29 +81,29 @@ public class CompanyController {
 
 
     @GetMapping
-    public ResponseEntity<List<CompanyEntity>> getAllCompanies() {
+    public BaseResponse<List<CompanyEntity>> getAllCompanies() {
         List<CompanyEntity> companyEntities = userService.getAllCompanies();
-        return new ResponseEntity<>(companyEntities, HttpStatus.OK);
+        return BaseResponse.success(companyEntities);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CompanyEntity> getCompaniesById(@PathVariable Long id) {
+    public BaseResponse<CompanyEntity> getCompaniesById(@PathVariable Long id) {
         CompanyEntity companyEntity = userService.getCompaniesById(id);
-        return new ResponseEntity<>(companyEntity, HttpStatus.OK);
+        return BaseResponse.success(companyEntity);
     }
 
 
     @GetMapping("/current-user")
-    public CompanyEntity getCurrentUser() {
+    public BaseResponse<CompanyDTO> getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.isAuthenticated()) {
             String email = authentication.getName();
             // Retrieve user details from the database
-            return companyRepository.findByEmail(email);
+            CompanyDTO companyDTO = CompanyMapper.INSTANCE.convert(companyRepository.findByEmail(email));
+            return BaseResponse.success(companyDTO);
         } else {
-
-            return null;
+            throw new UnauthorizedException();
         }
     }
 

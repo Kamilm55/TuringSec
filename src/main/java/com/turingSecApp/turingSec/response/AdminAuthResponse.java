@@ -9,8 +9,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AuthResponse {
+public class AdminAuthResponse {
     String accessToken;
-    UserHackerDTO userInfo;
-    /*UserDTO*/
+    AdminDTO userInfo;
 }

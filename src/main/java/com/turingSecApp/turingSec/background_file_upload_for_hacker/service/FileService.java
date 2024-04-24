@@ -43,7 +43,7 @@ public class FileService {
 
             file.setHackerId(hackerId); // set hacker id
 
-            BackgroundImageForHacker saved = fileRepository.save(file);//save
+            BackgroundImageForHacker saved = fileRepository.save(file);// update
 
             FileResponse response = modelMapper.map(saved, FileResponse.class);
             return response;

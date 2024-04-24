@@ -1,6 +1,8 @@
 package com.turingSecApp.turingSec.controller;
 
+import com.turingSecApp.turingSec.response.HackerDTO;
 import com.turingSecApp.turingSec.response.HackerResponse;
+import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.HackerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +20,7 @@ public class HackerController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<HackerResponse> getById(@PathVariable Long id) throws FileNotFoundException {
-        return hackerService.findById(id);
+    public BaseResponse<HackerDTO> getById(@PathVariable Long id) throws FileNotFoundException {
+        return BaseResponse.success(hackerService.findById(id));
     }
 }

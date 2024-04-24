@@ -1,5 +1,8 @@
 package com.turingSecApp.turingSec.service;
 
+import com.turingSecApp.turingSec.exception.custom.CompanyNotFoundException;
+import com.turingSecApp.turingSec.payload.RegisterCompanyPayload;
+import com.turingSecApp.turingSec.response.AuthResponse;
 import com.turingSecApp.turingSec.response.RegistrationResponse;
 import com.turingSecApp.turingSec.dao.entities.AdminEntity;
 import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
@@ -9,6 +12,7 @@ import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
 import com.turingSecApp.turingSec.dao.repository.RoleRepository;
 import com.turingSecApp.turingSec.exception.custom.EmailAlreadyExistsException;
 import com.turingSecApp.turingSec.background_file_upload_for_hacker.repository.FileRepository;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,24 +24,15 @@ import javax.ws.rs.NotFoundException;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class CompanyService {
-    @Autowired
-    private CompanyRepository companyRepository;
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private AdminRepository adminRepository;
-
-    @Autowired
-    private EmailNotificationService emailNotificationService;
-    @Autowired
-    private FileRepository fileRepository;
-
-    @Autowired
-
-    private ModelMapper modelMapper;
+    private final CompanyRepository companyRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AdminRepository adminRepository;
+    private final EmailNotificationService emailNotificationService;
+    private final FileRepository fileRepository;
+    //private ModelMapper modelMapper;
 
     public String approveCompanyRegistration(Long companyId) {
         Optional<CompanyEntity> companyOptional = companyRepository.findById(companyId);
@@ -54,23 +49,25 @@ public class CompanyService {
             // Retrieve the "COMPANY" role
             Role companyRole = roleRepository.findByName("COMPANY");
             if (companyRole == null) {
-                throw new NotFoundException("Company role not found.");
+                throw new CompanyNotFoundException("Company role not found.");
             }
 
             // Save the company
             companyRepository.save(company);
 
+            //todo: send password to company gmail with smtp
+
             // Return the generated password
             return generatedPassword;
         } else {
-            throw new NotFoundException("Company with the given ID not found.");
+            throw new CompanyNotFoundException("Company with the given ID not found.");
         }
     }
 
 
-    public ResponseEntity<?> registerCompany(CompanyEntity company) {
+    public void registerCompany(RegisterCompanyPayload companyPayload) {
         // Ensure the company doesn't already exist
-        if (companyRepository.findByEmail(company.getEmail()) != null) {
+        if (companyRepository.findByEmail(companyPayload.getEmail()) != null) {
             throw new EmailAlreadyExistsException("Email is already taken.");
         }
 
@@ -79,15 +76,24 @@ public class CompanyService {
         if (companyRole == null) {
             throw new NotFoundException("Company role not found.");
         }
-        company.setRoles(Collections.singleton(companyRole));
-        company.setApproved(false);
 
-        // Save the company
-        companyRepository.save(company);
+        CompanyEntity company = CompanyEntity.builder()
+                .job_title(companyPayload.getJobTitle())
+                .company_name(companyPayload.getCompanyName())
+                .email(companyPayload.getEmail())
+                .message(companyPayload.getMessage())
+                .first_name(companyPayload.getFirstName())
+                .last_name(companyPayload.getLastName())
+                .approved(false)
+                .build();
+        //todo:add default asset => mock data , change in db to Set<Asset>
+
+        company.setRoles(Collections.singleton(companyRole));
+
         notifyAdminsForApproval(company);
 
-        // Return the company entity without the generated password
-        return ResponseEntity.ok(new RegistrationResponse(company));
+        // Save the company
+        CompanyEntity saved = companyRepository.save(company);
     }
 
 
@@ -100,8 +106,10 @@ public class CompanyService {
         String subject = "New Company Registration for Approval";
         String content = "A new company has registered and requires approval.\n\n"
                 + "Company Name: " + company.getCompany_name() + "\n"
-                + "Contact Person: " + company.getFirst_name() + "\n"
+                + "Contact Person: " + company.getEmail() + "\n"
+                + "Name , Surname: " + company.getFirst_name() + ", " + company.getLast_name() + "\n"
                 + "Job Title: " + company.getJob_title() + "\n\n"
+                + "Message: " + company.getMessage() + "\n\n"
                 + "Please login to the admin panel to review and approve.";
 
         // Send email notification to each admin

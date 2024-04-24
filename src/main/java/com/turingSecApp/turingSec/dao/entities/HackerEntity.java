@@ -7,6 +7,8 @@ import lombok.*;
 
 
 @Entity
+@EqualsAndHashCode(exclude = "user") // this is important for operations in db
+@ToString(exclude = "user")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

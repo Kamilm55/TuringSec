@@ -11,6 +11,8 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(exclude = "hacker") // this is important for operations in db
+@ToString(exclude = "hacker")
 @Data
 @Entity
 @Table(name = "users")

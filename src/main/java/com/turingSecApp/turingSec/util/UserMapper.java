@@ -1,8 +1,10 @@
 package com.turingSecApp.turingSec.util;
 
 import com.turingSecApp.turingSec.Request.UserDTO;
+import com.turingSecApp.turingSec.dao.entities.AdminEntity;
 import com.turingSecApp.turingSec.dao.entities.HackerEntity;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
+import com.turingSecApp.turingSec.response.AdminDTO;
 import com.turingSecApp.turingSec.response.UserHackerDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -36,5 +38,6 @@ public interface UserMapper {
             // Add more mappings as needed
     })
     UserDTO convert(UserEntity userEntity);
+    AdminDTO convert(AdminEntity adminEntity);
 }
 

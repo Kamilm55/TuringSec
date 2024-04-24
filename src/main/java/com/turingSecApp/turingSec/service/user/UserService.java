@@ -156,7 +156,7 @@ public class UserService {
 
     public CompanyEntity getCompaniesById(Long id) {
         Optional<CompanyEntity> companyEntity = companyRepository.findById(id);
-        return companyEntity.orElseThrow(() -> new ResourceNotFoundException("Bug Bounty Program not found"));
+        return companyEntity.orElseThrow(() -> new ResourceNotFoundException("Company not found with id:" + id));
     }
 }
 

@@ -12,6 +12,9 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@EqualsAndHashCode(exclude = {"roles", "bugBountyPrograms", "userRoles"})
+@ToString(exclude = {"roles", "bugBountyPrograms", "userRoles"})
+@Builder
 @Table(name = "companies")
 public class CompanyEntity {
     @Id

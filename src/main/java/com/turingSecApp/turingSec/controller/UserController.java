@@ -53,7 +53,6 @@ public class UserController {
     @Transactional
      public BaseResponse<AuthResponse> registerHacker(@RequestBody RegisterPayload payload) {
         // Ensure the user doesn't exist
-//        System.out.println(userRepository.findByUsername(payload.getUsername()));
         if (userRepository.findByUsername(payload.getUsername()).isPresent()) {
             throw new UserAlreadyExistsException("Username is already taken.");
         }

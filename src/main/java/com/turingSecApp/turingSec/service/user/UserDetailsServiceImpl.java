@@ -33,15 +33,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             return new CustomUserDetails(user);
 
 
-//        AdminEntity admin = adminRepository.findByUsername(username);
-//        if (admin != null) {
-//            return new CustomUserDetails(admin);
-//        }
-//
-//        CompanyEntity companyEntity = companyRepository.findByEmail(username);
-//        if (companyEntity != null) {
-//            return new CustomUserDetails(companyEntity);
-//        }
+        AdminEntity admin = adminRepository.findByUsername(username);
+        if (admin != null) {
+            return new CustomUserDetails(admin);
+        }
+
+        CompanyEntity companyEntity = companyRepository.findByEmail(username);
+        if (companyEntity != null) {
+            return new CustomUserDetails(companyEntity);
+        }
 
 
     }
