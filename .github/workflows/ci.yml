@@ -24,6 +24,10 @@ jobs:
           chmod +x mvnw
           ./mvnw clean install
 
+      - name: Print Build Artifact Contents
+        run: |
+           ls -R ./main/target
+
       - name: Get Commit ID
         id: commit_id
         run: echo "::set-output name=commit_id::$(git rev-parse --short HEAD)"
