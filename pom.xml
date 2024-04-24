@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.turingSecApp</groupId>
     <artifactId>TuringSec</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1T</version>
     <name>TuringSec</name>
     <description>TuringSec WEb app</description>
     <properties>
