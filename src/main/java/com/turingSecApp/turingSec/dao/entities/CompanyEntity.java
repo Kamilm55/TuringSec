@@ -25,7 +25,7 @@ public class CompanyEntity {
     private String email;
     private String company_name;
     private String job_title;
-    private String assets;
+    private String assets;//
     private String message;
     private String password;
 
