@@ -11,6 +11,7 @@ import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.payload.RegisterCompanyPayload;
 import com.turingSecApp.turingSec.response.AuthResponse;
 import com.turingSecApp.turingSec.response.CompanyDTO;
+import com.turingSecApp.turingSec.response.CompanyResponse;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.CompanyService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/companies")
@@ -43,7 +45,6 @@ public class CompanyController {
     private final CompanyRepository companyRepository;
     private final JwtUtil jwtTokenProvider;
 
-
     @PostMapping("/register")
     public BaseResponse<?> registerCompany(@RequestBody RegisterCompanyPayload registerCompanyPayload) {
        companyService.registerCompany(registerCompanyPayload);
@@ -53,12 +54,10 @@ public class CompanyController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> loginCompany(@RequestBody CompanyRequest companyRequest) {
+    public BaseResponse<Map<String, String>> loginCompany(@RequestBody CompanyRequest companyRequest) {
         // Check if the input is an email
         CompanyEntity companyEntity = companyRepository.findByEmail(companyRequest.getEmail());
 
-        System.out.println(companyRequest);
-        System.out.println(companyEntity);
         // Authenticate user if found
         if (companyEntity != null && passwordEncoder.matches(companyRequest.getPassword(), companyEntity.getPassword())) {
             // Generate token using the user details
@@ -72,7 +71,8 @@ public class CompanyController {
             response.put("access_token", token);
             response.put("userId", String.valueOf(userId));
 
-            return ResponseEntity.ok(response);
+
+            return BaseResponse.success(response);
         } else {
             throw new BadCredentialsException("Invalid username/email or password.");
         }
@@ -81,27 +81,33 @@ public class CompanyController {
 
 
     @GetMapping
-    public BaseResponse<List<CompanyEntity>> getAllCompanies() {
+    public BaseResponse<List<CompanyResponse>> getAllCompanies() {
         List<CompanyEntity> companyEntities = userService.getAllCompanies();
-        return BaseResponse.success(companyEntities);
+        List<CompanyResponse> companyResponses = companyEntities.stream().map(CompanyMapper.INSTANCE::convertToResponse).collect(Collectors.toList());
+
+        return BaseResponse.success(companyResponses);
     }
 
     @GetMapping("/{id}")
-    public BaseResponse<CompanyEntity> getCompaniesById(@PathVariable Long id) {
-        CompanyEntity companyEntity = userService.getCompaniesById(id);
-        return BaseResponse.success(companyEntity);
+    public BaseResponse<CompanyResponse> getCompaniesById(@PathVariable Long id) {
+        CompanyEntity company = userService.getCompaniesById(id);
+
+        return BaseResponse.success(CompanyMapper.INSTANCE.convertToResponse(company));
     }
 
 
     @GetMapping("/current-user")
-    public BaseResponse<CompanyDTO> getCurrentUser() {
+    public BaseResponse<CompanyResponse> getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.isAuthenticated()) {
             String email = authentication.getName();
+
             // Retrieve user details from the database
-            CompanyDTO companyDTO = CompanyMapper.INSTANCE.convert(companyRepository.findByEmail(email));
-            return BaseResponse.success(companyDTO);
+            CompanyEntity company = companyRepository.findByEmail(email);
+            CompanyResponse companyResponse = CompanyMapper.INSTANCE.convertToResponse(company);
+
+            return BaseResponse.success(companyResponse);
         } else {
             throw new UnauthorizedException();
         }

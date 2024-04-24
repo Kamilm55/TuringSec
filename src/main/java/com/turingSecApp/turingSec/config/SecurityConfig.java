@@ -56,7 +56,7 @@ public class SecurityConfig {
                     request.requestMatchers("/api/background-image-for-hacker/**", "/api/image-for-hacker/**", "/api/hacker/**").permitAll();
                     request.requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll();
 
-                 // User Controller
+                    // User Controller
                     request
                             .requestMatchers("/api/auth/register/hacker").anonymous()
                             .requestMatchers("/api/auth/login").anonymous() // Public endpoints for registration and login
@@ -72,20 +72,23 @@ public class SecurityConfig {
                             .requestMatchers("/api/auth/delete-user").authenticated()
                             .requestMatchers("/api/auth/programs").permitAll()
                             .requestMatchers("/api/auth/programsById/{id}").permitAll()
-                            .requestMatchers("/api/auth/users/**").permitAll()
+                            .requestMatchers("/api/auth/users/**").permitAll();
 
+                    // Company Controller
+                    request
+                            .requestMatchers("/api/companies/register").anonymous()
+                            .requestMatchers("/api/companies/login").anonymous()
+                            .requestMatchers("/api/companies/current-user").hasRole("COMPANY")
+                            .requestMatchers("/api/companies/**").permitAll();
 
+                    // Hacker Controller
+                    request.requestMatchers("/api/hacker/{id}").permitAll();
 
-                            .requestMatchers("/api/auth/register/company").permitAll()
-
-                            .requestMatchers("/api/companies/current-user").authenticated()
-                            .requestMatchers("/api/companies/**").permitAll()
-
-
-
-                            .requestMatchers("/api/admin/register").permitAll()
+                    // Admin Controller
+                    request
+                            .requestMatchers("/api/admin/login").anonymous()
                             .requestMatchers("/api/admin/approve-company/{companyId}").hasRole("ADMIN")
-                            .requestMatchers("/api/admin/login").permitAll()
+
 
 
                             .requestMatchers("/api/bug-bounty-reports/reports/company").hasRole("COMPANY")
@@ -96,16 +99,6 @@ public class SecurityConfig {
 
                             .requestMatchers("/api/bug-bounty-programs/**").hasRole("COMPANY");
 
-
-
-
-//                            .anyRequest().access((authentication, object) ->{
-//                                if(authentication.get() instanceof AnonymousAuthenticationToken)
-//                                    return new AuthorizationDecision(false);
-//
-//                                return new AuthorizationDecision(true);
-//                            });
-                   // request.anyRequest().permitAll();//todo: fix this
 
                 })
                 .sessionManagement(sm->sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

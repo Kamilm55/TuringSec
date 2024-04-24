@@ -5,10 +5,12 @@ import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface AdminRepository extends JpaRepository<AdminEntity, Long> {
 
-    AdminEntity findByUsername(String username);
+    Optional<AdminEntity> findByUsername(String username);
     AdminEntity findByEmail(String email);
 
     }

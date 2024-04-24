@@ -9,6 +9,4 @@ import java.util.Optional;
 @Repository
 public interface CompanyRepository extends JpaRepository<CompanyEntity, Long> {
     CompanyEntity findByEmail(String email);
-
-
 }

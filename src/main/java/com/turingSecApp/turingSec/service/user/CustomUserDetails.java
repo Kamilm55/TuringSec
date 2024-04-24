@@ -4,14 +4,20 @@ import com.turingSecApp.turingSec.dao.entities.AdminEntity;
 import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
 import com.turingSecApp.turingSec.dao.entities.role.Role;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
+import com.turingSecApp.turingSec.dao.repository.RoleRepository;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import javax.ws.rs.NotFoundException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Data
 public class CustomUserDetails implements UserDetails {
 
     private final Object user;

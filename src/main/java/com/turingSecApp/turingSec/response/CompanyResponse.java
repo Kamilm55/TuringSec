@@ -16,11 +16,10 @@ public class CompanyResponse {
     private String job_title;
     private String assets;
     private String message;
-    private String password;
 
     private boolean approved; // Indicates whether the company registration is approved
 
-    private Set<Role> roles;
+    //private Set<Role> roles;
 
     private Set<BugBountyProgramEntity> bugBountyPrograms;
 

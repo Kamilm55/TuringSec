@@ -1,5 +1,6 @@
 package com.turingSecApp.turingSec.filter;
 
+import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import com.turingSecApp.turingSec.service.user.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -34,6 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             if (userDetails != null) {
+                System.out.println("UserDetails of current user: " + userDetails);
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }

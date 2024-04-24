@@ -23,6 +23,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -68,7 +69,7 @@ public class AdminController {
 
         // If the input is not an email, check if it's a username
         if (adminEntity == null) {
-            adminEntity = adminRepository.findByUsername(user.getUsernameOrEmail());
+             adminEntity = adminRepository.findByUsername(user.getUsernameOrEmail()).orElseThrow(()->new UsernameNotFoundException("Admin does not found with username:" + user.getUsernameOrEmail() ));
         }
 
         // Authenticate user if found
