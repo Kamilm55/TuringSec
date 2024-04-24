@@ -44,7 +44,9 @@ jobs:
              context: .
              dockerfile: Dockerfile
              push: true
-             tags: docker.io/kamil571/e-commerce_spring_boot_app:latest
+             tags: |
+                docker.io/kamil571/TuringSec_spring_boot:latest
+                docker.io/kamil571/e-TuringSec_spring_boot:${{ steps.commit_id.outputs.commit_id }}
 #      - name: Build & Push Docker image
 #        uses: docker/build-push-action@v2
 #        with:
