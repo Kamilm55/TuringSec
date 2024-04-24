@@ -28,9 +28,9 @@ jobs:
         run: |
           ls -R ./target
 
-      - name: Get Commit ID
-        id: commit_id
-        run: echo "::set-output name=commit_id::$(git rev-parse --short HEAD)"
+#      - name: Get Commit ID
+#        id: commit_id
+#        run: echo "::set-output name=commit_id::$(git rev-parse --short HEAD)"
 
       - name: Build & Push Docker image
         uses: docker/build-push-action@v2
@@ -38,4 +38,4 @@ jobs:
           push: true
           tags: |
             docker.io/kamil571/e-commerce_spring_boot_app:latest
-            docker.io/kamil571/e-commerce_spring_boot_app:${{ steps.commit_id.outputs.commit_id }}
+#            docker.io/kamil571/e-commerce_spring_boot_app:${{ steps.commit_id.outputs.commit_id }}
