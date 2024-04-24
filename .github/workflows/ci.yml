@@ -24,6 +24,12 @@ jobs:
           chmod +x mvnw
           ./mvnw clean install
 
+        # View Surefire Reports
+          ls -R ./main/target/surefire-reports
+          
+          # Run Maven with Debug Logging
+          ./mvnw clean install -X
+
       #      - name: Print Build Artifact Contents
       #        run: |
       #          ls -R ./main/target
