@@ -26,7 +26,7 @@ jobs:
 
       - name: Print Build Artifact Contents
         run: |
-           ls -R ./target
+          ls -R ./target
 
       - name: Get Commit ID
         id: commit_id
