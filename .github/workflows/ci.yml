@@ -35,7 +35,3 @@ jobs:
           tags: |
             docker.io/kamil571/e-commerce_spring_boot_app:latest
             docker.io/kamil571/e-commerce_spring_boot_app:${{ steps.commit_id.outputs.commit_id }}
-          env:
-            DOCKER_BUILDKIT: 1
-            BUILDKIT_PROGRESS: plain
-          dockerfile: Dockerfile  # Path to your Dockerfile if not in root
