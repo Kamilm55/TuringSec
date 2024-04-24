@@ -8,7 +8,7 @@ WORKDIR /app
 COPY ./main/target/TuringSec.jar app.jar
 
 # Expose the port your application runs on
-EXPOSE 8080
+EXPOSE 5000
 
 # Specify the command to run on container startup
 CMD ["java", "-jar", "app.jar"]
