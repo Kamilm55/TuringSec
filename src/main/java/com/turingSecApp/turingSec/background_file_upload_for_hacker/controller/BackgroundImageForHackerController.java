@@ -55,7 +55,7 @@ public class BackgroundImageForHackerController {
         }
 
         // Call the service method to save the video
-        return fileService.saveVideo(file, hackerId);
+        return fileService.saveVideoOrImg(file, hackerId);
     }
 
 

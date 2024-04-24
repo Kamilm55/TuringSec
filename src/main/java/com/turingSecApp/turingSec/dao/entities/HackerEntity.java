@@ -23,6 +23,8 @@ public class HackerEntity {
     private String website;
     private String background_pic;
     private String profile_pic;
+//    private Long background_pic_id;
+//    private Long profile_pic_id;
     private String bio;
     private String linkedin;
     private String twitter;

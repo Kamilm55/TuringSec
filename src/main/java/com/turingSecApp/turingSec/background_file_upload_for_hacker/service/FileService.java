@@ -22,7 +22,7 @@ public class FileService {
     private final FileRepository fileRepository;
 
 
-    public FileResponse saveVideo(MultipartFile multipartFile, Long hackerId) throws IOException {
+    public FileResponse saveVideoOrImg(MultipartFile multipartFile, Long hackerId) throws IOException {
         Optional<BackgroundImageForHacker> existingFileOptional = fileRepository.findBackgroundImageForHackerByHackerId(hackerId);
 
         if (existingFileOptional.isPresent()) {
@@ -30,7 +30,8 @@ public class FileService {
             existingFile.setName(multipartFile.getOriginalFilename());
             existingFile.setContentType(multipartFile.getContentType());
             existingFile.setFileData(multipartFile.getBytes());
-            BackgroundImageForHacker saved = fileRepository.save(existingFile);
+
+            BackgroundImageForHacker saved = fileRepository.save(existingFile);//save
 
             FileResponse response = modelMapper.map(saved, FileResponse.class);
             return response;
@@ -39,8 +40,10 @@ public class FileService {
             file.setName(multipartFile.getOriginalFilename());
             file.setContentType(multipartFile.getContentType());
             file.setFileData(multipartFile.getBytes());
-            file.setHackerId(hackerId);
-            BackgroundImageForHacker saved = fileRepository.save(file);
+
+            file.setHackerId(hackerId); // set hacker id
+
+            BackgroundImageForHacker saved = fileRepository.save(file);//save
 
             FileResponse response = modelMapper.map(saved, FileResponse.class);
             return response;

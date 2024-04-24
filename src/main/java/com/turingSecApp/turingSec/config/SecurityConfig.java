@@ -1,6 +1,7 @@
 package com.turingSecApp.turingSec.config;
 
 
+import com.turingSecApp.turingSec.exception.CustomAuthenticationEntryPoint;
 import com.turingSecApp.turingSec.filter.JwtAuthenticationFilter;
 import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.service.user.UserDetailsServiceImpl;
@@ -18,6 +19,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -36,6 +38,10 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return new CustomAuthenticationEntryPoint();
+    }
 
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http , JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
@@ -43,6 +49,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling( (exception)->
+                        exception.authenticationEntryPoint(authenticationEntryPoint())
+                )
                 .authorizeHttpRequests(request -> {
                     request.requestMatchers("/api/background-image-for-hacker/**", "/api/image-for-hacker/**", "/api/hacker/**").permitAll();
                     request.requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll();
@@ -51,13 +60,15 @@ public class SecurityConfig {
                     request
                             .requestMatchers("/api/auth/register/hacker").anonymous()
                             .requestMatchers("/api/auth/login").anonymous() // Public endpoints for registration and login
+
                             .requestMatchers("/api/auth/change-password").authenticated()
                             .requestMatchers("/api/auth/change-email").authenticated()
                             .requestMatchers("/api/auth/update-profile").authenticated() //todo: it must be admin or currentUser
                             .requestMatchers("/api/auth/test").authenticated()
                             .requestMatchers("/api/auth/current-user").authenticated()
-                            .requestMatchers("/api/auth/allUsers").permitAll() // Public endpoints for registration and login
+                            .requestMatchers("/api/auth/allUsers").permitAll()
                             .requestMatchers("/api/auth/activate").permitAll() // Public endpoints for registration and login
+                            .requestMatchers("/api/auth/users/{userId}").authenticated()
                             .requestMatchers("/api/auth/delete-user").authenticated()
                             .requestMatchers("/api/auth/programs").permitAll()
                             .requestMatchers("/api/auth/programsById/{id}").permitAll()

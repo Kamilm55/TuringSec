@@ -7,7 +7,6 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserHackerDTO {
     private String username;
     private String first_name;
@@ -21,4 +20,8 @@ public class UserHackerDTO {
     private String twitter;
     private String github;
     private String city;
+
+    private Long userId;
+    private Long hackerId;
+
 }

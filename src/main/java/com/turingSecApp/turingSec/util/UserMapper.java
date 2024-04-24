@@ -6,6 +6,7 @@ import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.response.UserHackerDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Mappings;
 import org.mapstruct.factory.Mappers;
 
 @Mapper
@@ -24,10 +25,16 @@ public interface UserMapper {
     @Mapping(target = "twitter", source = "hackerEntity.twitter")
     @Mapping(target = "github", source = "hackerEntity.github")
     @Mapping(target = "city", source = "hackerEntity.city")
+    @Mapping(target = "hackerId", source = "hackerEntity.id") // Add this mapping for hackerId
+    @Mapping(target = "userId", source = "userEntity.id") // Add this mapping for userId
     UserHackerDTO toDto(UserEntity userEntity, HackerEntity hackerEntity);
 
-    @Mapping(target = "firstName", source = "userEntity.first_name")
-    @Mapping(target = "lastName", source = "userEntity.last_name")
+    @Mappings({
+            @Mapping(source = "first_name", target = "firstName"),
+            @Mapping(source = "last_name", target = "lastName"),
+            @Mapping(source = "hacker.id", target = "hackerId")
+            // Add more mappings as needed
+    })
     UserDTO convert(UserEntity userEntity);
 }
 

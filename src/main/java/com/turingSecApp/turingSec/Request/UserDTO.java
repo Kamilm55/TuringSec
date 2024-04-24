@@ -15,5 +15,7 @@ public class UserDTO {
     private String firstName;
     private String lastName;
 
+    private Long hackerId;
+
     // Add other user properties as needed
 }

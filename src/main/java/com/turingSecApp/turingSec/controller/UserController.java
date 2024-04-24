@@ -2,6 +2,7 @@ package com.turingSecApp.turingSec.controller;
 
 
 import com.turingSecApp.turingSec.Request.*;
+import com.turingSecApp.turingSec.background_file_upload_for_hacker.service.FileService;
 import com.turingSecApp.turingSec.dao.entities.*;
 import com.turingSecApp.turingSec.dao.entities.role.Role;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
@@ -20,8 +21,6 @@ import com.turingSecApp.turingSec.service.user.UserService;
 import com.turingSecApp.turingSec.util.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -44,6 +43,7 @@ public class UserController {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final JwtUtil jwtTokenProvider;
+    private final FileService fileService;
     private final ProgramsService programsService;
     private final HackerRepository hackerRepository;
     private final PasswordEncoder passwordEncoder;
@@ -53,7 +53,8 @@ public class UserController {
     @Transactional
      public BaseResponse<AuthResponse> registerHacker(@RequestBody RegisterPayload payload) {
         // Ensure the user doesn't exist
-        if (userRepository.findByUsername(payload.getUsername()) != null) {
+//        System.out.println(userRepository.findByUsername(payload.getUsername()));
+        if (userRepository.findByUsername(payload.getUsername()).isPresent()) {
             throw new UserAlreadyExistsException("Username is already taken.");
         }
 
@@ -95,6 +96,9 @@ public class UserController {
         hackerEntity.setCountry(fetchedUser.getCountry()); // Set the age in the hackerEntity entity
 
         // There are fields  related to hacker will added after register...
+        // default fields
+        hackerEntity.setBackground_pic("https://plus.unsplash.com/premium_photo-1701090940014-320b715b5a8c?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8Z3JheSUyMHdhbGxwYXBlcnxlbnwwfHwwfHx8MA%3D%3D");
+        hackerEntity.setProfile_pic("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAq96S4rzot47qiaT2Q65A3Jc3vLAUaKWKA&s");
 
         hackerRepository.save(hackerEntity);
 
@@ -113,6 +117,7 @@ public class UserController {
         // Retrieve the user ID from CustomUserDetails
         Long userId = ((CustomUserDetails) userDetails).getId();
         UserEntity userById = findUserById(userId);
+        HackerEntity hackerFromDB = hackerRepository.findByUser(userById);
 
 
         // Create a response map containing the token and user ID
@@ -120,13 +125,7 @@ public class UserController {
        AuthResponse authResponse = AuthResponse.builder()
                 .accessToken(token)
                 .userInfo(
-                        UserDTO.builder()
-                                .id(userById.getId())
-                                .email(userById.getEmail())
-                                .firstName(userById.getFirst_name())
-                                .lastName(userById.getLast_name())
-                                .username(userById.getUsername())
-                                .build()
+                        UserMapper.INSTANCE.toDto(userById,hackerFromDB)
                 )
                 .build();
 
@@ -167,18 +166,15 @@ public class UserController {
             // Retrieve the user ID from CustomUserDetails
             Long userId = ((CustomUserDetails) userDetails).getId();
             UserEntity userById = findUserById(userId);
+            HackerEntity hackerFromDB = hackerRepository.findByUser(userById);
 
 
+            // Create a response map containing the token and user ID
+            //refactorThis
             AuthResponse authResponse = AuthResponse.builder()
                     .accessToken(token)
                     .userInfo(
-                            UserDTO.builder()
-                                    .id(userById.getId())
-                                    .email(userById.getEmail())
-                                    .firstName(userById.getFirst_name())
-                                    .lastName(userById.getLast_name())
-                                    .username(userById.getUsername())
-                                    .build()
+                            UserMapper.INSTANCE.toDto(userById,hackerFromDB)
                     )
                     .build();
 
@@ -349,6 +345,8 @@ public class UserController {
         // Get the authenticated user's username from the security context
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
+//
+//        if()
 
         // Find the user by username
         UserEntity user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
