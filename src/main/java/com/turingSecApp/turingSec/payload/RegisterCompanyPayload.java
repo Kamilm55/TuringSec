@@ -18,7 +18,7 @@ public class RegisterCompanyPayload {
     private String email;
     private String companyName;
     private String jobTitle;
-    private Set<Long> assets_id;
+   // private Set<Long> assets_id;
     private String message;
    // private Set<> bugbounty;
 }
