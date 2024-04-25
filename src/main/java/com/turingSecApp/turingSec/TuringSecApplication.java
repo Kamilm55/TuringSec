@@ -1,9 +1,12 @@
 package com.turingSecApp.turingSec;
 
 import com.turingSecApp.turingSec.dao.entities.AdminEntity;
+import com.turingSecApp.turingSec.dao.entities.HackerEntity;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.AdminRepository;
+import com.turingSecApp.turingSec.dao.repository.HackerRepository;
 import com.turingSecApp.turingSec.dao.repository.UserRepository;
+import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.service.HackerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -17,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 public class TuringSecApplication implements CommandLineRunner {
     private final HackerService hackerService;
+    private final HackerRepository hackerRepository;
     private final UserRepository userRepository;
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
@@ -42,6 +46,24 @@ public class TuringSecApplication implements CommandLineRunner {
                 .activated(true)
                 .build();
         userRepository.save(user1);
+
+        //Note: To fetch user explicitly to avoid save process instead it updates because there is user entity with actual id not null
+        UserEntity fetchedUser = userRepository.findByUsername(user1.getUsername()).orElseThrow(()-> new UserNotFoundException("User with username " + user1.getUsername() + " not found"));
+
+        // Create and associate , populate hackerEntity entity
+        HackerEntity hackerEntity = new HackerEntity();
+        hackerEntity.setUser(fetchedUser);
+        hackerEntity.setFirst_name(fetchedUser.getFirst_name()); // Set the username in the hackerEntity entity
+        hackerEntity.setLast_name(fetchedUser.getLast_name()); // Set the age in the hackerEntity entity
+        hackerEntity.setCountry(fetchedUser.getCountry()); // Set the age in the hackerEntity entity
+
+
+        hackerRepository.save(hackerEntity);
+
+        // Accomplish associations between
+        fetchedUser.setHacker(hackerEntity);
+
+        userRepository.save(fetchedUser);
 
         // insert 2 admins
         AdminEntity admin1 = AdminEntity.builder()

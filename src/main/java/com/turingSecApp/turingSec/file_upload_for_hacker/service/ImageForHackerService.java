@@ -1,5 +1,8 @@
 package com.turingSecApp.turingSec.file_upload_for_hacker.service;
 
+import com.turingSecApp.turingSec.dao.entities.HackerEntity;
+import com.turingSecApp.turingSec.dao.repository.HackerRepository;
+import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.file_upload_for_hacker.entity.ImageForHacker;
 import com.turingSecApp.turingSec.file_upload_for_hacker.exception.FileNotFoundException;
 import com.turingSecApp.turingSec.file_upload_for_hacker.repository.ImageForHackerRepository;
@@ -17,12 +20,15 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class ImageForHackerService {
-
     private final ImageForHackerRepository imageForHackerRepository;
+    private final HackerRepository hackerRepository;
     private final ModelMapper modelMapper;
 
     public ImageForHackerResponse saveVideo(MultipartFile multipartFile, Long hackerId) throws IOException {
         Optional<ImageForHacker> existingFileOptional = imageForHackerRepository.findImageForHackerByHackerId(hackerId);
+
+        HackerEntity hacker = hackerRepository.findById(hackerId).orElseThrow(()-> new UserNotFoundException("Hacker not found with id:"+hackerId));
+
 
         if (existingFileOptional.isPresent()) {
             ImageForHacker existingFile = existingFileOptional.get();
@@ -30,6 +36,9 @@ public class ImageForHackerService {
             existingFile.setContentType(multipartFile.getContentType());
             existingFile.setFileData(multipartFile.getBytes());
             ImageForHacker saved = imageForHackerRepository.save(existingFile);
+
+            setHackerPicturesTrueAndSave(hacker);
+
             ImageForHackerResponse response = modelMapper.map(saved, ImageForHackerResponse.class);
             return response;
         } else {
@@ -39,6 +48,9 @@ public class ImageForHackerService {
             file.setFileData(multipartFile.getBytes());
             file.setHackerId(hackerId);
             ImageForHacker saved = imageForHackerRepository.save(file);
+
+            setHackerPicturesTrueAndSave(hacker);
+
             ImageForHackerResponse response = modelMapper.map(saved, ImageForHackerResponse.class);
             return response;
         }
@@ -51,6 +63,13 @@ public class ImageForHackerService {
         return ResponseEntity.status(HttpStatus.OK)
                 .header("Content-Type", fileOptional.getContentType())
                 .body(fileOptional.getFileData());
+    }
+
+    // Util methods
+    private void setHackerPicturesTrueAndSave(HackerEntity hacker) {
+        hacker.setHas_profile_pic(true);
+        hacker.setHas_background_pic(true);
+        hackerRepository.save(hacker);
     }
 
 }

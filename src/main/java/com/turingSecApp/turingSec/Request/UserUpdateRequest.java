@@ -16,8 +16,8 @@ public class UserUpdateRequest {
     private String last_name;
     private String country;
     private String website;
-    private String background_pic;
-    private String profile_pic;
+    private boolean has_background_pic;
+    private boolean has_profile_pic;
     private String bio;
     private String linkedin;
     private String twitter;

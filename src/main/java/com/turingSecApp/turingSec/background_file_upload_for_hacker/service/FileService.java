@@ -4,6 +4,9 @@ import com.turingSecApp.turingSec.background_file_upload_for_hacker.entity.Backg
 import com.turingSecApp.turingSec.background_file_upload_for_hacker.exception.FileNotFoundException;
 import com.turingSecApp.turingSec.background_file_upload_for_hacker.repository.FileRepository;
 import com.turingSecApp.turingSec.background_file_upload_for_hacker.response.FileResponse;
+import com.turingSecApp.turingSec.dao.entities.HackerEntity;
+import com.turingSecApp.turingSec.dao.repository.HackerRepository;
+import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -18,12 +21,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class FileService {
     private final ModelMapper modelMapper;
-
+    private final HackerRepository hackerRepository;
     private final FileRepository fileRepository;
 
 
     public FileResponse saveVideoOrImg(MultipartFile multipartFile, Long hackerId) throws IOException {
         Optional<BackgroundImageForHacker> existingFileOptional = fileRepository.findBackgroundImageForHackerByHackerId(hackerId);
+
+        HackerEntity hacker = hackerRepository.findById(hackerId).orElseThrow(()-> new UserNotFoundException("Hacker not found with id:"+hackerId));
 
         if (existingFileOptional.isPresent()) {
             BackgroundImageForHacker existingFile = existingFileOptional.get();
@@ -32,8 +37,11 @@ public class FileService {
             existingFile.setFileData(multipartFile.getBytes());
 
             BackgroundImageForHacker saved = fileRepository.save(existingFile);//save
+            setHackerPicturesTrueAndSave(hacker);
 
             FileResponse response = modelMapper.map(saved, FileResponse.class);
+
+
             return response;
         } else {
             BackgroundImageForHacker file = new BackgroundImageForHacker();
@@ -45,9 +53,11 @@ public class FileService {
 
             BackgroundImageForHacker saved = fileRepository.save(file);// update
 
+            setHackerPicturesTrueAndSave(hacker);
             FileResponse response = modelMapper.map(saved, FileResponse.class);
             return response;
         }
+
     }
 
     public ResponseEntity<?> getVideoById(Long id) throws FileNotFoundException {
@@ -59,5 +69,13 @@ public class FileService {
                         backgroundImageForHackerOptional.getFileData()
                 );
     }
+    // Util
+    private void setHackerPicturesTrueAndSave(HackerEntity hacker) {
+        hacker.setHas_profile_pic(true);
+        hacker.setHas_background_pic(true);
+        hackerRepository.save(hacker);
+    }
+
+
 
 }

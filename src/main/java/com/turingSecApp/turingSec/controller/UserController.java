@@ -97,10 +97,6 @@ public class UserController {
         hackerEntity.setLast_name(fetchedUser.getLast_name()); // Set the age in the hackerEntity entity
         hackerEntity.setCountry(fetchedUser.getCountry()); // Set the age in the hackerEntity entity
 
-        // There are fields  related to hacker will added after register...
-        // default fields
-//        hackerEntity.setBackground_pic("https://plus.unsplash.com/premium_photo-1701090940014-320b715b5a8c?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8Z3JheSUyMHdhbGxwYXBlcnxlbnwwfHwwfHx8MA%3D%3D");
-//        hackerEntity.setProfile_pic("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAq96S4rzot47qiaT2Q65A3Jc3vLAUaKWKA&s");
 
         hackerRepository.save(hackerEntity);
 
@@ -276,8 +272,9 @@ public class UserController {
             hackerEntity.setCity(profileUpdateRequest.getCity());
 
             hackerEntity.setWebsite(profileUpdateRequest.getWebsite());
-            hackerEntity.setBackground_pic(profileUpdateRequest.getBackground_pic());
-            hackerEntity.setProfile_pic(profileUpdateRequest.getProfile_pic());
+//            hackerEntity.setBackground_pic(profileUpdateRequest.getBackground_pic());
+//            hackerEntity.setProfile_pic(profileUpdateRequest.getProfile_pic());
+
             hackerEntity.setBio(profileUpdateRequest.getBio());
             hackerEntity.setLinkedin(profileUpdateRequest.getLinkedin());
             hackerEntity.setTwitter(profileUpdateRequest.getTwitter());
@@ -289,7 +286,7 @@ public class UserController {
         }
 
         userEntity.setHacker(hackerEntity);
-       userRepository.save(userEntity);
+        userRepository.save(userEntity);
 
         UserDetails userDetailsFromDB = userDetailsService.loadUserByUsername(profileUpdateRequest.getUsername());
         // Assuming you have generated a new token here
