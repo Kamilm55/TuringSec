@@ -19,6 +19,7 @@ import com.turingSecApp.turingSec.service.ProgramsService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import com.turingSecApp.turingSec.service.user.UserService;
 import com.turingSecApp.turingSec.util.UserMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 
@@ -26,6 +27,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -42,6 +44,7 @@ public class UserController {
     private final UserService userService;
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
+    private final UserDetailsService userDetailsService;
     private final JwtUtil jwtTokenProvider;
     private final FileService fileService;
     private final ProgramsService programsService;
@@ -96,8 +99,8 @@ public class UserController {
 
         // There are fields  related to hacker will added after register...
         // default fields
-        hackerEntity.setBackground_pic("https://plus.unsplash.com/premium_photo-1701090940014-320b715b5a8c?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8Z3JheSUyMHdhbGxwYXBlcnxlbnwwfHwwfHx8MA%3D%3D");
-        hackerEntity.setProfile_pic("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAq96S4rzot47qiaT2Q65A3Jc3vLAUaKWKA&s");
+//        hackerEntity.setBackground_pic("https://plus.unsplash.com/premium_photo-1701090940014-320b715b5a8c?q=80&w=1000&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8Z3JheSUyMHdhbGxwYXBlcnxlbnwwfHwwfHx8MA%3D%3D");
+//        hackerEntity.setProfile_pic("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRhAq96S4rzot47qiaT2Q65A3Jc3vLAUaKWKA&s");
 
         hackerRepository.save(hackerEntity);
 
@@ -244,7 +247,7 @@ public class UserController {
 
 
     @PostMapping("/update-profile")
-    public BaseResponse<UserHackerDTO> updateProfile(@RequestBody UserUpdateRequest profileUpdateRequest) {
+    public BaseResponse<UserHackerDTO> updateProfile(@RequestBody UserUpdateRequest profileUpdateRequest, HttpServletRequest request) {
         // Get the authenticated user details from the security context
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -286,8 +289,16 @@ public class UserController {
         }
 
         userEntity.setHacker(hackerEntity);
-        userRepository.save(userEntity);
+       userRepository.save(userEntity);
 
+        UserDetails userDetailsFromDB = userDetailsService.loadUserByUsername(profileUpdateRequest.getUsername());
+        // Assuming you have generated a new token here
+        String newToken = jwtTokenProvider.generateToken(userDetailsFromDB);
+
+        // Clear the authorization header
+        request.removeAttribute("Authorization");
+        // Set the new token in the Authorization header
+        request.setAttribute("Authorization", "Bearer " + newToken);
 
         UserHackerDTO userHackerDTO = UserMapper.INSTANCE.toDto(userEntity, hackerEntity);
 
@@ -340,18 +351,20 @@ public class UserController {
 
 
     @DeleteMapping("/delete-user")
-    public BaseResponse<?> deleteUser() {
+    public BaseResponse<?> deleteUser(HttpServletRequest request) {
         // Get the authenticated user's username from the security context
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-//
-//        if()
+
 
         // Find the user by username
         UserEntity user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
 
         // Delete the user
         userRepository.delete(user);
+
+        // Clear the authorization header
+        request.removeAttribute("Authorization");
 
         return BaseResponse.success(null,"User deleted successfully");
     }
