@@ -1,8 +1,6 @@
 package com.turingSecApp.turingSec;
 
-import com.turingSecApp.turingSec.dao.entities.AdminEntity;
-import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
-import com.turingSecApp.turingSec.dao.entities.HackerEntity;
+import com.turingSecApp.turingSec.dao.entities.*;
 import com.turingSecApp.turingSec.dao.entities.role.Role;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.*;
@@ -16,7 +14,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.ws.rs.NotFoundException;
-import java.util.Collections;
+import java.time.LocalDate;
+import java.util.*;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.turingSecApp.turingSec", "com.turingSecApp.turingSec.config"})
@@ -29,16 +28,15 @@ public class TuringSecApplication implements CommandLineRunner {
     private final UserRepository userRepository;
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ProgramsRepository programsRepository;
+    private final AssetTypeRepository assetTypeRepository;
+    private final StrictRepository strictRepository;
     public static void main(String[] args) {
         SpringApplication.run(TuringSecApplication.class, args);
     }
 
     @Override
     public void run(String... args) throws Exception {
-//        System.out.println(hackerService.findById(18L));
-//       // System.out.println(hackerService.findById(10L));
-//        System.out.println(hackerService.findById(33L));
-
         // Mock Data
 
         // insert 1 company
@@ -62,7 +60,37 @@ public class TuringSecApplication implements CommandLineRunner {
 
         companyRepository.save(company1);
 
+
+
         // insert 1 Bug Bounty program
+        BugBountyProgramEntity bugBountyProgram = BugBountyProgramEntity.builder()
+                .fromDate(LocalDate.now())
+                .notes("Program notes")
+                .policy("Policy")
+                .build();
+
+        bugBountyProgram.setCompany(company1);
+        programsRepository.save(bugBountyProgram);
+
+        // insert asset type and strict entity and create relationship
+        AssetTypeEntity assetTypeEntity = new AssetTypeEntity();
+        assetTypeEntity.setLevel("low");
+        assetTypeEntity.setAssetType("Mobile");
+        assetTypeEntity.setPrice("$50");
+        assetTypeEntity.setBugBountyProgram(programsRepository.findById(bugBountyProgram.getId()).orElse(null));
+
+        assetTypeRepository.save(assetTypeEntity);
+
+        StrictEntity strictEntity = new StrictEntity();
+        strictEntity.setProhibitAdded("prohibits");
+        strictEntity.setBugBountyProgramForStrict(bugBountyProgram);
+        strictRepository.save(strictEntity);
+
+        // update bug bounty program
+        bugBountyProgram.setAssetTypes(List.of(Objects.requireNonNull(assetTypeRepository.findById(assetTypeEntity.getId()).orElse(null))));
+        bugBountyProgram.setProhibits(List.of(Objects.requireNonNull(strictRepository.findById(strictEntity.getId()).orElse(null))));
+        programsRepository.save(bugBountyProgram);
+
 
         // insert 1 user
         UserEntity user1 = UserEntity.builder()
@@ -75,6 +103,11 @@ public class TuringSecApplication implements CommandLineRunner {
                 .activationToken("7203c486-0069-45d4-8857-15a27ad24bee")
                 .activated(true)
                 .build();
+        // Set user roles
+        Set<Role> roles = new HashSet<>();
+        roles.add(roleRepository.findByName("HACKER"));
+        user1.setRoles(roles);
+
         userRepository.save(user1);
 
         //Note: To fetch user explicitly to avoid save process instead it updates because there is user entity with actual id not null

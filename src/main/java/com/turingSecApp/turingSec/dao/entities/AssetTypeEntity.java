@@ -1,16 +1,14 @@
 package com.turingSecApp.turingSec.dao.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import jakarta.persistence.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
+@EqualsAndHashCode(exclude = "bugBountyProgram")
+@ToString(exclude = "bugBountyProgram")
 @Entity
 @Table(name = "asset_types")
 public class AssetTypeEntity {

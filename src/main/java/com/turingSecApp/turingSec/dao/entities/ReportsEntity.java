@@ -15,6 +15,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@EqualsAndHashCode(exclude = {"user", "bugBountyProgram", "collaborators"})
+@ToString(exclude = {"user", "bugBountyProgram", "collaborators"})
 @Table(name = "bug_bounty_reports")
 public class ReportsEntity {
     @Id

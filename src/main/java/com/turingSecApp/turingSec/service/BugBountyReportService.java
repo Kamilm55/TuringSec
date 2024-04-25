@@ -10,15 +10,19 @@ import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
 import com.turingSecApp.turingSec.dao.repository.ReportsRepository;
 import com.turingSecApp.turingSec.dao.repository.UserRepository;
+import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.turingSecApp.turingSec.util.GlobalConstants.ROOT_LINK;
 
 @Service
 public class BugBountyReportService {
@@ -45,9 +49,12 @@ public class BugBountyReportService {
         return bugBountyReportOptional.orElse(null);
     }
 
+    @Transactional
     public void submitBugBountyReport(ReportsEntity report) {
+        ReportsEntity  reportFromDB = bugBountyReportRepository.findById(report.getId()).orElseThrow(()-> new ResourceNotFoundException("Report not found with id:" + report.getId()));
+
         // You can perform any necessary validation or processing here before saving the report
-        bugBountyReportRepository.save(report);
+        bugBountyReportRepository.save(reportFromDB);
     }
 
     private String getUsernameFromToken() {
@@ -134,7 +141,7 @@ public class BugBountyReportService {
 
         // Group reports by user
         Map<UserDTO, List<ReportsEntity>> reportsByUser = reports.stream()
-                .collect(Collectors.groupingBy(report -> new UserDTO(report.getUser().getId(), report.getUser().getUsername(), report.getUser().getEmail(),null,null,report.getUser().getHacker().getId())));
+                .collect(Collectors.groupingBy(report -> new UserDTO(report.getUser().getId(), report.getUser().getUsername(), report.getUser().getEmail(),report.getUser().getFirst_name(),report.getUser().getLast_name(),report.getUser().getHacker().getId())));
 
         // Fetch image URL for each user
         Map<Long, String> userImgUrls = reportsByUser.keySet().stream()
@@ -171,7 +178,7 @@ public class BugBountyReportService {
 
 
     private String getUserImgUrl(UserDTO userDTO) {
-
-        return "https://turingsec-production-de02.up.railway.app/api/background-image-for-hacker/download/" + userDTO.getId();
+    // https://turingsec-production-de02.up.railway.app
+        return ROOT_LINK + "/api/background-image-for-hacker/download/" + userDTO.getId();
     }
 }

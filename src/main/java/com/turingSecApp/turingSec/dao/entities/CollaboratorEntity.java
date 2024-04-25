@@ -1,18 +1,16 @@
 package com.turingSecApp.turingSec.dao.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 
 import jakarta.persistence.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
+@EqualsAndHashCode(exclude = "bugBountyReport")
+@ToString(exclude = "bugBountyReport")
 @Entity
 @Table(name = "bug_bounty_collaborators")
 public class CollaboratorEntity {

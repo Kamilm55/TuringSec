@@ -2,10 +2,7 @@ package com.turingSecApp.turingSec.dao.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -16,8 +13,10 @@ import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
+@Builder
+@EqualsAndHashCode(exclude = {"company", "assetTypes", "prohibits"})
+@ToString(exclude = {"company", "assetTypes", "prohibits"})
 @Entity
 @Table(name = "bug_bounty_programs")
 public class BugBountyProgramEntity {

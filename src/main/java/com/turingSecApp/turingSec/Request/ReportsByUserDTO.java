@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class ReportsByUserDTO {
-    private Long id;
+   // private Long id;
     private Long userId;
     private UserDTO user;
     private String userImgUrl; // Add image URL field

@@ -91,17 +91,18 @@ public class SecurityConfig {
                     // Admin Controller
                     request
                             .requestMatchers("/api/admin/login").anonymous()
-                            .requestMatchers("/api/admin/approve-company/{companyId}").hasRole("ADMIN")
+                            .requestMatchers("/api/admin/approve-company/{companyId}").hasRole("ADMIN");
 
+                    // Bug Bounty Program Controller
+                    request
+                            .requestMatchers("/api/bug-bounty-programs/**").hasRole("COMPANY");
 
-
+                    // Bug Bounty Report Controller
+                    request
                             .requestMatchers("/api/bug-bounty-reports/reports/company").hasRole("COMPANY")
                             .requestMatchers("/api/bug-bounty-reports/submit").hasRole("HACKER")
                             .requestMatchers("/api/bug-bounty-reports/user").hasRole("HACKER")
-                            .requestMatchers("/api/bug-bounty-reports/{id}").hasRole("HACKER")
-
-
-                            .requestMatchers("/api/bug-bounty-programs/**").hasRole("COMPANY");
+                            .requestMatchers("/api/bug-bounty-reports/{id}").hasRole("HACKER");
 
 
                 })

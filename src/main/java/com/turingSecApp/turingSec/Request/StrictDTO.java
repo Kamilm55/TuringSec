@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class StrictDTO {
-    private Long id;
+    //private Long id;
     private String prohibitAdded;
     private Long programId; // New field for program ID
 

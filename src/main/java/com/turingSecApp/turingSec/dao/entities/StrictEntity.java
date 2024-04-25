@@ -8,6 +8,8 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@EqualsAndHashCode(exclude = "bugBountyProgramForStrict")
+@ToString(exclude = "bugBountyProgramForStrict")
 @Entity
 @Table(name = "strict_prohibits")
 public class StrictEntity {

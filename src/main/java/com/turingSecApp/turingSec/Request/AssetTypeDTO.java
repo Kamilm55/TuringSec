@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AssetTypeDTO {
-    private Long id;
+   // private Long id;
     private String level;
     private String assetType;
     private String price;

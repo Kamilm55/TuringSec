@@ -13,6 +13,7 @@ import com.turingSecApp.turingSec.service.AssetTypeService;
 import com.turingSecApp.turingSec.service.ProgramsService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import com.turingSecApp.turingSec.service.user.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,16 +30,33 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/bug-bounty-programs")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
+@RequiredArgsConstructor
 public class BugBountyProgramController {
+    private final ProgramsService bugBountyProgramService;
+    private final AssetTypeService assetTypeService;
+    private final  CompanyRepository companyRepository;
 
+    @GetMapping
+    @Secured("ROLE_COMPANY")
+    public ResponseEntity<List<BugBountyProgramEntity>> getAllBugBountyPrograms() {
+        // Retrieve the email of the authenticated user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userEmail = authentication.getName();
 
-    @Autowired
-    private ProgramsService bugBountyProgramService;
-    @Autowired
-    private AssetTypeService assetTypeService;
+        // Retrieve the company associated with the authenticated user
+        CompanyEntity company = companyRepository.findByEmail(userEmail);
 
-    @Autowired
-    private  CompanyRepository companyRepository;
+        // Check if the company is authenticated
+        if (company != null) {
+            // Get programs belonging to the company
+            List<BugBountyProgramEntity> programs = bugBountyProgramService.getAllBugBountyProgramsByCompany(company);
+
+            return ResponseEntity.ok(programs);
+        } else {
+            // Return unauthorized response or handle as needed
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+    }
 
     @PostMapping
     public ResponseEntity<BugBountyProgramEntity> createBugBountyProgram(@Valid @RequestBody BugBountyProgramWithAssetTypeDTO programDTO) {
@@ -122,40 +140,6 @@ public class BugBountyProgramController {
         }
     }
 
-    private AssetTypeDTO mapToDTO(AssetTypeEntity assetTypeEntity) {
-        AssetTypeDTO dto = new AssetTypeDTO();
-        dto.setId(assetTypeEntity.getId());
-        dto.setLevel(assetTypeEntity.getLevel());
-        dto.setAssetType(assetTypeEntity.getAssetType());
-        dto.setPrice(assetTypeEntity.getPrice());
-        return dto;
-    }
-
-
-    @GetMapping
-    @Secured("ROLE_COMPANY")
-    public ResponseEntity<List<BugBountyProgramEntity>> getAllBugBountyPrograms() {
-        // Retrieve the email of the authenticated user
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userEmail = authentication.getName();
-
-        // Retrieve the company associated with the authenticated user
-        CompanyEntity company = companyRepository.findByEmail(userEmail);
-
-        // Check if the company is authenticated
-        if (company != null) {
-            // Get programs belonging to the company
-            List<BugBountyProgramEntity> programs = bugBountyProgramService.getAllBugBountyProgramsByCompany(company);
-
-            return ResponseEntity.ok(programs);
-        } else {
-            // Return unauthorized response or handle as needed
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-    }
-
-
-
     @DeleteMapping("/{id}")
     @Secured("ROLE_COMPANY")
     public ResponseEntity<Void> deleteBugBountyProgram(@PathVariable Long id) {
@@ -180,4 +164,13 @@ public class BugBountyProgramController {
         }
     }
 
+    // Util methods
+    private AssetTypeDTO mapToDTO(AssetTypeEntity assetTypeEntity) {
+        AssetTypeDTO dto = new AssetTypeDTO();
+//        dto.setId(assetTypeEntity.getId());
+        dto.setLevel(assetTypeEntity.getLevel());
+        dto.setAssetType(assetTypeEntity.getAssetType());
+        dto.setPrice(assetTypeEntity.getPrice());
+        return dto;
+    }
 }

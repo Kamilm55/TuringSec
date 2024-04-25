@@ -393,7 +393,7 @@ public class UserController {
     }
     private BugBountyProgramWithAssetTypeDTO mapToDTO(BugBountyProgramEntity programEntity) {
         BugBountyProgramWithAssetTypeDTO dto = new BugBountyProgramWithAssetTypeDTO();
-        dto.setId(programEntity.getId());
+//        dto.setId(programEntity.getId());
         dto.setFromDate(programEntity.getFromDate());
         dto.setToDate(programEntity.getToDate());
         dto.setNotes(programEntity.getNotes());
@@ -413,7 +413,7 @@ public class UserController {
 
     private AssetTypeDTO mapAssetTypeToDTO(AssetTypeEntity assetTypeEntity) {
         AssetTypeDTO dto = new AssetTypeDTO();
-        dto.setId(assetTypeEntity.getId());
+//        dto.setId(assetTypeEntity.getId());
         dto.setLevel(assetTypeEntity.getLevel());
         dto.setAssetType(assetTypeEntity.getAssetType());
         dto.setPrice(assetTypeEntity.getPrice());

@@ -69,7 +69,7 @@ public class CompanyController {
             // Create a response map containing the token and user ID
             Map<String, String> response = new HashMap<>();
             response.put("access_token", token);
-            response.put("userId", String.valueOf(userId));
+            response.put("companyId", String.valueOf(userId));
 
 
             return BaseResponse.success(response);
