@@ -60,9 +60,9 @@ public class BackgroundImageForHackerController {
     }
 
 
-    @GetMapping("/download/{id}")
-    public ResponseEntity<?> downloadVideo(@PathVariable Long id) throws FileNotFoundException {
-        return fileService.getVideoById(id);
+    @GetMapping("/download/{hackerId}")
+    public ResponseEntity<?> downloadVideo(@PathVariable Long hackerId) throws FileNotFoundException {
+        return fileService.getVideoById(hackerId);
     }
 
 }

@@ -61,9 +61,9 @@ public class ImageForHackerController {
         return imageForHackerService.saveVideo(file, hackerId);
     }
 
-    @GetMapping("/download/{id}")
-    public ResponseEntity<?> downloadVideo(@PathVariable Long id) throws FileNotFoundException {
-        return imageForHackerService.getVideoById(id);
+    @GetMapping("/download/{hackerId}")
+    public ResponseEntity<?> downloadVideo(@PathVariable Long hackerId) throws FileNotFoundException {
+        return imageForHackerService.getVideoById(hackerId);
     }
 
 }

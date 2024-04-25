@@ -60,9 +60,13 @@ public class FileService {
 
     }
 
-    public ResponseEntity<?> getVideoById(Long id) throws FileNotFoundException {
-        BackgroundImageForHacker backgroundImageForHackerOptional = fileRepository.findById(id).orElseThrow(
-                () -> new FileNotFoundException("File cannot found by id:" + id));
+    public ResponseEntity<?> getVideoById(Long hackerId) throws FileNotFoundException {
+        BackgroundImageForHacker backgroundImageForHackerOptional = fileRepository.findBackgroundImageForHackerByHackerId(hackerId).orElseThrow(
+                () -> new FileNotFoundException("File cannot found by hackerId:" + hackerId));
+
+
+
+
         return ResponseEntity.status(HttpStatus.OK)
                 .header("Content-Type", backgroundImageForHackerOptional.getContentType())
                 .body(

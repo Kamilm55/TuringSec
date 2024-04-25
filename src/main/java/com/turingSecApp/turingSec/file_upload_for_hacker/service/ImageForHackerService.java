@@ -57,9 +57,9 @@ public class ImageForHackerService {
     }
 
 
-    public ResponseEntity<?> getVideoById(Long id) throws FileNotFoundException {
-        ImageForHacker fileOptional = imageForHackerRepository.findById(id).orElseThrow(
-                () -> new FileNotFoundException("File not found by id:" + id));
+    public ResponseEntity<?> getVideoById(Long hackerId) throws FileNotFoundException {
+        ImageForHacker fileOptional = imageForHackerRepository.findImageForHackerByHackerId(hackerId).orElseThrow(
+                () -> new com.turingSecApp.turingSec.background_file_upload_for_hacker.exception.FileNotFoundException("File cannot found by hackerId:" + hackerId));
         return ResponseEntity.status(HttpStatus.OK)
                 .header("Content-Type", fileOptional.getContentType())
                 .body(fileOptional.getFileData());
