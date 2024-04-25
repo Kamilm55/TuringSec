@@ -86,7 +86,7 @@ public class CompanyService {
                 .last_name(companyPayload.getLastName())
                 .approved(false)
                 .build();
-        //todo:add default asset => mock data , change in db to Set<Asset>
+        //todo:add default mock data
 
         company.setRoles(Collections.singleton(companyRole));
 

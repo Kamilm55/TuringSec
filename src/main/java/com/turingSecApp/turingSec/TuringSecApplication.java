@@ -1,11 +1,11 @@
 package com.turingSecApp.turingSec;
 
 import com.turingSecApp.turingSec.dao.entities.AdminEntity;
+import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
 import com.turingSecApp.turingSec.dao.entities.HackerEntity;
+import com.turingSecApp.turingSec.dao.entities.role.Role;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
-import com.turingSecApp.turingSec.dao.repository.AdminRepository;
-import com.turingSecApp.turingSec.dao.repository.HackerRepository;
-import com.turingSecApp.turingSec.dao.repository.UserRepository;
+import com.turingSecApp.turingSec.dao.repository.*;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.service.HackerService;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +15,17 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.ws.rs.NotFoundException;
+import java.util.Collections;
+
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.turingSecApp.turingSec", "com.turingSecApp.turingSec.config"})
 @RequiredArgsConstructor
 public class TuringSecApplication implements CommandLineRunner {
     private final HackerService hackerService;
     private final HackerRepository hackerRepository;
+    private final RoleRepository roleRepository;
+    private final CompanyRepository companyRepository;
     private final UserRepository userRepository;
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
@@ -33,6 +38,31 @@ public class TuringSecApplication implements CommandLineRunner {
 //        System.out.println(hackerService.findById(18L));
 //       // System.out.println(hackerService.findById(10L));
 //        System.out.println(hackerService.findById(33L));
+
+        // Mock Data
+
+        // insert 1 company
+        Role companyRole = roleRepository.findByName("COMPANY");
+        if (companyRole == null) {
+            throw new NotFoundException("Company role not found.");
+        }
+
+        CompanyEntity company1 = CompanyEntity.builder()
+                .first_name("Kenan")
+                .last_name("Memmedov")
+                .email("string@gmail.com")
+                .company_name("Company")
+                .job_title("CEO")
+                .message("I want to build company")
+                .approved(true)
+                .password(passwordEncoder.encode("string"))
+                .build();
+
+        company1.setRoles(Collections.singleton(companyRole));
+
+        companyRepository.save(company1);
+
+        // insert 1 Bug Bounty program
 
         // insert 1 user
         UserEntity user1 = UserEntity.builder()
