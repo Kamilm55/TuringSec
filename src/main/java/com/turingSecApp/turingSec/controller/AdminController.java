@@ -2,14 +2,18 @@ package com.turingSecApp.turingSec.controller;
 
 import com.turingSecApp.turingSec.Request.LoginRequest;
 import com.turingSecApp.turingSec.dao.entities.AdminEntity;
+import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.AdminRepository;
+import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
+import com.turingSecApp.turingSec.exception.custom.CompanyNotFoundException;
 import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
 import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.response.AdminAuthResponse;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.AdminService;
 import com.turingSecApp.turingSec.service.CompanyService;
+import com.turingSecApp.turingSec.service.EmailNotificationService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import com.turingSecApp.turingSec.util.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +32,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -40,6 +45,8 @@ public class AdminController {
     private final AdminRepository adminRepository;
     private final CompanyService companyService;
     private final JwtUtil jwtTokenProvider;
+    private final CompanyRepository companyRepository;
+    private final EmailNotificationService emailNotificationService;
     
 //    @PostMapping("/register")
 //    public ResponseEntity<?> registerAdmin(@RequestBody AdminEntity admin) {
@@ -54,12 +61,17 @@ public class AdminController {
     public BaseResponse<?> approveCompanyRegistration(@PathVariable Long companyId) {
         // Assuming you have a method in the CompanyService to approve company registration
         String generatedPassword = companyService.approveCompanyRegistration(companyId);
+
         if (generatedPassword != null) {
+            CompanyEntity company = companyRepository.findById(companyId).orElseThrow(()-> new CompanyNotFoundException("Company not found with id:" + companyId));
+            adminService.notifyCompanyForApproval(company,generatedPassword);
+
             return BaseResponse.success("Company registration approved successfully. Generated password: " + generatedPassword);
         } else {
            throw new RuntimeException("Failed to approve company registration.");
         }
     }
+
 
 
     @PostMapping("/login")

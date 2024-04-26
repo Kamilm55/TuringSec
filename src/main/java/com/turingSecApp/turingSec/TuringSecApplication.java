@@ -5,6 +5,7 @@ import com.turingSecApp.turingSec.dao.entities.role.Role;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.*;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
+import com.turingSecApp.turingSec.service.EmailNotificationService;
 import com.turingSecApp.turingSec.service.HackerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -31,6 +32,7 @@ public class TuringSecApplication implements CommandLineRunner {
     private final ProgramsRepository programsRepository;
     private final AssetTypeRepository assetTypeRepository;
     private final StrictRepository strictRepository;
+    private final EmailNotificationService emailNotificationService;
     public static void main(String[] args) {
         SpringApplication.run(TuringSecApplication.class, args);
     }
@@ -133,7 +135,7 @@ public class TuringSecApplication implements CommandLineRunner {
                 .first_name("Kamil")
                 .last_name("Memmedov")
                 .username("admin1_username")
-                .password(passwordEncoder.encode("password"))
+                .password(passwordEncoder.encode("admin"))
                 .email("kamilmmmdov2905@gmail.com")
                 .build();
 
@@ -141,14 +143,15 @@ public class TuringSecApplication implements CommandLineRunner {
                 .first_name("Admin2")
                 .last_name("Admin2Last")
                 .username("admin2_username")
-                .password(passwordEncoder.encode("admin2_password"))
-                .email("admin2@example.com")
+                .password(passwordEncoder.encode("admin"))
+                .email("elnarzulfuqarli2001@gmail.com")
                 .build();
 
         //todo: admin must be user create fk and insert
         adminRepository.save(admin1);
-        adminRepository.save(admin2);
+//        adminRepository.save(admin2);
 
-
+        // notify company for approvement
+//        emailNotificationService.sendEmail("kamilmdov2905@gmail.com", "subject", "content");
     }
 }

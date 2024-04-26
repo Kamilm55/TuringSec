@@ -90,10 +90,12 @@ public class CompanyService {
 
         company.setRoles(Collections.singleton(companyRole));
 
-        notifyAdminsForApproval(company);
 
         // Save the company
-        CompanyEntity saved = companyRepository.save(company);
+        CompanyEntity savedCompany = companyRepository.save(company);
+
+
+        notifyAdminsForApproval(savedCompany);
     }
 
 
@@ -105,6 +107,7 @@ public class CompanyService {
         // Compose the email message
         String subject = "New Company Registration for Approval";
         String content = "A new company has registered and requires approval.\n\n"
+                + "Company ID: " + company.getId() + "\n"
                 + "Company Name: " + company.getCompany_name() + "\n"
                 + "Contact Person: " + company.getEmail() + "\n"
                 + "Name , Surname: " + company.getFirst_name() + ", " + company.getLast_name() + "\n"
