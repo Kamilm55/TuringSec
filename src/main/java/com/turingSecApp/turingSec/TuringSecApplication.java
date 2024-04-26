@@ -149,7 +149,7 @@ public class TuringSecApplication implements CommandLineRunner {
 
         //todo: admin must be user create fk and insert
         adminRepository.save(admin1);
-//        adminRepository.save(admin2);
+        adminRepository.save(admin2);
 
         // notify company for approvement
 //        emailNotificationService.sendEmail("kamilmdov2905@gmail.com", "subject", "content");
