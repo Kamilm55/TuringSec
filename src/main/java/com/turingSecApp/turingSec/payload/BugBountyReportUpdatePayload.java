@@ -1,19 +1,19 @@
 package com.turingSecApp.turingSec.payload;
 
+import com.turingSecApp.turingSec.dao.entities.CollaboratorEntity;
 import com.turingSecApp.turingSec.response.CollaboratorDTO;
-import jakarta.persistence.Column;
 import lombok.*;
 
 import java.util.Date;
 import java.util.List;
 
 @Data
-@EqualsAndHashCode(exclude = "collaboratorDTO")
-@ToString(exclude = "collaboratorDTO")
+@EqualsAndHashCode(exclude = "collaborator")
+@ToString(exclude = "collaborator")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BugBountyReportPayload {
+public class BugBountyReportUpdatePayload {
     private String asset;
     private String weakness;
     private String severity;
@@ -27,6 +27,5 @@ public class BugBountyReportPayload {
 
     private Long userId;
 
-    private List<CollaboratorDTO> collaboratorDTO;
-
+    private List<CollaboratorWithIdPayload> collaborator;
 }

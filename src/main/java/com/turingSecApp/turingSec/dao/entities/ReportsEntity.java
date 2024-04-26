@@ -20,7 +20,7 @@ import java.util.List;
 @Table(name = "bug_bounty_reports")
 public class ReportsEntity {
     @Id
-    @JsonIgnore
+   // @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

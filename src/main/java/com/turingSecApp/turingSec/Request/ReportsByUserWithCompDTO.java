@@ -12,11 +12,6 @@ import java.util.List;
 @Getter
 @Setter
 public class ReportsByUserWithCompDTO {
-
-
     private String companyName;
     private List<ReportsEntity> reports;
-
-
-
 }

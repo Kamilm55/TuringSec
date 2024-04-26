@@ -62,7 +62,7 @@ public class SecurityConfig {
 
                     // User Controller
                     request
-                            .requestMatchers("/api/auth/register/hacker").anonymous()
+                            .requestMatchers("/api/auth/register/hacker").anonymous() // anonymous means , only unauthenticated users can send request
                             .requestMatchers("/api/auth/login").anonymous() // Public endpoints for registration and login
 
                             .requestMatchers("/api/auth/change-password").authenticated()
@@ -82,7 +82,7 @@ public class SecurityConfig {
                     request
                             .requestMatchers("/api/companies/register").anonymous()
                             .requestMatchers("/api/companies/login").anonymous()
-                            .requestMatchers("/api/companies/current-user").hasRole("COMPANY")
+                            .requestMatchers("/api/companies/current-user").hasRole("COMPANY") // only company
                             .requestMatchers("/api/companies/**").permitAll();
 
                     // Hacker Controller

@@ -13,6 +13,7 @@ public class ReportsByUserDTO {
    // private Long id;
     private Long userId;
     private UserDTO user;
-    private String userImgUrl; // Add image URL field
+    private boolean has_hacker_profile_pic;
+    //private String userImgUrl; // Add image URL field
     private List<ReportsEntity> reports;
 }

@@ -14,6 +14,7 @@ import com.turingSecApp.turingSec.dao.repository.UserRepository;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.payload.BugBountyReportPayload;
+import com.turingSecApp.turingSec.payload.BugBountyReportUpdatePayload;
 import com.turingSecApp.turingSec.response.CollaboratorDTO;
 import com.turingSecApp.turingSec.service.BugBountyReportService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
@@ -22,10 +23,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -106,8 +105,6 @@ public class BugBountyReportController {
                 collaboratorRepository.save(collaboratorEntity); // Save each collaborator to manage them
             }
 
-            System.out.println(program);
-            System.out.println(report);
             // Save the report and its collaborators
             bugBountyReportRepository.save(report);
 
@@ -168,8 +165,8 @@ public class BugBountyReportController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ReportsEntity> updateBugBountyReport(@PathVariable Long id,
-                                                                  @RequestBody ReportsEntity bugBountyReport) {
-        ReportsEntity updatedReport = bugBountyReportService.updateBugBountyReport(id, bugBountyReport);
+                                                                  @RequestBody BugBountyReportUpdatePayload bugBountyReportUpdatePayload) {
+        ReportsEntity updatedReport = bugBountyReportService.updateBugBountyReport(id, bugBountyReportUpdatePayload);
         return new ResponseEntity<>(updatedReport, HttpStatus.OK);
     }
 
