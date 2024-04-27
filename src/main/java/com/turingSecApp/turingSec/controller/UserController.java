@@ -23,6 +23,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -131,13 +132,13 @@ public class UserController {
     }
 
     @GetMapping("/activate")
-    public BaseResponse<?> activateAccount(@RequestParam("token") String token) {
+    public ResponseEntity<?> activateAccount(@RequestParam("token") String token) {
         boolean activationResult = userService.activateAccount(token);
 
         if (!activationResult) {
            throw new  InvalidTokenException();
         }
-            return BaseResponse.success(null,"Account activated successfully!");
+            return ResponseEntity.ok("Account activated successfully! You can login your account.");
     }
 
     @PostMapping("/login")
@@ -293,15 +294,15 @@ public class UserController {
         String newToken = jwtTokenProvider.generateToken(userDetailsFromDB);
 
         // Clear the authorization header
-        request.removeAttribute("Authorization");
-        // Set the new token in the Authorization header
-        request.setAttribute("Authorization", "Bearer " + newToken);
+//        request.removeAttribute("Authorization");
+//        // Set the new token in the Authorization header
+//        request.setAttribute("Authorization", "Bearer " + newToken); // Not Working
 
         UserHackerDTO userHackerDTO = UserMapper.INSTANCE.toDto(userEntity, hackerEntity);
 
         return BaseResponse.success(
                 userHackerDTO,
-                "Profile updated successfully.");
+                "Profile updated successfully. You must update Authorization header (Bearer token) , new token is: " + newToken);
     }
 
 
@@ -361,9 +362,9 @@ public class UserController {
         userRepository.delete(user);
 
         // Clear the authorization header
-        request.removeAttribute("Authorization");
+//        request.removeAttribute("Authorization"); //Not Working
 
-        return BaseResponse.success(null,"User deleted successfully");
+        return BaseResponse.success(null,"User deleted successfully. You must delete Authorization header (Bearer token)");
     }
 
     @GetMapping("/programs")

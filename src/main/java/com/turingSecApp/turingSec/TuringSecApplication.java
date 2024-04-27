@@ -100,8 +100,8 @@ public class TuringSecApplication implements CommandLineRunner {
                 .last_name("Memmedov")
                 .country("Azerbaijan")
                 .username("Username")
-                .email("string@gmail.com")
-                .password(passwordEncoder.encode("string"))
+                .email("kamilmdov2905@gmail.com")
+                .password(passwordEncoder.encode("userPass"))
                 .activationToken("7203c486-0069-45d4-8857-15a27ad24bee")
                 .activated(true)
                 .build();
@@ -135,7 +135,7 @@ public class TuringSecApplication implements CommandLineRunner {
                 .first_name("Kamil")
                 .last_name("Memmedov")
                 .username("admin1_username")
-                .password(passwordEncoder.encode("admin"))
+                .password(passwordEncoder.encode("adminPass"))
                 .email("kamilmmmdov2905@gmail.com")
                 .build();
 
@@ -143,7 +143,7 @@ public class TuringSecApplication implements CommandLineRunner {
                 .first_name("Admin2")
                 .last_name("Admin2Last")
                 .username("admin2_username")
-                .password(passwordEncoder.encode("admin"))
+                .password(passwordEncoder.encode("adminPass "))
                 .email("elnarzulfuqarli2001@gmail.com")
                 .build();
 

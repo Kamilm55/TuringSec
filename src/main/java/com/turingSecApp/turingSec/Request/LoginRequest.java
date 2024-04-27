@@ -1,17 +1,15 @@
 package com.turingSecApp.turingSec.Request;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 public class LoginRequest {
+    @Schema(example = "Username")
     private String usernameOrEmail;
+    @Schema(example = "userPass")
     private String password;
-
-
 }
