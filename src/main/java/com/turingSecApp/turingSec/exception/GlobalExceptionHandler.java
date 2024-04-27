@@ -49,6 +49,13 @@ public class GlobalExceptionHandler {
     }
     //TODO
 
+    @ExceptionHandler(PermissionDeniedException.class)
+    public ResponseEntity<ExceptionResponseMessages> handleEPermissionDeniedException(PermissionDeniedException ex) {
+        return new ResponseEntity<>(
+                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.FORBIDDEN) ,
+                HttpStatus.FORBIDDEN
+        );
+    }
 
     @ExceptionHandler(com.turingSecApp.turingSec.exception.custom.BadCredentialsException.class)
     public ResponseEntity<ExceptionResponseMessages> handleBadCredentials(com.turingSecApp.turingSec.exception.custom.BadCredentialsException ex) {

@@ -1,5 +1,7 @@
 package com.turingSecApp.turingSec.Request;
 
+import com.turingSecApp.turingSec.payload.AssetTypePayload;
+import com.turingSecApp.turingSec.payload.StrictPayload;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +23,7 @@ public class BugBountyProgramWithAssetTypeDTO {
     private List<AssetTypeDTO> assetTypes;
     private List<StrictDTO> prohibits; // New field for prohibits
     private Long companyId; // New field for company ID
+    private Long programId;
 
     // Getters and setters
 }

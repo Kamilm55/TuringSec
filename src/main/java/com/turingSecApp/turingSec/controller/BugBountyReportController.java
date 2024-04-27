@@ -12,10 +12,12 @@ import com.turingSecApp.turingSec.dao.repository.ProgramsRepository;
 import com.turingSecApp.turingSec.dao.repository.ReportsRepository;
 import com.turingSecApp.turingSec.dao.repository.UserRepository;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
+import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.payload.BugBountyReportPayload;
 import com.turingSecApp.turingSec.payload.BugBountyReportUpdatePayload;
 import com.turingSecApp.turingSec.response.CollaboratorDTO;
+import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.BugBountyReportService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
@@ -47,13 +49,13 @@ public class BugBountyReportController {
 //    }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ReportsEntity> getBugBountyReportById(@PathVariable Long id) {
+    public BaseResponse<ReportsEntity> getBugBountyReportById(@PathVariable Long id) {
         ReportsEntity bugBountyReport = bugBountyReportService.getBugBountyReportById(id);
-        return new ResponseEntity<>(bugBountyReport, HttpStatus.OK);
+        return BaseResponse.success(bugBountyReport);
     }
 
     @PostMapping("/submit")
-    public ResponseEntity<?> submitBugBountyReport(@RequestBody BugBountyReportPayload reportPayload, @RequestParam Long bugBountyProgramId) {
+    public BaseResponse<?> submitBugBountyReport(@RequestBody BugBountyReportPayload reportPayload, @RequestParam Long bugBountyProgramId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         // Fetch the BugBountyProgramEntity from the repository
@@ -64,10 +66,6 @@ public class BugBountyReportController {
             String username = authentication.getName();
             UserEntity user = userRepository.findByUsername(username)
                     .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
-
-            if (user == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
-            }
 
             ReportsEntity report = new ReportsEntity();
 
@@ -108,9 +106,9 @@ public class BugBountyReportController {
             // Save the report and its collaborators
             bugBountyReportRepository.save(report);
 
-            return ResponseEntity.ok("Bug bounty report submitted successfully");
+            return BaseResponse.success("Bug bounty report submitted successfully");
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+           throw new UnauthorizedException();
         }
     }
 
@@ -164,26 +162,27 @@ public class BugBountyReportController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<ReportsEntity> updateBugBountyReport(@PathVariable Long id,
+    public BaseResponse<ReportsEntity> updateBugBountyReport(@PathVariable Long id,
                                                                   @RequestBody BugBountyReportUpdatePayload bugBountyReportUpdatePayload) {
         ReportsEntity updatedReport = bugBountyReportService.updateBugBountyReport(id, bugBountyReportUpdatePayload);
-        return new ResponseEntity<>(updatedReport, HttpStatus.OK);
+        return BaseResponse.success(updatedReport);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteBugBountyReport(@PathVariable Long id) {
+    public BaseResponse<?> deleteBugBountyReport(@PathVariable Long id) {
         bugBountyReportService.deleteBugBountyReport(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        // refactorThis -> new ResponseEntity<>(HttpStatus.NO_CONTENT)
+        return BaseResponse.success();
     }
 
     @GetMapping("/user")
-    public ResponseEntity<List<ReportsByUserWithCompDTO>> getAllBugBountyReportsByUser() {
+    public BaseResponse<List<ReportsByUserWithCompDTO>> getAllBugBountyReportsByUser() {
         List<ReportsByUserWithCompDTO> userReports = bugBountyReportService.getAllReportsByUser();
-        return new ResponseEntity<>(userReports, HttpStatus.OK);
+        return BaseResponse.success(userReports);
     }
 
     @GetMapping("/reports/company")
-    public ResponseEntity<List<ReportsByUserDTO>> getBugBountyReportsForCompanyPrograms() {
+    public BaseResponse<List<ReportsByUserDTO>> getBugBountyReportsForCompanyPrograms() {
         // Retrieve the authenticated user details
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -202,6 +201,6 @@ public class BugBountyReportController {
         // Retrieve bug bounty reports submitted for the company's programs
         List<ReportsByUserDTO> reportsForCompanyPrograms = bugBountyReportService.getBugBountyReportsForCompanyPrograms(company);
 
-        return ResponseEntity.ok(reportsForCompanyPrograms);
+        return BaseResponse.success(reportsForCompanyPrograms);
     }
 }

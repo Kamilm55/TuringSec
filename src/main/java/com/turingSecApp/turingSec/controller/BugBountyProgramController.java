@@ -1,29 +1,27 @@
 package com.turingSecApp.turingSec.controller;
 
 import com.turingSecApp.turingSec.Request.AssetTypeDTO;
-import com.turingSecApp.turingSec.Request.BugBountyProgramWithAssetTypeDTO;
-import com.turingSecApp.turingSec.Request.StrictDTO;
 import com.turingSecApp.turingSec.dao.entities.AssetTypeEntity;
 import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
 import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
 import com.turingSecApp.turingSec.dao.entities.StrictEntity;
-import com.turingSecApp.turingSec.dao.repository.AssetTypeRepository;
 import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
+import com.turingSecApp.turingSec.exception.custom.PermissionDeniedException;
+import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
+import com.turingSecApp.turingSec.payload.AssetTypePayload;
+import com.turingSecApp.turingSec.payload.BugBountyProgramWithAssetTypePayload;
+import com.turingSecApp.turingSec.payload.StrictPayload;
+import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.AssetTypeService;
 import com.turingSecApp.turingSec.service.ProgramsService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
-import com.turingSecApp.turingSec.service.user.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,7 +36,7 @@ public class BugBountyProgramController {
 
     @GetMapping
     @Secured("ROLE_COMPANY")
-    public ResponseEntity<List<BugBountyProgramEntity>> getAllBugBountyPrograms() {
+    public BaseResponse<List<BugBountyProgramEntity>> getAllBugBountyPrograms() {
         // Retrieve the email of the authenticated user
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = authentication.getName();
@@ -51,15 +49,15 @@ public class BugBountyProgramController {
             // Get programs belonging to the company
             List<BugBountyProgramEntity> programs = bugBountyProgramService.getAllBugBountyProgramsByCompany(company);
 
-            return ResponseEntity.ok(programs);
+            return BaseResponse.success(programs);
         } else {
             // Return unauthorized response or handle as needed
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new UnauthorizedException();
         }
     }
 
     @PostMapping
-    public ResponseEntity<BugBountyProgramEntity> createBugBountyProgram(@Valid @RequestBody BugBountyProgramWithAssetTypeDTO programDTO) {
+    public BaseResponse<BugBountyProgramEntity> createBugBountyProgram(@Valid @RequestBody BugBountyProgramWithAssetTypePayload programDTO) {
         // Get the authenticated user details
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -76,7 +74,7 @@ public class BugBountyProgramController {
         program.setCompany(company);
 
         // Convert AssetTypeDTOs to AssetTypeEntities
-        List<AssetTypeDTO> assetTypeDTOs = programDTO.getAssetTypes();
+        List<AssetTypePayload> assetTypeDTOs = programDTO.getAssetTypes();
         List<AssetTypeEntity> assetTypes = assetTypeDTOs.stream()
                 .map(assetTypeDTO -> {
                     AssetTypeEntity assetTypeEntity = new AssetTypeEntity();
@@ -92,7 +90,7 @@ public class BugBountyProgramController {
         program.setAssetTypes(assetTypes);
 
         // Convert ProhibitsDTOs to StrictEntities
-        List<StrictDTO> prohibitsDTOs = programDTO.getProhibits();
+        List<StrictPayload> prohibitsDTOs = programDTO.getProhibits();
         List<StrictEntity> prohibits = prohibitsDTOs.stream()
                 .map(prohibitDTO -> {
                     StrictEntity strictEntity = new StrictEntity();
@@ -108,10 +106,12 @@ public class BugBountyProgramController {
 
         // Proceed with creating or updating the bug bounty program
         BugBountyProgramEntity createdOrUpdateProgram = bugBountyProgramService.createOrUpdateBugBountyProgram(program);
-        return ResponseEntity.created(URI.create("/api/bug-bounty-programs/" + createdOrUpdateProgram.getId())).body(createdOrUpdateProgram);
+//          refactorThis: CREATED RESPONSE MESSAGE 201
+//           ResponseEntity.created(URI.create("/api/bug-bounty-programs/" + createdOrUpdateProgram.getId())).body(createdOrUpdateProgram);
+        return BaseResponse.success(createdOrUpdateProgram);
     }
     @GetMapping("/assets")
-    public ResponseEntity<List<AssetTypeDTO>> getCompanyAssetTypes() {
+    public BaseResponse<List<AssetTypeDTO>> getCompanyAssetTypes() {
         // Retrieve the email of the authenticated user
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String userEmail = authentication.getName();
@@ -133,16 +133,16 @@ public class BugBountyProgramController {
                     })
                     .collect(Collectors.toList());
 
-            return ResponseEntity.ok(assetTypeDTOs);
+            return BaseResponse.success(assetTypeDTOs);
         } else {
             // Return unauthorized response or handle as needed
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+           throw new UnauthorizedException();
         }
     }
 
     @DeleteMapping("/{id}")
     @Secured("ROLE_COMPANY")
-    public ResponseEntity<Void> deleteBugBountyProgram(@PathVariable Long id) {
+    public BaseResponse<Void> deleteBugBountyProgram(@PathVariable Long id) {
         // Get the authenticated user details
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -157,10 +157,12 @@ public class BugBountyProgramController {
         if (program.getCompany().getId().equals(company.getId())) {
             // Proceed with deleting the bug bounty program
             bugBountyProgramService.deleteBugBountyProgram(id);
-            return ResponseEntity.noContent().build();
+            //          refactorThis: NOCONTENT RESPONSE MESSAGE 204
+            return BaseResponse.success(null,"Program deleted successfully");
         } else {
             // If the authenticated company is not the owner, return forbidden status
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            throw new PermissionDeniedException();
         }
     }
 
