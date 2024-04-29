@@ -4,8 +4,10 @@ import com.turingSecApp.turingSec.dao.entities.AssetTypeEntity;
 import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
 import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
 import com.turingSecApp.turingSec.dao.entities.StrictEntity;
+import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
 import com.turingSecApp.turingSec.dao.repository.ProgramsRepository;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +18,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ProgramsService {
 
-    @Autowired
-    private ProgramsRepository programsRepository;
+    private final ProgramsRepository programsRepository;
+    private final CompanyRepository companyRepository;
 
     public BugBountyProgramEntity createOrUpdateBugBountyProgram(BugBountyProgramEntity program) {
         // Check if a program with the same parameters already exists for the company
@@ -113,6 +116,8 @@ public class ProgramsService {
 
     public BugBountyProgramEntity getBugBountyProgramById(Long id) {
         Optional<BugBountyProgramEntity> program = programsRepository.findById(id);
+
+
         return program.orElseThrow(() -> new ResourceNotFoundException("Bug Bounty Program not found"));
     }
 

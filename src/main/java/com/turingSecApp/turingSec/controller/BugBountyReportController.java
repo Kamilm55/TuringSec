@@ -112,55 +112,6 @@ public class BugBountyReportController {
         }
     }
 
-
-//    @PostMapping("/submit")
-//    public ResponseEntity<?> submitBugBountyReport(@RequestBody ReportsEntity report, @RequestParam Long bugBountyProgramId) {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//
-//        programsRepository.findById(bugBountyProgramId).orElseThrow(()-> new ResourceNotFoundException("Program not found with id:" + bugBountyProgramId));
-//        if (authentication != null && authentication.isAuthenticated()) {
-//
-//
-//            String username = authentication.getName();
-//            UserEntity user = userRepository.findByUsername(username).orElseThrow(()-> new UserNotFoundException("User with username " + username + " not found"));
-//
-//            if (user == null) {
-//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
-//            }
-//
-//            // Set the user for the bug bounty report
-//            report.setUser(user);
-//
-//
-//            // Set the bug bounty program for the bug bounty report
-//            BugBountyProgramEntity program = new BugBountyProgramEntity();
-//            program.setId(bugBountyProgramId);
-//            report.setBugBountyProgram(program);
-//
-//            System.out.println(program);
-//
-//            // Set the bug bounty report for each collaborator
-//            for (CollaboratorEntity collaborator : report.getCollaborators()) {
-//                collaborator.setBugBountyReport(report);
-//                System.out.println(collaborator);
-//                collaboratorRepository.save(collaborator);
-//            }
-//
-//
-//            System.out.println(report);
-//
-//            bugBountyReportRepository.save(report);
-//            // Save the bug bounty report
-//          //  bugBountyReportService.submitBugBountyReport(report);
-//
-//            return ResponseEntity.ok("Bug bounty report submitted successfully");
-//        } else {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
-//        }
-//    }
-
-
-
     @PutMapping("/{id}")
     public BaseResponse<ReportsEntity> updateBugBountyReport(@PathVariable Long id,
                                                                   @RequestBody BugBountyReportUpdatePayload bugBountyReportUpdatePayload) {
