@@ -59,6 +59,10 @@ public class SecurityConfig {
                     // h2 console
                     request.requestMatchers("/h2-console/**").permitAll(); // permits access to all URLs starting with /h2-console/ without authentication.
 
+                    // Bug Bounty Program Controller
+                    request
+                            .requestMatchers("/api/bug-bounty-programs").permitAll()
+                            .requestMatchers("/api/bug-bounty-programs/**").permitAll();
 
                     // User Controller
                     request
@@ -93,9 +97,7 @@ public class SecurityConfig {
                             .requestMatchers("/api/admin/login").anonymous()
                             .requestMatchers("/api/admin/approve-company/{companyId}").hasRole("ADMIN");
 
-                    // Bug Bounty Program Controller
-                    request
-                            .requestMatchers("/api/bug-bounty-programs/**").hasRole("COMPANY");
+
 
                     // Bug Bounty Report Controller
                     request

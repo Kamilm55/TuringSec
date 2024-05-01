@@ -6,6 +6,7 @@ import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
 import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
 import com.turingSecApp.turingSec.dao.entities.StrictEntity;
 import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
+import com.turingSecApp.turingSec.dao.repository.ProgramsRepository;
 import com.turingSecApp.turingSec.exception.custom.PermissionDeniedException;
 import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
 import com.turingSecApp.turingSec.payload.AssetTypePayload;
@@ -33,28 +34,49 @@ public class BugBountyProgramController {
     private final ProgramsService bugBountyProgramService;
     private final AssetTypeService assetTypeService;
     private final  CompanyRepository companyRepository;
+    private final ProgramsRepository programsRepository;
 
+//    @GetMapping
+//    public BaseResponse<List<BugBountyProgramEntity>> getAllBugBountyPrograms() {
+//        // Retrieve the email of the authenticated user
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String userEmail = authentication.getName();
+//
+//        // Retrieve the company associated with the authenticated user
+//        CompanyEntity company = companyRepository.findByEmail(userEmail);
+//
+//        // Check if the company is authenticated
+//        if (company != null) {
+//            // Get programs belonging to the company
+//            List<BugBountyProgramEntity> programs = bugBountyProgramService.getAllBugBountyProgramsByCompany(company);
+//
+//            return BaseResponse.success(programs);
+//        } else {
+//            // Return unauthorized response or handle as needed
+//            throw new UnauthorizedException();
+//        }
+//    }
     @GetMapping
-    @Secured("ROLE_COMPANY")
     public BaseResponse<List<BugBountyProgramEntity>> getAllBugBountyPrograms() {
         // Retrieve the email of the authenticated user
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userEmail = authentication.getName();
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String userEmail = authentication.getName();
 
         // Retrieve the company associated with the authenticated user
-        CompanyEntity company = companyRepository.findByEmail(userEmail);
+//        CompanyEntity company = companyRepository.findByEmail(userEmail);
 
         // Check if the company is authenticated
-        if (company != null) {
+//        if (company != null) {
             // Get programs belonging to the company
-            List<BugBountyProgramEntity> programs = bugBountyProgramService.getAllBugBountyProgramsByCompany(company);
+            List<BugBountyProgramEntity> programs = programsRepository.findAll();
 
             return BaseResponse.success(programs);
-        } else {
-            // Return unauthorized response or handle as needed
-            throw new UnauthorizedException();
-        }
+//        } else {
+//            // Return unauthorized response or handle as needed
+//            throw new UnauthorizedException();
+//        }
     }
+
 
     @PostMapping
     public BaseResponse<BugBountyProgramEntity> createBugBountyProgram(@Valid @RequestBody BugBountyProgramWithAssetTypePayload programDTO) {
