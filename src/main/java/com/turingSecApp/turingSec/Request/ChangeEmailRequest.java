@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ChangeEmailRequest {
-    private String password;
     private String newEmail;
+    private String password;
 
 }

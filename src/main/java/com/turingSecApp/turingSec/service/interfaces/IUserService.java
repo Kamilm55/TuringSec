@@ -11,6 +11,7 @@ import java.util.List;
 
 public interface IUserService {
     AuthResponse registerHacker(RegisterPayload registerPayload);
+    void insertActiveHacker(RegisterPayload registerPayload); // for testing
     boolean activateAccount(String token);
     AuthResponse loginUser(LoginRequest loginRequest);
     void changePassword(ChangePasswordRequest request);

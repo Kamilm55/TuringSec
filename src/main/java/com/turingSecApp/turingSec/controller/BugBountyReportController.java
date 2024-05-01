@@ -56,60 +56,7 @@ public class BugBountyReportController {
 
     @PostMapping("/submit")
     public BaseResponse<?> submitBugBountyReport(@RequestBody BugBountyReportPayload reportPayload, @RequestParam Long bugBountyProgramId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        // Fetch the BugBountyProgramEntity from the repository
-        BugBountyProgramEntity program = programsRepository.findById(bugBountyProgramId)
-                .orElseThrow(() -> new ResourceNotFoundException("Program not found with id:" + bugBountyProgramId));
-
-        if (authentication != null && authentication.isAuthenticated()) {
-            String username = authentication.getName();
-            UserEntity user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
-
-            ReportsEntity report = new ReportsEntity();
-
-            // Populate report entity
-            report.setAsset(reportPayload.getAsset());
-            report.setWeakness(reportPayload.getWeakness());
-            report.setSeverity(reportPayload.getSeverity());
-            report.setMethodName(reportPayload.getMethodName());
-            report.setProofOfConcept(reportPayload.getProofOfConcept());
-            report.setDiscoveryDetails(reportPayload.getDiscoveryDetails());
-            report.setLastActivity(reportPayload.getLastActivity());
-            report.setReportTitle(reportPayload.getReportTitle());
-            report.setRewardsStatus(reportPayload.getRewardsStatus());
-            report.setVulnerabilityUrl(reportPayload.getVulnerabilityUrl());
-
-            // Set the user for the bug bounty report
-            UserEntity userFromDB = userRepository.findById(reportPayload.getUserId()).orElseThrow(() -> new UserNotFoundException("User with id " + reportPayload.getUserId() + " not found"));
-            report.setUser(userFromDB);
-
-            // Set the bug bounty program for the bug bounty report
-            report.setBugBountyProgram(program);
-
-            ReportsEntity saved = bugBountyReportRepository.save(report);
-
-            ReportsEntity reportFromDB = bugBountyReportRepository.findById(saved.getId()).orElseThrow(() -> new ResourceNotFoundException("Report not found"));
-            // Set the bug bounty report for each collaborator
-            for (CollaboratorDTO collaboratorDTO : reportPayload.getCollaboratorDTO()) {
-                CollaboratorEntity collaboratorEntity = new CollaboratorEntity();
-                collaboratorEntity.setCollaborationPercentage(collaboratorDTO.getCollaborationPercentage());
-                collaboratorEntity.setHackerUsername(collaboratorDTO.getHackerUsername());
-                collaboratorEntity.setBugBountyReport(reportFromDB);
-
-//                collaborator.setBugBountyReport(report);
-//                System.out.println(collaborator);
-                collaboratorRepository.save(collaboratorEntity); // Save each collaborator to manage them
-            }
-
-            // Save the report and its collaborators
-            bugBountyReportRepository.save(report);
-
-            return BaseResponse.success("Bug bounty report submitted successfully");
-        } else {
-           throw new UnauthorizedException();
-        }
+       return bugBountyReportService.submitBugBountyReport(reportPayload,bugBountyProgramId);
     }
 
     @PutMapping("/{id}")

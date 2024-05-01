@@ -7,10 +7,13 @@ import com.turingSecApp.turingSec.dao.entities.*;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.*;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
+import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
+import com.turingSecApp.turingSec.payload.BugBountyReportPayload;
 import com.turingSecApp.turingSec.payload.BugBountyReportUpdatePayload;
 import com.turingSecApp.turingSec.payload.CollaboratorWithIdPayload;
 import com.turingSecApp.turingSec.response.CollaboratorDTO;
+import com.turingSecApp.turingSec.response.base.BaseResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -27,7 +30,7 @@ import static com.turingSecApp.turingSec.util.GlobalConstants.ROOT_LINK;
 @Service
 @RequiredArgsConstructor
 public class BugBountyReportService {
-    //private final ProgramsRepository programsRepository;
+    private final ProgramsRepository programsRepository;
     private final HackerRepository hackerRepository;
     private final ReportsRepository bugBountyReportRepository;
     private final UserRepository userRepository;
@@ -217,4 +220,114 @@ public class BugBountyReportService {
     // https://turingsec-production-de02.up.railway.app
         return ROOT_LINK + "/api/background-image-for-hacker/download/" + userDTO.getHackerId();
     }
+
+    public BaseResponse<?> submitBugBountyReport(BugBountyReportPayload reportPayload, Long bugBountyProgramId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // Fetch the BugBountyProgramEntity from the repository
+        BugBountyProgramEntity program = programsRepository.findById(bugBountyProgramId)
+                .orElseThrow(() -> new ResourceNotFoundException("Program not found with id:" + bugBountyProgramId));
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            String username = authentication.getName();
+            userRepository.findByUsername(username)
+                    .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
+
+            ReportsEntity report = new ReportsEntity();
+
+            // Populate report entity
+            report.setAsset(reportPayload.getAsset());
+            report.setWeakness(reportPayload.getWeakness());
+            report.setSeverity(reportPayload.getSeverity());
+            report.setMethodName(reportPayload.getMethodName());
+            report.setProofOfConcept(reportPayload.getProofOfConcept());
+            report.setDiscoveryDetails(reportPayload.getDiscoveryDetails());
+            report.setLastActivity(reportPayload.getLastActivity());
+            report.setReportTitle(reportPayload.getReportTitle());
+            report.setRewardsStatus(reportPayload.getRewardsStatus());
+            report.setVulnerabilityUrl(reportPayload.getVulnerabilityUrl());
+
+            // Set the user for the bug bounty report
+            UserEntity userFromDB = userRepository.findById(reportPayload.getUserId()).orElseThrow(() -> new UserNotFoundException("User with id " + reportPayload.getUserId() + " not found"));
+            report.setUser(userFromDB);
+
+            // Set the bug bounty program for the bug bounty report
+            report.setBugBountyProgram(program);
+
+            ReportsEntity saved = bugBountyReportRepository.save(report);
+
+            ReportsEntity reportFromDB = bugBountyReportRepository.findById(saved.getId()).orElseThrow(() -> new ResourceNotFoundException("Report not found"));
+            // Set the bug bounty report for each collaborator
+            for (CollaboratorDTO collaboratorDTO : reportPayload.getCollaboratorDTO()) {
+                CollaboratorEntity collaboratorEntity = new CollaboratorEntity();
+                collaboratorEntity.setCollaborationPercentage(collaboratorDTO.getCollaborationPercentage());
+                collaboratorEntity.setHackerUsername(collaboratorDTO.getHackerUsername());
+                collaboratorEntity.setBugBountyReport(reportFromDB);
+
+//                collaborator.setBugBountyReport(report);
+//                System.out.println(collaborator);
+                collaboratorRepository.save(collaboratorEntity); // Save each collaborator to manage them
+            }
+
+            // Save the report and its collaborators
+            bugBountyReportRepository.save(report);
+
+            return BaseResponse.success("Bug bounty report submitted successfully");
+        } else {
+            throw new UnauthorizedException();
+        }
+    }
+
+
+    public void submitBugBountyReportForTest(BugBountyReportPayload reportPayload, Long bugBountyProgramId) {
+
+        // Fetch the BugBountyProgramEntity from the repository
+        BugBountyProgramEntity program = programsRepository.findById(bugBountyProgramId)
+                .orElseThrow(() -> new ResourceNotFoundException("Program not found with id:" + bugBountyProgramId));
+
+
+//        String username = authentication.getName();
+//        userRepository.findByUsername(username)
+//                .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
+
+        ReportsEntity report = new ReportsEntity();
+
+        // Populate report entity
+        report.setAsset(reportPayload.getAsset());
+        report.setWeakness(reportPayload.getWeakness());
+        report.setSeverity(reportPayload.getSeverity());
+        report.setMethodName(reportPayload.getMethodName());
+        report.setProofOfConcept(reportPayload.getProofOfConcept());
+        report.setDiscoveryDetails(reportPayload.getDiscoveryDetails());
+        report.setLastActivity(reportPayload.getLastActivity());
+        report.setReportTitle(reportPayload.getReportTitle());
+        report.setRewardsStatus(reportPayload.getRewardsStatus());
+        report.setVulnerabilityUrl(reportPayload.getVulnerabilityUrl());
+
+        // Set the user for the bug bounty report
+        UserEntity userFromDB = userRepository.findById(reportPayload.getUserId()).orElseThrow(() -> new UserNotFoundException("User with id " + reportPayload.getUserId() + " not found"));
+        report.setUser(userFromDB);
+
+        // Set the bug bounty program for the bug bounty report
+        report.setBugBountyProgram(program);
+
+        ReportsEntity saved = bugBountyReportRepository.save(report);
+
+        ReportsEntity reportFromDB = bugBountyReportRepository.findById(saved.getId()).orElseThrow(() -> new ResourceNotFoundException("Report not found"));
+        // Set the bug bounty report for each collaborator
+        for (CollaboratorDTO collaboratorDTO : reportPayload.getCollaboratorDTO()) {
+            CollaboratorEntity collaboratorEntity = new CollaboratorEntity();
+            collaboratorEntity.setCollaborationPercentage(collaboratorDTO.getCollaborationPercentage());
+            collaboratorEntity.setHackerUsername(collaboratorDTO.getHackerUsername());
+            collaboratorEntity.setBugBountyReport(reportFromDB);
+
+//                collaborator.setBugBountyReport(report);
+//                System.out.println(collaborator);
+            collaboratorRepository.save(collaboratorEntity); // Save each collaborator to manage them
+        }
+
+        // Save the report and its collaborators
+        bugBountyReportRepository.save(report);
+    }
+
 }

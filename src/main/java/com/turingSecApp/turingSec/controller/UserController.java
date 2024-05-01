@@ -45,10 +45,8 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final UserService userService;
-    private final UserRepository userRepository;
 
     @PostMapping("/register/hacker")
-    @Transactional
      public BaseResponse<AuthResponse> registerHacker(@RequestBody RegisterPayload payload) {
         return BaseResponse.success(userService.registerHacker(payload),
                 "You should receive gmail message for account activation");

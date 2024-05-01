@@ -10,7 +10,7 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
 
-            <column name="prohibit_added" type="varchar(50)">
+            <column name="prohibit_added" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
 

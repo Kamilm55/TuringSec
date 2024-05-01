@@ -117,6 +117,68 @@ public class UserService implements IUserService {
                 .build();
     }
 
+    @Override
+    public void insertActiveHacker(RegisterPayload registerPayload) {
+        // Ensure the user doesn't exist
+        isUserExistWithUsername(registerPayload.getUsername());
+        isUserExistWithEmail(registerPayload.getEmail());
+
+        UserEntity user = UserEntity.builder()
+                .first_name(registerPayload.getFirstName())
+                .last_name(registerPayload.getLastName())
+                .country(registerPayload.getCountry())
+                .username(registerPayload.getUsername())
+                .email(registerPayload.getEmail())
+                .password(
+                        // Encode the password
+                        passwordEncoder.encode(registerPayload.getPassword())
+                ).activated(true)
+                .build();
+
+        // Set user roles
+        Set<Role> roles = new HashSet<>();
+        roles.add(roleRepository.findByName("HACKER"));
+        user.setRoles(roles);
+
+
+        // Save the user
+        userRepository.save(user);
+
+
+        //Note: To fetch user explicitly to avoid save process instead it updates because there is user entity with actual id not null
+        UserEntity fetchedUser = userRepository.findByUsername(registerPayload.getUsername()).orElseThrow(()-> new UserNotFoundException("User with username " + registerPayload.getUsername() + " not found"));
+
+        // Create and associate , populate hackerEntity entity
+        HackerEntity hackerEntity = new HackerEntity();
+        hackerEntity.setUser(fetchedUser);
+        hackerEntity.setFirst_name(fetchedUser.getFirst_name()); // Set the username in the hackerEntity entity
+        hackerEntity.setLast_name(fetchedUser.getLast_name()); // Set the age in the hackerEntity entity
+        hackerEntity.setCountry(fetchedUser.getCountry()); // Set the age in the hackerEntity entity
+
+
+        hackerRepository.save(hackerEntity);
+
+        // Accomplish associations between
+        fetchedUser.setHacker(hackerEntity);
+
+        userRepository.save(fetchedUser);
+
+        // Send activation email
+//        sendActivationEmail(fetchedUser);
+//
+////        // Generate token for the registered user
+////        UserDetails userDetails = new CustomUserDetails(fetchedUser);
+////        String token = jwtTokenProvider.generateToken(userDetails);
+////
+//////        // Retrieve the user ID from CustomUserDetails
+//////        Long userId = ((CustomUserDetails) userDetails).getId();
+//////        UserEntity userById = findUserById(userId);
+//////        HackerEntity hackerFromDB = hackerRepository.findByUser(userById);
+
+    }
+
+
+
     private void isUserExistWithEmail(String email) {
         if (userRepository.findByUsername(email).isPresent()) {
             throw new EmailAlreadyExistsException("Email is already taken.");
