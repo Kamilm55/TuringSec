@@ -5,7 +5,6 @@ import com.turingSecApp.turingSec.dao.entities.AdminEntity;
 import com.turingSecApp.turingSec.dao.entities.HackerEntity;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.response.AdminDTO;
-import com.turingSecApp.turingSec.response.UserDTOWithCity;
 import com.turingSecApp.turingSec.response.UserHackerDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
