@@ -394,8 +394,13 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public List<UserDTO> getAllUsers() {
-      return userRepository.findAll().stream().map(UserMapper.INSTANCE::convert).collect(Collectors.toList());
+    public List<UserHackerDTO> getAllUsers() {
+
+      return userRepository.findAll()
+              .stream()
+              .map(userEntity -> UserMapper.INSTANCE.toDto(userEntity, userEntity.getHacker()))
+              .collect(Collectors.toList());
+
     }
     /////////////
 

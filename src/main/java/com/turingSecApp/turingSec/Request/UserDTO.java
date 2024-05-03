@@ -17,5 +17,6 @@ public class UserDTO {
 
     private Long hackerId;
 
+
     // Add other user properties as needed
 }

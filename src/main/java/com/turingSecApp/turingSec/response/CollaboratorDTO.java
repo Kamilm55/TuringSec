@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class CollaboratorDTO {
-  //  private Long bugBountyReportId;
+    /*private Long id*//*bugBountyReportId*/;
     private String hackerUsername;
     private Double collaborationPercentage;
 }

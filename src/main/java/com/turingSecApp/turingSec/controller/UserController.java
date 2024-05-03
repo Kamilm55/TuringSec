@@ -2,41 +2,18 @@ package com.turingSecApp.turingSec.controller;
 
 
 import com.turingSecApp.turingSec.Request.*;
-import com.turingSecApp.turingSec.background_file_upload_for_hacker.service.FileService;
-import com.turingSecApp.turingSec.dao.entities.*;
-import com.turingSecApp.turingSec.dao.entities.role.Role;
-import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
-import com.turingSecApp.turingSec.dao.repository.HackerRepository;
-import com.turingSecApp.turingSec.dao.repository.RoleRepository;
-import com.turingSecApp.turingSec.dao.repository.UserRepository;
-import com.turingSecApp.turingSec.exception.custom.*;
-import com.turingSecApp.turingSec.filter.JwtUtil;
+import com.turingSecApp.turingSec.exception.custom.InvalidTokenException;
 import com.turingSecApp.turingSec.payload.RegisterPayload;
 import com.turingSecApp.turingSec.response.AuthResponse;
 import com.turingSecApp.turingSec.response.BugBountyProgramDTO;
 import com.turingSecApp.turingSec.response.UserHackerDTO;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
-import com.turingSecApp.turingSec.service.ProgramsService;
-import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import com.turingSecApp.turingSec.service.user.UserService;
-import com.turingSecApp.turingSec.util.ProgramMapper;
-import com.turingSecApp.turingSec.util.UserMapper;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
-
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -106,7 +83,7 @@ public class UserController {
     }
 
     @GetMapping("/allUsers")
-    public BaseResponse<List<UserDTO>> getAllUsers() {
+    public BaseResponse<List<UserHackerDTO>> getAllUsers() {
         return BaseResponse.success(userService.getAllUsers());
     }
 
