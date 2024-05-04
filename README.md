@@ -1,7 +1,7 @@
 # TuringSec App in Progress
 
 ## Overview
-Our startup is planning to receive an investment of 4000 AZN as it won the 3rd place in the competition sponsored by UNEC Incubators. This project aims to facilitate communication between Companies and Hackers. 
+This project aims to facilitate communication between Companies and Hackers. 
 In this app there are 3 roles `(HACKER, COMPANY, ADMIN)`. 
 They can send reports if any bugs are detected. Every company can send programs for hiring hackers, etc. The app is in progress...(There will be more features )
 
