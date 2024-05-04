@@ -27,5 +27,5 @@ In every request I send 2 images, one updates latest version, the other one spec
 - CI
 - Maven
 - Mapstruct
-- javax.mai
+- javax.mail
 - JWT, etc.
