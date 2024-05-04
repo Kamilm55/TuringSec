@@ -1,5 +1,6 @@
 package com.turingSecApp.turingSec.Request;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,9 +11,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ChangePasswordRequest {
+    @NotBlank(message = "Current password is required")
     private String currentPassword;
-    private String newPassword;
-    private String confirmNewPassword;
 
+    @NotBlank(message = "New password is required")
+    private String newPassword;
+
+    @NotBlank(message = "Please confirm new password")
+    private String confirmNewPassword;
     // Getters and setters
 }

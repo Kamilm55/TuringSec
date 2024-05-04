@@ -17,6 +17,7 @@ import com.turingSecApp.turingSec.service.CompanyService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import com.turingSecApp.turingSec.service.user.UserService;
 import com.turingSecApp.turingSec.util.CompanyMapper;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ public class CompanyController {
     private final JwtUtil jwtTokenProvider;
 
     @PostMapping("/register")
-    public BaseResponse<?> registerCompany(@RequestBody RegisterCompanyPayload registerCompanyPayload) {
+    public BaseResponse<?> registerCompany(@RequestBody @Valid RegisterCompanyPayload registerCompanyPayload) {
        companyService.registerCompany(registerCompanyPayload);
 
         return BaseResponse.success(null,"Your request sent to admins. When any admin approve your request, you receive password for company from gmail!");
@@ -54,7 +55,7 @@ public class CompanyController {
 
 
     @PostMapping("/login")
-    public BaseResponse<Map<String, String>> loginCompany(@RequestBody CompanyRequest companyRequest) {
+    public BaseResponse<Map<String, String>> loginCompany(@RequestBody @Valid CompanyRequest companyRequest) {
         // Check if the input is an email
         CompanyEntity companyEntity = companyRepository.findByEmail(companyRequest.getEmail());
 

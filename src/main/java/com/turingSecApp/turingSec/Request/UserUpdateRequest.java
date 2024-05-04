@@ -1,27 +1,43 @@
 package com.turingSecApp.turingSec.Request;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
 public class UserUpdateRequest {
 
+    @NotBlank(message = "First name is required")
+    private String firstName;
+
+    @NotBlank(message = "Last name is required")
+    private String lastName;
+
+    @NotBlank(message = "Username is required")
     private String username;
-    private String first_name;
-    private String last_name;
+
+    @NotBlank(message = "Country is required")
     private String country;
+
+    @Pattern(regexp = "^(https?:\\/\\/)?(www\\.)?linkedin\\.com\\/\\w*$|^$",
+            message = "Linkedin should be in format linkedin.com/<username> or empty")
+    private String linkedin;
+
+    @Pattern(regexp = "^(https?:\\/\\/)?(www\\.)?github\\.com\\/\\w*$|^$",
+            message = "GitHub should be in format github.com/<username> or empty")
+    private String github;
+
+    @Pattern(regexp = "^(https?:\\/\\/)?(www\\.)?twitter\\.com\\/\\w*$|^$",
+            message = "Twitter should be in format twitter.com/<username> or empty")
+    private String twitter;
+    @NotBlank(message = "City is required")
+    private String city;
+
+    // Optional fields
     private String website;
     private boolean has_background_pic;
     private boolean has_profile_pic;
     private String bio;
-    private String linkedin;
-    private String twitter;
-    private String github;
-    private String city;
-
 }

@@ -180,7 +180,8 @@ public class UserService implements IUserService {
 
 
     private void isUserExistWithEmail(String email) {
-        if (userRepository.findByUsername(email).isPresent()) {
+//        System.out.println(email);
+        if (userRepository.findByEmail(email) != null) {
             throw new EmailAlreadyExistsException("Email is already taken.");
         }
     }
@@ -322,8 +323,8 @@ public class UserService implements IUserService {
 
         userEntity.setUsername(userUpdateRequest.getUsername());
 
-        userEntity.setFirst_name(userUpdateRequest.getFirst_name());
-        userEntity.setLast_name(userUpdateRequest.getLast_name());
+        userEntity.setFirst_name(userUpdateRequest.getFirstName());
+        userEntity.setLast_name(userUpdateRequest.getLastName());
         userEntity.setCountry(userUpdateRequest.getCountry());
 
         // Save the updated user entity
@@ -332,8 +333,8 @@ public class UserService implements IUserService {
         // Update the corresponding HackerEntity if it exists
         HackerEntity hackerEntity = hackerRepository.findByUser(userEntity);
         if (hackerEntity != null) {
-            hackerEntity.setFirst_name(userUpdateRequest.getFirst_name());
-            hackerEntity.setLast_name(userUpdateRequest.getLast_name());
+            hackerEntity.setFirst_name(userUpdateRequest.getFirstName());
+            hackerEntity.setLast_name(userUpdateRequest.getLastName());
             hackerEntity.setCountry(userUpdateRequest.getCountry());
             hackerEntity.setCity(userUpdateRequest.getCity());
 
@@ -396,7 +397,7 @@ public class UserService implements IUserService {
     @Override
     public List<UserHackerDTO> getAllUsers() {
 
-      return userRepository.findAll()
+      return userRepository.findAllByActivated(true)
               .stream()
               .map(userEntity -> UserMapper.INSTANCE.toDto(userEntity, userEntity.getHacker()))
               .collect(Collectors.toList());

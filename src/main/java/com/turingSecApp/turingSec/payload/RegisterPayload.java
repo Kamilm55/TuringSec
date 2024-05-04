@@ -1,5 +1,7 @@
 package com.turingSecApp.turingSec.payload;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,14 +12,28 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class RegisterPayload {
+
+    @NotBlank(message = "First name is required")
     private String firstName;
+
+    @NotBlank(message = "Last name is required")
     private String lastName;
+
+    @NotBlank(message = "Username is required")
     private String username;
+
+    @NotBlank(message = "Password is required")
     private String password;
+
+    @NotBlank(message = "Email is mandatory")
+    @Email(message = "Please provide a valid email address")
     private String email;
+
+    @NotBlank(message = "Country is required")
     private String country;
 
-    // Additional fields for hacker
+}
+// Additional fields for hacker
 //    private String website;
 //    private String background_pic;
 //    private String profile_pic;
@@ -26,4 +42,3 @@ public class RegisterPayload {
 //    private String twitter;
 //    private String github;
 //    private String city;
-}

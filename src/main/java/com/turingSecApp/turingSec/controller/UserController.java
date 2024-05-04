@@ -9,6 +9,7 @@ import com.turingSecApp.turingSec.response.BugBountyProgramDTO;
 import com.turingSecApp.turingSec.response.UserHackerDTO;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.user.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +25,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/register/hacker")
-     public BaseResponse<AuthResponse> registerHacker(@RequestBody RegisterPayload payload) {
+     public BaseResponse<AuthResponse> registerHacker(@RequestBody @Valid RegisterPayload payload) {
         return BaseResponse.success(userService.registerHacker(payload),
                 "You should receive gmail message for account activation");
     }
@@ -40,24 +41,24 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public BaseResponse<AuthResponse> loginUser(@RequestBody LoginRequest loginRequest) {
+    public BaseResponse<AuthResponse> loginUser(@RequestBody @Valid LoginRequest loginRequest) {
         return BaseResponse.success(userService.loginUser(loginRequest));
     }
 
     @PostMapping("/change-password")
-    public BaseResponse<?> changePassword(@RequestBody ChangePasswordRequest request) {
+    public BaseResponse<?> changePassword(@RequestBody @Valid ChangePasswordRequest request) {
         userService.changePassword(request);
        return BaseResponse.success(null,"Password updated successfully");
     }
 
     @PostMapping("/change-email")
-    public BaseResponse<?>  changeEmail(@RequestBody ChangeEmailRequest request) {
+    public BaseResponse<?>  changeEmail(@RequestBody @Valid ChangeEmailRequest request) {
         userService.changeEmail(request);
         return BaseResponse.success(null,"Email updated successfully");
     }
 
     @PostMapping("/update-profile")
-    public BaseResponse<UserHackerDTO> updateProfile(@RequestBody UserUpdateRequest profileUpdateRequest) {
+    public BaseResponse<UserHackerDTO> updateProfile(@RequestBody @Valid UserUpdateRequest profileUpdateRequest) {
         UserHackerDTO updateProfile = userService.updateProfile(profileUpdateRequest);
 
         String newToken = userService.generateNewToken(updateProfile);
