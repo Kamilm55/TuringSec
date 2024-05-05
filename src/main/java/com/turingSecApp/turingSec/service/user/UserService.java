@@ -11,7 +11,7 @@ import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.*;
 import com.turingSecApp.turingSec.exception.custom.*;
 import com.turingSecApp.turingSec.filter.JwtUtil;
-import com.turingSecApp.turingSec.payload.RegisterPayload;
+import com.turingSecApp.turingSec.payload.*;
 import com.turingSecApp.turingSec.response.AuthResponse;
 import com.turingSecApp.turingSec.response.BugBountyProgramDTO;
 import com.turingSecApp.turingSec.response.UserHackerDTO;

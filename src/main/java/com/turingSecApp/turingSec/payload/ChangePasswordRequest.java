@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.Request;
+package com.turingSecApp.turingSec.payload;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

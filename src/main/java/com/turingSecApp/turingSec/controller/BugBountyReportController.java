@@ -20,6 +20,7 @@ import com.turingSecApp.turingSec.response.CollaboratorDTO;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.BugBountyReportService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,11 +36,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BugBountyReportController {
 
-    private final UserRepository userRepository;
-    private final ProgramsRepository programsRepository;
     private final BugBountyReportService bugBountyReportService;
-    private final ReportsRepository bugBountyReportRepository;
-    private final CollaboratorRepository collaboratorRepository;
 
 
 //    @GetMapping// No need , because every report belongs to specific hacker or company
@@ -55,7 +52,7 @@ public class BugBountyReportController {
     }
 
     @PostMapping("/submit")
-    public BaseResponse<?> submitBugBountyReport(@RequestBody BugBountyReportPayload reportPayload, @RequestParam Long bugBountyProgramId) {
+    public BaseResponse<?> submitBugBountyReport(@RequestBody @Valid BugBountyReportPayload reportPayload, @RequestParam Long bugBountyProgramId) {
        return bugBountyReportService.submitBugBountyReport(reportPayload,bugBountyProgramId);
     }
 

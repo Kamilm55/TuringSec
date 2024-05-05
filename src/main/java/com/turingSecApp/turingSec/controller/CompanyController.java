@@ -1,16 +1,11 @@
 package com.turingSecApp.turingSec.controller;
 
-import com.turingSecApp.turingSec.Request.CompanyRequest;
-import com.turingSecApp.turingSec.Request.LoginRequest;
-import com.turingSecApp.turingSec.dao.entities.AdminEntity;
+import com.turingSecApp.turingSec.payload.CompanyRequest;
 import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
-import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
 import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
 import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.payload.RegisterCompanyPayload;
-import com.turingSecApp.turingSec.response.AuthResponse;
-import com.turingSecApp.turingSec.response.CompanyDTO;
 import com.turingSecApp.turingSec.response.CompanyResponse;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.CompanyService;
@@ -19,10 +14,6 @@ import com.turingSecApp.turingSec.service.user.UserService;
 import com.turingSecApp.turingSec.util.CompanyMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

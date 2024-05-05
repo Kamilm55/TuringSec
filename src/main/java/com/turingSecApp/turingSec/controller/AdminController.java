@@ -1,13 +1,11 @@
 package com.turingSecApp.turingSec.controller;
 
-import com.turingSecApp.turingSec.Request.LoginRequest;
+import com.turingSecApp.turingSec.payload.LoginRequest;
 import com.turingSecApp.turingSec.dao.entities.AdminEntity;
 import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
-import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.AdminRepository;
 import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
 import com.turingSecApp.turingSec.exception.custom.CompanyNotFoundException;
-import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
 import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.response.AdminAuthResponse;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
@@ -16,24 +14,13 @@ import com.turingSecApp.turingSec.service.CompanyService;
 import com.turingSecApp.turingSec.service.EmailNotificationService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import com.turingSecApp.turingSec.util.UserMapper;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -46,16 +33,6 @@ public class AdminController {
     private final CompanyService companyService;
     private final JwtUtil jwtTokenProvider;
     private final CompanyRepository companyRepository;
-    private final EmailNotificationService emailNotificationService;
-    
-//    @PostMapping("/register")
-//    public ResponseEntity<?> registerAdmin(@RequestBody AdminEntity admin) {
-//        ResponseEntity<?> registerAdmin = adminService.registerAdmin(admin);
-//        return new ResponseEntity<>(registerAdmin, HttpStatus.CREATED);
-//    }
-    
-    // Other admin management endpoints
-
 
     @PostMapping("/approve-company/{companyId}")
     public BaseResponse<?> approveCompanyRegistration(@PathVariable Long companyId) {
@@ -75,7 +52,7 @@ public class AdminController {
 
 
     @PostMapping("/login")
-    public BaseResponse<AdminAuthResponse> loginAdmin(@RequestBody LoginRequest user) {
+    public BaseResponse<AdminAuthResponse> loginAdmin(@RequestBody @Valid LoginRequest user) {
         // Check if the input is an email
         AdminEntity adminEntity = adminRepository.findByEmail(user.getUsernameOrEmail());
 

@@ -3,7 +3,7 @@ package com.turingSecApp.turingSec.controller;
 
 import com.turingSecApp.turingSec.Request.*;
 import com.turingSecApp.turingSec.exception.custom.InvalidTokenException;
-import com.turingSecApp.turingSec.payload.RegisterPayload;
+import com.turingSecApp.turingSec.payload.*;
 import com.turingSecApp.turingSec.response.AuthResponse;
 import com.turingSecApp.turingSec.response.BugBountyProgramDTO;
 import com.turingSecApp.turingSec.response.UserHackerDTO;

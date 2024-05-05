@@ -1,26 +1,36 @@
 package com.turingSecApp.turingSec.payload;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
 public class BugBountyProgramWithAssetTypePayload {
     // private Long id; // New field for company ID
+
+    @NotNull(message = "From date is required")
     private LocalDate fromDate;
+
+    @NotNull(message = "To date is required")
     private LocalDate toDate;
-    private String notes;
+    @NotBlank(message = "Policy is required")
     private String policy;
-    private List<AssetTypePayload> assetTypes;
-    private List<StrictPayload> prohibits; // New field for prohibits
-    private Long companyId; // New field for company ID
+    private String notes;
+//    @AllFieldsRequired(message = "Asset types must have all fields populated") //todo: do this it's in chatgpt
+    private List<AssetTypePayload> assetTypes = new ArrayList<>();
+
+//    @AllFieldsRequired(message = "Prohibits must have all fields populated")
+    private List<StrictPayload> prohibits = new ArrayList<>();
+
+    @NotNull(message = "Company Id is required")
+    private Long companyId;
+    @NotNull(message = "Program Id is required")
     private Long programId;
 
     // Getters and setters

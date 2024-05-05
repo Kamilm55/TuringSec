@@ -4,6 +4,7 @@ import com.turingSecApp.turingSec.response.CollaboratorDTO;
 import jakarta.persistence.Column;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -27,6 +28,6 @@ public class BugBountyReportPayload {
 
     private Long userId;
 
-    private List<CollaboratorDTO> collaboratorDTO;
+    private List<CollaboratorDTO> collaboratorDTO = new ArrayList<>();
 
 }
