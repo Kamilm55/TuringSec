@@ -6,6 +6,7 @@ import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.*;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.payload.BugBountyReportPayload;
+import com.turingSecApp.turingSec.payload.CollaboratorWithIdPayload;
 import com.turingSecApp.turingSec.payload.RegisterPayload;
 import com.turingSecApp.turingSec.response.CollaboratorDTO;
 import com.turingSecApp.turingSec.service.BugBountyReportService;
@@ -191,11 +192,11 @@ public class TuringSecApplication implements CommandLineRunner {
                 .userId(1L)
                 .collaboratorDTO(
                         List.of(
-                                CollaboratorDTO.builder()
+                                CollaboratorWithIdPayload.builder()
                                         .hackerUsername("Username")
                                         .collaborationPercentage(50.0)
                                         .build(),
-                                CollaboratorDTO.builder()
+                                CollaboratorWithIdPayload.builder()
                                         .hackerUsername("Hacker_2")
                                         .collaborationPercentage(50.0)
                                         .build()
@@ -217,11 +218,11 @@ public class TuringSecApplication implements CommandLineRunner {
                 .userId(2L)
                 .collaboratorDTO(
                         List.of(
-                                CollaboratorDTO.builder()
+                                CollaboratorWithIdPayload.builder()
                                         .hackerUsername("securitypro789")
                                         .collaborationPercentage(70.0)
                                         .build(),
-                                CollaboratorDTO.builder()
+                                CollaboratorWithIdPayload.builder()
                                         .hackerUsername("cyberninja007")
                                         .collaborationPercentage(30.0)
                                         .build()

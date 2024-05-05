@@ -1,9 +1,5 @@
 package com.turingSecApp.turingSec.service;
 
-import com.turingSecApp.turingSec.exception.custom.CompanyNotFoundException;
-import com.turingSecApp.turingSec.payload.RegisterCompanyPayload;
-import com.turingSecApp.turingSec.response.AuthResponse;
-import com.turingSecApp.turingSec.response.RegistrationResponse;
 import com.turingSecApp.turingSec.dao.entities.AdminEntity;
 import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
 import com.turingSecApp.turingSec.dao.entities.role.Role;
@@ -11,60 +7,43 @@ import com.turingSecApp.turingSec.dao.repository.AdminRepository;
 import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
 import com.turingSecApp.turingSec.dao.repository.RoleRepository;
 import com.turingSecApp.turingSec.exception.custom.EmailAlreadyExistsException;
-import com.turingSecApp.turingSec.background_file_upload_for_hacker.repository.FileRepository;
+import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
+import com.turingSecApp.turingSec.filter.JwtUtil;
+import com.turingSecApp.turingSec.payload.CompanyLoginPayload;
+import com.turingSecApp.turingSec.payload.RegisterCompanyPayload;
+import com.turingSecApp.turingSec.response.CompanyResponse;
+import com.turingSecApp.turingSec.service.interfaces.ICompanyService;
+import com.turingSecApp.turingSec.service.user.CustomUserDetails;
+import com.turingSecApp.turingSec.service.user.UserService;
+import com.turingSecApp.turingSec.util.CompanyMapper;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.NotFoundException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class CompanyService {
+public class CompanyService implements ICompanyService {
+    private final UserService userService;
+    private final EmailNotificationService emailNotificationService;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtTokenProvider;
+
     private final CompanyRepository companyRepository;
     private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
     private final AdminRepository adminRepository;
-    private final EmailNotificationService emailNotificationService;
-    private final FileRepository fileRepository;
-    //private ModelMapper modelMapper;
 
-    public String approveCompanyRegistration(Long companyId) {
-        Optional<CompanyEntity> companyOptional = companyRepository.findById(companyId);
-        if (companyOptional.isPresent()) {
-            CompanyEntity company = companyOptional.get();
-
-            // Generate a random password for the company
-            String generatedPassword = generateRandomPassword();
-            company.setPassword(passwordEncoder.encode(generatedPassword));
-
-            // Set the approval status to true
-            company.setApproved(true);
-
-            // Retrieve the "COMPANY" role
-            Role companyRole = roleRepository.findByName("COMPANY");
-            if (companyRole == null) {
-                throw new CompanyNotFoundException("Company role not found.");
-            }
-
-            // Save the company
-            companyRepository.save(company);
-
-            //todo: send password to company gmail with smtp
-
-            // Return the generated password
-            return generatedPassword;
-        } else {
-            throw new CompanyNotFoundException("Company with the given ID not found.");
-        }
-    }
-
-
+    @Override
     public void registerCompany(RegisterCompanyPayload companyPayload) {
         // Ensure the company doesn't already exist
         if (companyRepository.findByEmail(companyPayload.getEmail()) != null) {
@@ -98,8 +77,66 @@ public class CompanyService {
         notifyAdminsForApproval(savedCompany);
     }
 
+    @Override
+    public Map<String, String> loginCompany(CompanyLoginPayload companyLoginPayload) {
+        // Check if the input is an email
+        CompanyEntity companyEntity = companyRepository.findByEmail(companyLoginPayload.getEmail());
 
-    //
+        // Authenticate user if found
+        if (companyEntity != null && passwordEncoder.matches(companyLoginPayload.getPassword(), companyEntity.getPassword())) {
+            // Generate token using the user details
+            UserDetails userDetails = new CustomUserDetails(companyEntity);
+            String token = jwtTokenProvider.generateToken(userDetails);
+
+            Long userId = ((CustomUserDetails) userDetails).getId();
+
+            // Create a response map containing the token and user ID
+            Map<String, String> response = new HashMap<>();
+            response.put("access_token", token);
+            response.put("companyId", String.valueOf(userId));
+
+
+            return response;
+        } else {
+            throw new BadCredentialsException("Invalid username/email or password.");
+        }
+    }
+
+    @Override
+    public List<CompanyResponse> getAllCompanies() {
+        List<CompanyEntity> companyEntities = userService.getAllCompanies();
+        List<CompanyResponse> companyResponses = companyEntities.stream().map(CompanyMapper.INSTANCE::convertToResponse).collect(Collectors.toList());
+
+        return companyResponses;
+    }
+
+    @Override
+    public CompanyResponse getCompaniesById(Long id) {
+        CompanyEntity company = userService.getCompaniesById(id);
+
+        return CompanyMapper.INSTANCE.convertToResponse(company);
+    }
+
+    @Override
+    public CompanyResponse getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.isAuthenticated()) {
+            String email = authentication.getName();
+
+            // Retrieve user details from the database
+            CompanyEntity company = companyRepository.findByEmail(email);
+
+            return CompanyMapper.INSTANCE.convertToResponse(company);
+        } else {
+            throw new UnauthorizedException();
+        }
+    }
+
+
+
+
+    // Utils
     private void notifyAdminsForApproval(CompanyEntity company) {
         // Get a list of administrators from the database or any other source
         List<AdminEntity> admins = adminRepository.findAll(); // Assuming you have an AdminRepository
@@ -120,29 +157,6 @@ public class CompanyService {
             emailNotificationService.sendEmail(admin.getEmail(), subject, content);
         }
     }
-
-
-
-    // Other methods for managing companies
-
-    private String generateRandomPassword() {
-        // Generate a random alphanumeric password with 12 characters
-        return RandomStringUtils.randomAlphanumeric(12);
-    }
-
-//    public ResponseEntity<CompanyResponse> getCompanyById(Long companyId) {
-//        Optional<CompanyEntity> company = companyRepository.findById(companyId);
-//
-//        File fileByCompanyId = fileRepository.findFileByCompanyId(companyId);
-//
-//        CompanyResponse blogPostResponse = modelMapper.map(company.get(), CompanyResponse.class);
-//        blogPostResponse.setFileId(fileByCompanyId.getId());
-//
-//        return ResponseEntity.status(HttpStatus.OK).body(blogPostResponse);
-//    }
-
-
-
 
 
 }

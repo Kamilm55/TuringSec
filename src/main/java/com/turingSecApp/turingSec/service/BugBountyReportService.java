@@ -258,7 +258,7 @@ public class BugBountyReportService {
 
             ReportsEntity reportFromDB = bugBountyReportRepository.findById(saved.getId()).orElseThrow(() -> new ResourceNotFoundException("Report not found"));
             // Set the bug bounty report for each collaborator
-            for (CollaboratorDTO collaboratorDTO : reportPayload.getCollaboratorDTO()) {
+            for (var collaboratorDTO : reportPayload.getCollaboratorDTO()) {
                 CollaboratorEntity collaboratorEntity = new CollaboratorEntity();
                 collaboratorEntity.setCollaborationPercentage(collaboratorDTO.getCollaborationPercentage());
                 collaboratorEntity.setHackerUsername(collaboratorDTO.getHackerUsername());
@@ -315,7 +315,7 @@ public class BugBountyReportService {
 
         ReportsEntity reportFromDB = bugBountyReportRepository.findById(saved.getId()).orElseThrow(() -> new ResourceNotFoundException("Report not found"));
         // Set the bug bounty report for each collaborator
-        for (CollaboratorDTO collaboratorDTO : reportPayload.getCollaboratorDTO()) {
+        for (var collaboratorDTO : reportPayload.getCollaboratorDTO()) {
             CollaboratorEntity collaboratorEntity = new CollaboratorEntity();
             collaboratorEntity.setCollaborationPercentage(collaboratorDTO.getCollaborationPercentage());
             collaboratorEntity.setHackerUsername(collaboratorDTO.getHackerUsername());

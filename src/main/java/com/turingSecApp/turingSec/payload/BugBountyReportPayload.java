@@ -1,7 +1,7 @@
 package com.turingSecApp.turingSec.payload;
 
-import com.turingSecApp.turingSec.response.CollaboratorDTO;
-import jakarta.persistence.Column;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -15,19 +15,37 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class BugBountyReportPayload {
+    @NotBlank(message = "Asset is required")
     private String asset;
-    private String weakness;
-    private String severity;
-    private String methodName;
-    private String proofOfConcept;
-    private String discoveryDetails;
-    private Date lastActivity;
-    private String reportTitle;
-    private String rewardsStatus;
-    private String vulnerabilityUrl;
 
+    @NotBlank(message = "Weakness is required")
+    private String weakness;
+
+    @NotBlank(message = "Severity is required")
+    private String severity;
+
+    @NotBlank(message = "Proof of Concept is required")
+    private String proofOfConcept;
+
+    @NotBlank(message = "Discovery Details is required")
+    private String discoveryDetails;
+
+    @NotNull(message = "Last Activity is required")
+    private Date lastActivity;
+
+    @NotBlank(message = "Report Title is required")
+    private String reportTitle;
+
+    @NotBlank(message = "Rewards Status is required")
+    private String rewardsStatus;
+
+    // vulnerabilityUrl is optional
+    private String vulnerabilityUrl;
+    // methodName is optional
+    private String methodName;
+
+    @NotNull(message = "User Id is required")
     private Long userId;
 
-    private List<CollaboratorDTO> collaboratorDTO = new ArrayList<>();
-
+    private List<CollaboratorWithIdPayload> collaboratorDTO = new ArrayList<>();
 }

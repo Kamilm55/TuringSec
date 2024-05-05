@@ -8,6 +8,7 @@ import com.turingSecApp.turingSec.response.AuthResponse;
 import com.turingSecApp.turingSec.response.BugBountyProgramDTO;
 import com.turingSecApp.turingSec.response.UserHackerDTO;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
+import com.turingSecApp.turingSec.service.interfaces.IUserService;
 import com.turingSecApp.turingSec.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final IUserService userService;
 
     @PostMapping("/register/hacker")
      public BaseResponse<AuthResponse> registerHacker(@RequestBody @Valid RegisterPayload payload) {

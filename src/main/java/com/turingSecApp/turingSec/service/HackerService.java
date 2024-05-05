@@ -10,6 +10,7 @@ import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.file_upload_for_hacker.entity.ImageForHacker;
 import com.turingSecApp.turingSec.file_upload_for_hacker.exception.FileNotFoundException;
 import com.turingSecApp.turingSec.file_upload_for_hacker.repository.ImageForHackerRepository;
+import com.turingSecApp.turingSec.service.interfaces.IHackerService;
 import com.turingSecApp.turingSec.util.HackerMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -18,12 +19,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class HackerService {
+public class HackerService implements IHackerService {
    // private final ModelMapper modelMapper;
     private final HackerRepository hackerRepository;
     private final FileRepository fileRepository;
     private final ImageForHackerRepository imageForHackerRepository;
 
+    @Override
     public HackerDTO findById(Long hackerId){
         HackerEntity hackerEntity = hackerRepository.findById(hackerId).orElseThrow(() -> new UserNotFoundException("Hacker is not found with id:" + hackerId));
 

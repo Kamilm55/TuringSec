@@ -1,5 +1,6 @@
 package com.turingSecApp.turingSec.payload;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -22,11 +23,9 @@ public class BugBountyProgramWithAssetTypePayload {
     @NotBlank(message = "Policy is required")
     private String policy;
     private String notes;
-//    @AllFieldsRequired(message = "Asset types must have all fields populated") //todo: do this it's in chatgpt
-    private List<AssetTypePayload> assetTypes = new ArrayList<>();
+    private List<@Valid  AssetTypePayload> assetTypes = new ArrayList<>();
 
-//    @AllFieldsRequired(message = "Prohibits must have all fields populated")
-    private List<StrictPayload> prohibits = new ArrayList<>();
+    private List<@Valid StrictPayload> prohibits = new ArrayList<>();
 
     @NotNull(message = "Company Id is required")
     private Long companyId;

@@ -26,4 +26,5 @@ public interface IUserService {
     BugBountyProgramDTO getBugBountyProgramById(Long id);
     UserEntity findUserByUsername(String username);
 
+    String generateNewToken(UserHackerDTO updateProfile);
 }

@@ -38,13 +38,6 @@ public class BugBountyReportController {
 
     private final BugBountyReportService bugBountyReportService;
 
-
-//    @GetMapping// No need , because every report belongs to specific hacker or company
-//    public ResponseEntity<List<ReportsEntity>> getAllBugBountyReports() {
-//        List<ReportsEntity> bugBountyReports = bugBountyReportService.getAllBugBountyReports();
-//        return new ResponseEntity<>(bugBountyReports, HttpStatus.OK);
-//    }
-
     @GetMapping("/{id}")
     public BaseResponse<ReportsEntity> getBugBountyReportById(@PathVariable Long id) {
         ReportsEntity bugBountyReport = bugBountyReportService.getBugBountyReportById(id);
@@ -58,7 +51,7 @@ public class BugBountyReportController {
 
     @PutMapping("/{id}")
     public BaseResponse<ReportsEntity> updateBugBountyReport(@PathVariable Long id,
-                                                                  @RequestBody BugBountyReportUpdatePayload bugBountyReportUpdatePayload) {
+                                                                  @RequestBody @Valid BugBountyReportUpdatePayload bugBountyReportUpdatePayload) {
         ReportsEntity updatedReport = bugBountyReportService.updateBugBountyReport(id, bugBountyReportUpdatePayload);
         return BaseResponse.success(updatedReport);
     }
@@ -98,4 +91,10 @@ public class BugBountyReportController {
 
         return BaseResponse.success(reportsForCompanyPrograms);
     }
+
+    //    @GetMapping// No need , because every report belongs to specific hacker or company
+//    public ResponseEntity<List<ReportsEntity>> getAllBugBountyReports() {
+//        List<ReportsEntity> bugBountyReports = bugBountyReportService.getAllBugBountyReports();
+//        return new ResponseEntity<>(bugBountyReports, HttpStatus.OK);
+//    }
 }

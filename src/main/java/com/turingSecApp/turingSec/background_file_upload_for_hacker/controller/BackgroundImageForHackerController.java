@@ -22,10 +22,8 @@ import java.io.IOException;
 @RequestMapping("/api/background-image-for-hacker")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*", allowedHeaders = "*")
-
 public class BackgroundImageForHackerController {
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     private final FileService fileService;
 
