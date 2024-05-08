@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class HackerService implements IHackerService {
-   // private final ModelMapper modelMapper;
     private final HackerRepository hackerRepository;
     private final FileRepository fileRepository;
     private final ImageForHackerRepository imageForHackerRepository;

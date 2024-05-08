@@ -37,7 +37,7 @@ public class UserUpdateRequest {
 
     // Optional fields
     private String website;
-    private boolean has_background_pic;
-    private boolean has_profile_pic;
     private String bio;
+//    private boolean has_background_pic;
+//    private boolean has_profile_pic;
 }

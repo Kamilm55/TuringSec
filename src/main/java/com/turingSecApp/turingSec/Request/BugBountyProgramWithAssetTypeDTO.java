@@ -23,7 +23,7 @@ public class BugBountyProgramWithAssetTypeDTO {
     private List<AssetTypeDTO> assetTypes;
     private List<StrictDTO> prohibits; // New field for prohibits
     private Long companyId; // New field for company ID
-    private Long programId;
+//    private Long programId; // every company has one program
 
     // Getters and setters
 }

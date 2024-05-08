@@ -19,6 +19,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.ws.rs.NotFoundException;
@@ -50,9 +52,23 @@ public class TuringSecApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Mock Data
+        insertMockData();
+    }
 
-        // insert 1 user
+    private void insertMockData() {
+        insertUser();
+        insertSecondUser();
+        insertAdmins();
+        insertCompany();
+        insertBugBountyProgram();
+        insertReports();
+
+        //
+        insertAdditionalData();
+    }
+
+    private void insertUser() {
+        // Insert 1 user
         UserEntity user1 = UserEntity.builder()
                 .first_name("Kamil")
                 .last_name("Memmedov")
@@ -63,32 +79,27 @@ public class TuringSecApplication implements CommandLineRunner {
                 .activationToken("7203c486-0069-45d4-8857-15a27ad24bee")
                 .activated(true)
                 .build();
-        // Set user roles
         Set<Role> roles = new HashSet<>();
         roles.add(roleRepository.findByName("HACKER"));
         user1.setRoles(roles);
-
         userRepository.save(user1);
 
-        //Note: To fetch user explicitly to avoid save process instead it updates because there is user entity with actual id not null
-        UserEntity fetchedUser = userRepository.findByUsername(user1.getUsername()).orElseThrow(()-> new UserNotFoundException("User with username " + user1.getUsername() + " not found"));
+        UserEntity fetchedUser = userRepository.findByUsername(user1.getUsername())
+                .orElseThrow(() -> new UserNotFoundException("User with username " + user1.getUsername() + " not found"));
 
-        // Create and associate , populate hackerEntity entity
         HackerEntity hackerEntity = new HackerEntity();
         hackerEntity.setUser(fetchedUser);
-        hackerEntity.setFirst_name(fetchedUser.getFirst_name()); // Set the username in the hackerEntity entity
-        hackerEntity.setLast_name(fetchedUser.getLast_name()); // Set the age in the hackerEntity entity
-        hackerEntity.setCountry(fetchedUser.getCountry()); // Set the age in the hackerEntity entity
-
-
+        hackerEntity.setFirst_name(fetchedUser.getFirst_name());
+        hackerEntity.setLast_name(fetchedUser.getLast_name());
+        hackerEntity.setCountry(fetchedUser.getCountry());
         hackerRepository.save(hackerEntity);
 
-        // Accomplish associations between
         fetchedUser.setHacker(hackerEntity);
-
         userRepository.save(fetchedUser);
+    }
 
-        // insert 2nd user
+    private void insertSecondUser() {
+        // Insert 2nd user
         RegisterPayload registerPayload = RegisterPayload.builder()
                 .firstName("Hackerrrr")
                 .lastName("Lastname")
@@ -97,10 +108,11 @@ public class TuringSecApplication implements CommandLineRunner {
                 .email("kamilmmmdov2905@gmail.com")
                 .password(passwordEncoder.encode("userPass"))
                 .build();
-
         userService.insertActiveHacker(registerPayload);
+    }
 
-        // insert 2 admins
+    private void insertAdmins() {
+        // Insert 2 admins
         AdminEntity admin1 = AdminEntity.builder()
                 .first_name("Kamil")
                 .last_name("Memmedov")
@@ -117,11 +129,12 @@ public class TuringSecApplication implements CommandLineRunner {
                 .email("elnarzulfuqarli2001@gmail.com")
                 .build();
 
-        //todo: admin must be user create fk and insert
         adminRepository.save(admin1);
         adminRepository.save(admin2);
+    }
 
-        // insert 1 company
+    private void insertCompany() {
+        // Insert 1 company
         Role companyRole = roleRepository.findByName("COMPANY");
         if (companyRole == null) {
             throw new NotFoundException("Company role not found.");
@@ -139,28 +152,25 @@ public class TuringSecApplication implements CommandLineRunner {
                 .build();
 
         company1.setRoles(Collections.singleton(companyRole));
-
         companyRepository.save(company1);
+    }
 
-
-
-        // insert 1 Bug Bounty program
+    private void insertBugBountyProgram() {
+        // Insert 1 Bug Bounty program
         BugBountyProgramEntity bugBountyProgram = BugBountyProgramEntity.builder()
                 .fromDate(LocalDate.of(2024, 4, 15))
                 .notes("Bug Bounty program for ExampleCompany's web assets.")
                 .policy("Responsible Disclosure Policy: Please report any vulnerabilities discovered to security@examplecompany.com.")
                 .build();
 
-        bugBountyProgram.setCompany(company1);
+        bugBountyProgram.setCompany(companyRepository.findAll().get(0));
         programsRepository.save(bugBountyProgram);
 
-        // insert asset type and strict entity and create relationship
         AssetTypeEntity assetTypeEntity = new AssetTypeEntity();
         assetTypeEntity.setLevel("High");
         assetTypeEntity.setAssetType("Web Application");
         assetTypeEntity.setPrice("$500");
         assetTypeEntity.setBugBountyProgram(programsRepository.findById(bugBountyProgram.getId()).orElse(null));
-
         assetTypeRepository.save(assetTypeEntity);
 
         StrictEntity strictEntity = new StrictEntity();
@@ -168,16 +178,13 @@ public class TuringSecApplication implements CommandLineRunner {
         strictEntity.setBugBountyProgramForStrict(bugBountyProgram);
         strictRepository.save(strictEntity);
 
-        // update bug bounty program
-        bugBountyProgram.setAssetTypes(List.of(Objects.requireNonNull(assetTypeRepository.findById(assetTypeEntity.getId()).orElse(null))));
-        bugBountyProgram.setProhibits(List.of(Objects.requireNonNull(strictRepository.findById(strictEntity.getId()).orElse(null))));
+        bugBountyProgram.setAssetTypes(Collections.singletonList(assetTypeEntity));
+        bugBountyProgram.setProhibits(Collections.singletonList(strictEntity));
         programsRepository.save(bugBountyProgram);
+    }
 
-
-
-
-        // insert 2 reports
-
+    private void insertReports() {
+        // Insert 2 reports
         BugBountyReportPayload reportPayload = BugBountyReportPayload.builder()
                 .asset("ExampleCompany Website")
                 .weakness("SQL Injection")
@@ -230,15 +237,111 @@ public class TuringSecApplication implements CommandLineRunner {
                 )
                 .build();
 
-
-        // insert report
-        bugBountyReportService.submitBugBountyReportForTest(reportPayload,1L);
+        bugBountyReportService.submitBugBountyReportForTest(reportPayload, 1L);
         bugBountyReportService.submitBugBountyReportForTest(reportPayload2, 1L);
-
-
-
-
-        // notify company for approvement
-//        emailNotificationService.sendEmail("kamilmdov2905@gmail.com", "subject", "content");
     }
+
+    //
+    private void insertAdditionalData() {
+        insertAdditionalCompanies();
+        insertAdditionalBugBountyPrograms();
+        insertAdditionalBugBountyReports();
+    }
+
+    private void insertAdditionalCompanies() {
+        // Insert 5 additional companies
+        Role companyRole = roleRepository.findByName("COMPANY");
+        if (companyRole == null) {
+            throw new NotFoundException("Company role not found.");
+        }
+
+        for (int i = 0; i < 5; i++) {
+            CompanyEntity company = CompanyEntity.builder()
+                    .first_name("Company " + (i + 1))
+                    .last_name("CEO " + (i + 1))
+                    .email("company" + (i + 1) + "@example.com")
+                    .company_name("Company " + (i + 1))
+                    .job_title("CEO")
+                    .message("Message " + (i + 1))
+                    .approved(true)
+                    .password(passwordEncoder.encode("password"))
+                    .build();
+
+            company.setRoles(Collections.singleton(companyRole));
+            companyRepository.save(company);
+        }
+    }
+
+    private void insertAdditionalBugBountyPrograms() {
+        // Insert 5 additional Bug Bounty programs and associate each with a company
+        List<CompanyEntity> companies = companyRepository.findAll();
+
+        for (int i = 0; i < 5; i++) {
+            CompanyEntity company = companies.get(i);
+
+            BugBountyProgramEntity bugBountyProgram = BugBountyProgramEntity.builder()
+                    .fromDate(LocalDate.of(2024, 5, i + 1))
+                    .notes("Notes for Program " + (i + 1))
+                    .policy("Policy for Program " + (i + 1))
+                    .build();
+
+            bugBountyProgram.setCompany(company);
+            programsRepository.save(bugBountyProgram);
+
+            AssetTypeEntity assetTypeEntity = new AssetTypeEntity();
+            assetTypeEntity.setLevel("Medium");
+            assetTypeEntity.setAssetType("Asset " + (i + 1));
+            assetTypeEntity.setPrice("$" + (i + 1) + "00");
+            assetTypeEntity.setBugBountyProgram(programsRepository.findById(bugBountyProgram.getId()).orElse(null));
+            assetTypeRepository.save(assetTypeEntity);
+
+            StrictEntity strictEntity = new StrictEntity();
+            strictEntity.setProhibitAdded("Prohibits for Program " + (i + 1));
+            strictEntity.setBugBountyProgramForStrict(bugBountyProgram);
+            strictRepository.save(strictEntity);
+
+            bugBountyProgram.setAssetTypes(Collections.singletonList(assetTypeEntity));
+            bugBountyProgram.setProhibits(Collections.singletonList(strictEntity));
+            programsRepository.save(bugBountyProgram);
+        }
+    }
+
+    private void insertAdditionalBugBountyReports() {
+        // Insert 5 additional Bug Bounty reports and associate each with a program
+        List<BugBountyProgramEntity> programs = programsRepository.findAll();
+
+        for (int i = 0; i < 5; i++) {
+            BugBountyProgramEntity program = programs.get(i);
+
+            BugBountyReportPayload reportPayload = BugBountyReportPayload.builder()
+                    .asset("Asset " + (i + 1))
+                    .weakness("Weakness " + (i + 1))
+                    .severity("High")
+                    .methodName("POST")
+                    .proofOfConcept("Proof of Concept " + (i + 1))
+                    .discoveryDetails("Discovery Details " + (i + 1))
+                    .lastActivity(Date.from(LocalDateTime.now().toInstant(ZoneOffset.UTC)))
+                    .reportTitle("Report " + (i + 1))
+                    .rewardsStatus("Pending")
+                    .vulnerabilityUrl("https://example.com/report" + (i + 1))
+                    .userId(1L) // Change as necessary
+                    .collaboratorDTO(
+                            List.of(
+                                    CollaboratorWithIdPayload.builder()
+                                            .hackerUsername("Username")
+                                            .collaborationPercentage(50.0)
+                                            .build(),
+                                    CollaboratorWithIdPayload.builder()
+                                            .hackerUsername("Hacker_2")
+                                            .collaborationPercentage(50.0)
+                                            .build()
+                            )
+                    )
+                    .build();
+
+            bugBountyReportService.submitBugBountyReportForTest(reportPayload, program.getId());
+        }
+    }
+
+
 }

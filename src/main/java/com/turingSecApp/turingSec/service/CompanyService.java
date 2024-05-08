@@ -38,8 +38,8 @@ public class CompanyService implements ICompanyService {
     private final EmailNotificationService emailNotificationService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtTokenProvider;
-
     private final CompanyRepository companyRepository;
+
     private final RoleRepository roleRepository;
     private final AdminRepository adminRepository;
 

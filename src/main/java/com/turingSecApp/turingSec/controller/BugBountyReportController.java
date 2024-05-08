@@ -19,6 +19,7 @@ import com.turingSecApp.turingSec.payload.BugBountyReportUpdatePayload;
 import com.turingSecApp.turingSec.response.CollaboratorDTO;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.BugBountyReportService;
+import com.turingSecApp.turingSec.service.interfaces.IBugBountyReportService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BugBountyReportController {
 
-    private final BugBountyReportService bugBountyReportService;
+    private final IBugBountyReportService bugBountyReportService;
 
     @GetMapping("/{id}")
     public BaseResponse<ReportsEntity> getBugBountyReportById(@PathVariable Long id) {
@@ -46,7 +47,8 @@ public class BugBountyReportController {
 
     @PostMapping("/submit")
     public BaseResponse<?> submitBugBountyReport(@RequestBody @Valid BugBountyReportPayload reportPayload, @RequestParam Long bugBountyProgramId) {
-       return bugBountyReportService.submitBugBountyReport(reportPayload,bugBountyProgramId);
+        bugBountyReportService.submitBugBountyReport(reportPayload,bugBountyProgramId);
+       return BaseResponse.success(null,"Bug bounty report submitted successfully");
     }
 
     @PutMapping("/{id}")
@@ -65,31 +67,13 @@ public class BugBountyReportController {
 
     @GetMapping("/user")
     public BaseResponse<List<ReportsByUserWithCompDTO>> getAllBugBountyReportsByUser() {
-        List<ReportsByUserWithCompDTO> userReports = bugBountyReportService.getAllReportsByUser();
+        List<ReportsByUserWithCompDTO> userReports = bugBountyReportService.getAllBugBountyReportsByUser();
         return BaseResponse.success(userReports);
     }
 
     @GetMapping("/reports/company")
     public BaseResponse<List<ReportsByUserDTO>> getBugBountyReportsForCompanyPrograms() {
-        // Retrieve the authenticated user details
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-
-        // Extract the company from the authenticated user details
-        Object user = userDetails.getUser();
-        CompanyEntity company = null;
-        if (user instanceof CompanyEntity) {
-            company = (CompanyEntity) user;
-        } else {
-            // Handle the case where the user is not a company (e.g., throw an exception or return an error response)
-            // For example:
-            throw new IllegalStateException("Authenticated user is not a company");
-        }
-
-        // Retrieve bug bounty reports submitted for the company's programs
-        List<ReportsByUserDTO> reportsForCompanyPrograms = bugBountyReportService.getBugBountyReportsForCompanyPrograms(company);
-
-        return BaseResponse.success(reportsForCompanyPrograms);
+        return BaseResponse.success(bugBountyReportService.getBugBountyReportsForCompanyPrograms());
     }
 
     //    @GetMapping// No need , because every report belongs to specific hacker or company

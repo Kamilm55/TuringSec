@@ -17,4 +17,5 @@ public interface ReportsRepository extends JpaRepository<ReportsEntity, Long> {
     List<ReportsEntity> findByBugBountyProgram(BugBountyProgramEntity program);
     @Query("SELECT r FROM ReportsEntity r WHERE r.bugBountyProgram IN :programs")
     List<ReportsEntity> findByBugBountyProgramIn(Collection<BugBountyProgramEntity> programs);
+    void deleteAllByUser(UserEntity user);
 }

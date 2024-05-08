@@ -34,12 +34,13 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class AdminService implements IAdminService {
+    private final EmailNotificationService emailNotificationService;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtTokenProvider;
     private final AdminRepository adminRepository;
+
     private final CompanyRepository companyRepository;
     private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final EmailNotificationService emailNotificationService;
-    private final JwtUtil jwtTokenProvider;
 
     @Override
     public String approveCompanyRegistration(Long companyId) {

@@ -56,7 +56,7 @@ public class ReportsEntity {
     private String vulnerabilityUrl;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY   )//todo: fix cascade type
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private UserEntity user;
