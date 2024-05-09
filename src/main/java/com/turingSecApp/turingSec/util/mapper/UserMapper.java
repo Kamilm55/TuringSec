@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.util;
+package com.turingSecApp.turingSec.util.mapper;
 
 import com.turingSecApp.turingSec.Request.UserDTO;
 import com.turingSecApp.turingSec.dao.entities.AdminEntity;

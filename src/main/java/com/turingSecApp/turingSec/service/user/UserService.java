@@ -18,11 +18,10 @@ import com.turingSecApp.turingSec.response.UserHackerDTO;
 import com.turingSecApp.turingSec.service.EmailNotificationService;
 import com.turingSecApp.turingSec.service.ProgramsService;
 import com.turingSecApp.turingSec.service.interfaces.IUserService;
-import com.turingSecApp.turingSec.util.ProgramMapper;
-import com.turingSecApp.turingSec.util.UserMapper;
+import com.turingSecApp.turingSec.util.UtilService;
+import com.turingSecApp.turingSec.util.mapper.ProgramMapper;
+import com.turingSecApp.turingSec.util.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,6 +42,7 @@ public class UserService implements IUserService {
     private final UserDetailsService userDetailsService;
     private final ProgramsService programsService;
     private final UserRepository userRepository;
+    private final UtilService utilService;
 
     private final HackerRepository hackerRepository;
     private final CompanyRepository companyRepository;
@@ -244,25 +244,13 @@ public class UserService implements IUserService {
     @Override
     public void changePassword(ChangePasswordRequest request) {
         // Retrieve authenticated user
-        UserEntity user = getAuthenticatedUser();
+        UserEntity user = utilService.getAuthenticatedHacker();
 
         // Validate current password
         validateCurrentPassword(request, user);
 
         // Validate and update new password
         updatePassword(request.getNewPassword(), request.getConfirmNewPassword(), user);
-    }
-
-    // Method to retrieve authenticated user
-    private UserEntity getAuthenticatedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            String username = authentication.getName();
-            return userRepository.findByUsername(username)
-                    .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
-        } else {
-            throw new UnauthorizedException();
-        }
     }
 
     // Method to validate current password
@@ -288,7 +276,7 @@ public class UserService implements IUserService {
     @Override
     public void changeEmail(ChangeEmailRequest request) {
         // Retrieve authenticated user
-        UserEntity user = getAuthenticatedUser();
+        UserEntity user = utilService.getAuthenticatedHacker();
 
         // Validate current password
         validateCurrentPassword(request, user);
@@ -318,7 +306,7 @@ public class UserService implements IUserService {
 
     @Override
     public UserHackerDTO updateProfile(UserUpdateRequest userUpdateRequest) {
-        UserEntity userEntity = getAuthenticatedUser();
+        UserEntity userEntity = utilService.getAuthenticatedHacker();
 
         updateProfile(userEntity, userUpdateRequest);
         userRepository.save(userEntity);
@@ -367,7 +355,7 @@ public class UserService implements IUserService {
 
     @Override
     public UserDTO getCurrentUser() {
-        return UserMapper.INSTANCE.convert(getAuthenticatedUser());
+        return UserMapper.INSTANCE.convert(utilService.getAuthenticatedHacker());
     }
 
     @Override
@@ -409,7 +397,7 @@ public class UserService implements IUserService {
     @Transactional// This annotation ensures that the method is executed within a transactional context, allowing database operations like deletion to be performed reliably.
     public void deleteUser() {
         // Get the authenticated user's username from the security context
-        UserEntity authenticatedUser = getAuthenticatedUser();
+        UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
 
         // Find the user by username
         UserEntity user = findUserByUsername(authenticatedUser.getUsername());

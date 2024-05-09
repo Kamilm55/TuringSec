@@ -44,8 +44,8 @@ public class BugBountyReportPayload {
     // methodName is optional
     private String methodName;
 
-    @NotNull(message = "User Id is required")
-    private Long userId;
+//    @NotNull(message = "User Id is required")
+//    private Long userId;
 
     private List<CollaboratorWithIdPayload> collaboratorDTO = new ArrayList<>();
 }

@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.util;
+package com.turingSecApp.turingSec.util.mapper;
 
 import com.turingSecApp.turingSec.dao.entities.HackerEntity;
 import com.turingSecApp.turingSec.response.HackerDTO;

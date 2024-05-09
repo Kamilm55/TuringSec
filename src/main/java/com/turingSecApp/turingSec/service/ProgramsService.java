@@ -9,17 +9,14 @@ import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
 import com.turingSecApp.turingSec.dao.repository.ProgramsRepository;
 import com.turingSecApp.turingSec.exception.custom.PermissionDeniedException;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
-import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
-import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.payload.AssetTypePayload;
 import com.turingSecApp.turingSec.payload.BugBountyProgramWithAssetTypePayload;
 import com.turingSecApp.turingSec.payload.StrictPayload;
 import com.turingSecApp.turingSec.response.BugBountyProgramDTO;
 import com.turingSecApp.turingSec.service.interfaces.IProgramsService;
-import com.turingSecApp.turingSec.util.ProgramMapper;
+import com.turingSecApp.turingSec.util.UtilService;
+import com.turingSecApp.turingSec.util.mapper.ProgramMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,39 +33,26 @@ public class ProgramsService implements IProgramsService {
 
     private final AssetTypeService assetTypeService;
     private final ProgramsRepository programsRepository;
+    private final UtilService utilService;
 
     private final CompanyRepository companyRepository;
 
     @Override
     public List<BugBountyProgramDTO> getCompanyAllBugBountyPrograms(){
         // Retrieve the company associated with the authenticated user
-        CompanyEntity company = getAuthenticatedUser();
+        CompanyEntity company = utilService.getAuthenticatedCompany();
 
         // Get programs belonging to the company
         List<BugBountyProgramEntity> programs = programsRepository.findByCompany(company);
 
         return programs.stream().map(ProgramMapper.INSTANCE::toDto).collect(Collectors.toList());
     }
-    // Method to retrieve authenticated company
-    private CompanyEntity getAuthenticatedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            String email = authentication.getName();
-            CompanyEntity company = companyRepository.findByEmail(email);
-            if(company==null){
-                throw  new UserNotFoundException("Company with email " + email + " not found");
-            }
-            return company;
-        } else {
-            throw new UnauthorizedException();
-        }
-    }
 
 
     @Override
     @Transactional
     public BugBountyProgramDTO createBugBountyProgram(BugBountyProgramWithAssetTypePayload programDTO) {
-        CompanyEntity company = getAuthenticatedUser();
+        CompanyEntity company = utilService.getAuthenticatedCompany();
         BugBountyProgramEntity program = convertToBugBountyProgramEntity(programDTO, company);
         BugBountyProgramEntity createdOrUpdateProgram = createOrUpdateBugBountyProgram(program);
         return ProgramMapper.INSTANCE.toDto(createdOrUpdateProgram);
@@ -187,7 +171,7 @@ public class ProgramsService implements IProgramsService {
     @Override
     public List<AssetTypeDTO> getCompanyAssetTypes() {
        // Retrieve the company associated with the authenticated user
-        CompanyEntity company = getAuthenticatedUser();
+        CompanyEntity company = utilService.getAuthenticatedCompany();
 
         // Get assets belonging to the company
         List<AssetTypeEntity> assetTypeEntities = assetTypeService.getCompanyAssetTypes(company);
@@ -218,7 +202,7 @@ public class ProgramsService implements IProgramsService {
     public void deleteBugBountyProgram(Long id){
 
         // Get the company associated with the authenticated user
-        CompanyEntity company = getAuthenticatedUser();
+        CompanyEntity company = utilService.getAuthenticatedCompany();
 
         // Retrieve the bug bounty program by ID
         BugBountyProgramEntity program = getBugBountyProgramById(id);

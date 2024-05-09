@@ -7,28 +7,20 @@ import com.turingSecApp.turingSec.dao.repository.AdminRepository;
 import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
 import com.turingSecApp.turingSec.dao.repository.RoleRepository;
 import com.turingSecApp.turingSec.exception.custom.CompanyNotFoundException;
-import com.turingSecApp.turingSec.exception.custom.EmailAlreadyExistsException;
-import com.turingSecApp.turingSec.exception.custom.UserAlreadyExistsException;
 import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.payload.LoginRequest;
 import com.turingSecApp.turingSec.response.AdminAuthResponse;
-import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.interfaces.IAdminService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
-import com.turingSecApp.turingSec.util.UserMapper;
+import com.turingSecApp.turingSec.util.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.ws.rs.NotFoundException;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 @Service

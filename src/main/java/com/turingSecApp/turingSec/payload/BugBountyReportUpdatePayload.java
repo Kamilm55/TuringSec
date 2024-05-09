@@ -43,8 +43,8 @@ public class BugBountyReportUpdatePayload {
     // methodName is optional
     private String methodName;
 
-    @NotNull(message = "User Id is required")
-    private Long userId;
+//    @NotNull(message = "User Id is required")
+//    private Long userId;
 
     // collaborator is required, but its elements' validations are handled in CollaboratorWithIdPayload
     @NotNull(message = "Collaborator list is required")

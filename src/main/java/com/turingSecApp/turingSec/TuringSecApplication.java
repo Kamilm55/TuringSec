@@ -205,7 +205,6 @@ public class TuringSecApplication implements CommandLineRunner {
                 .reportTitle("Critical SQL Injection Vulnerability in ExampleCompany Website")
                 .rewardsStatus("Pending")
                 .vulnerabilityUrl("https://example.com/login")
-                .userId(1L)
                 .collaboratorDTO(
                         List.of(
                                 CollaboratorWithIdPayload.builder()
@@ -231,7 +230,6 @@ public class TuringSecApplication implements CommandLineRunner {
                 .reportTitle("XSS Vulnerability in ExampleCompany Mobile App")
                 .rewardsStatus("Pending")
                 .vulnerabilityUrl("https://example.com/search")
-                .userId(2L)
                 .collaboratorDTO(
                         List.of(
                                 CollaboratorWithIdPayload.builder()
@@ -246,8 +244,8 @@ public class TuringSecApplication implements CommandLineRunner {
                 )
                 .build();
 
-        bugBountyReportService.submitBugBountyReportForTest(reportPayload, 1L);
-        bugBountyReportService.submitBugBountyReportForTest(reportPayload2, 1L);
+        bugBountyReportService.submitBugBountyReportForTest(reportPayload, 1L,1L);
+        bugBountyReportService.submitBugBountyReportForTest(reportPayload2, 1L,2L);
     }
 
     //
@@ -334,7 +332,6 @@ public class TuringSecApplication implements CommandLineRunner {
                     .reportTitle("Report " + (i + 1))
                     .rewardsStatus("Pending")
                     .vulnerabilityUrl("https://example.com/report" + (i + 1))
-                    .userId(1L) // Change as necessary
                     .collaboratorDTO(
                             List.of(
                                     CollaboratorWithIdPayload.builder()
@@ -349,7 +346,7 @@ public class TuringSecApplication implements CommandLineRunner {
                     )
                     .build();
 
-            bugBountyReportService.submitBugBountyReportForTest(reportPayload, program.getId());
+            bugBountyReportService.submitBugBountyReportForTest(reportPayload, program.getId(),2L);
         }
     }
 

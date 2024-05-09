@@ -9,7 +9,7 @@ import com.turingSecApp.turingSec.background_file_upload_for_hacker.repository.F
 import com.turingSecApp.turingSec.file_upload_for_hacker.entity.ImageForHacker;
 import com.turingSecApp.turingSec.file_upload_for_hacker.repository.ImageForHackerRepository;
 import com.turingSecApp.turingSec.service.interfaces.IHackerService;
-import com.turingSecApp.turingSec.util.HackerMapper;
+import com.turingSecApp.turingSec.util.mapper.HackerMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

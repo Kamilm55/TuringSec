@@ -3,13 +3,10 @@ package com.turingSecApp.turingSec.service;
 import com.turingSecApp.turingSec.dao.entities.AdminEntity;
 import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
 import com.turingSecApp.turingSec.dao.entities.role.Role;
-import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.AdminRepository;
 import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
 import com.turingSecApp.turingSec.dao.repository.RoleRepository;
 import com.turingSecApp.turingSec.exception.custom.EmailAlreadyExistsException;
-import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
-import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.payload.CompanyLoginPayload;
 import com.turingSecApp.turingSec.payload.RegisterCompanyPayload;
@@ -17,11 +14,10 @@ import com.turingSecApp.turingSec.response.CompanyResponse;
 import com.turingSecApp.turingSec.service.interfaces.ICompanyService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import com.turingSecApp.turingSec.service.user.UserService;
-import com.turingSecApp.turingSec.util.CompanyMapper;
+import com.turingSecApp.turingSec.util.UtilService;
+import com.turingSecApp.turingSec.util.mapper.CompanyMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,6 +36,7 @@ public class CompanyService implements ICompanyService {
     private final EmailNotificationService emailNotificationService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtTokenProvider;
+    private final UtilService utilService;
     private final CompanyRepository companyRepository;
 
     private final RoleRepository roleRepository;
@@ -135,25 +132,11 @@ public class CompanyService implements ICompanyService {
     @Override
     public CompanyResponse getCurrentUser() {
         // Retrieve user details from the database
-        CompanyEntity company = getAuthenticatedUser();
+        CompanyEntity company = utilService.getAuthenticatedCompany();
 
         return CompanyMapper.INSTANCE.convertToResponse(company);
     }
 
-    // Method to retrieve authenticated company
-    private CompanyEntity getAuthenticatedUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            String email = authentication.getName();
-            CompanyEntity company = companyRepository.findByEmail(email);
-            if(company==null){
-               throw  new UserNotFoundException("Company with email " + email + " not found");
-            }
-            return company;
-        } else {
-            throw new UnauthorizedException();
-        }
-    }
 
     // Utils
     private void notifyAdminsForApproval(CompanyEntity company) {
