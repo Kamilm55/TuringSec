@@ -5,13 +5,16 @@ import com.turingSecApp.turingSec.dao.entities.role.Role;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.*;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
-import com.turingSecApp.turingSec.payload.BugBountyReportPayload;
-import com.turingSecApp.turingSec.payload.CollaboratorWithIdPayload;
-import com.turingSecApp.turingSec.payload.RegisterPayload;
+import com.turingSecApp.turingSec.payload.*;
 import com.turingSecApp.turingSec.response.CollaboratorDTO;
 import com.turingSecApp.turingSec.service.BugBountyReportService;
 import com.turingSecApp.turingSec.service.EmailNotificationService;
 import com.turingSecApp.turingSec.service.HackerService;
+import com.turingSecApp.turingSec.service.ProgramsService;
+import com.turingSecApp.turingSec.service.interfaces.IBugBountyReportService;
+import com.turingSecApp.turingSec.service.interfaces.IHackerService;
+import com.turingSecApp.turingSec.service.interfaces.IProgramsService;
+import com.turingSecApp.turingSec.service.interfaces.IUserService;
 import com.turingSecApp.turingSec.service.user.UserService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -33,8 +36,8 @@ import java.util.*;
 @ComponentScan(basePackages = {"com.turingSecApp.turingSec", "com.turingSecApp.turingSec.config"})
 @RequiredArgsConstructor
 public class TuringSecApplication implements CommandLineRunner {
-    private final HackerService hackerService;
-    private final UserService userService;
+    private final IHackerService hackerService;
+    private final IUserService userService;
     private final HackerRepository hackerRepository;
     private final RoleRepository roleRepository;
     private final CompanyRepository companyRepository;
@@ -42,6 +45,7 @@ public class TuringSecApplication implements CommandLineRunner {
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
     private final ProgramsRepository programsRepository;
+    private final ProgramsService programsService;
     private final AssetTypeRepository assetTypeRepository;
     private final StrictRepository strictRepository;
     private final EmailNotificationService emailNotificationService;
@@ -63,8 +67,12 @@ public class TuringSecApplication implements CommandLineRunner {
         insertBugBountyProgram();
         insertReports();
 
-        //
         insertAdditionalData();
+
+//        programsRepository.delete(programsRepository.findById(1L).get());
+
+//        programsService.deleteBugBountyProgramForTest(1L);
+
     }
 
     private void insertUser() {
@@ -104,9 +112,9 @@ public class TuringSecApplication implements CommandLineRunner {
                 .firstName("Hackerrrr")
                 .lastName("Lastname")
                 .country("Azerbaijan")
-                .username("Hacker 2")
+                    .username("Hacker 2")
                 .email("kamilmmmdov2905@gmail.com")
-                .password(passwordEncoder.encode("userPass"))
+                .password("userPass") // encode inside service
                 .build();
         userService.insertActiveHacker(registerPayload);
     }
@@ -156,31 +164,32 @@ public class TuringSecApplication implements CommandLineRunner {
     }
 
     private void insertBugBountyProgram() {
-        // Insert 1 Bug Bounty program
-        BugBountyProgramEntity bugBountyProgram = BugBountyProgramEntity.builder()
-                .fromDate(LocalDate.of(2024, 4, 15))
-                .notes("Bug Bounty program for ExampleCompany's web assets.")
-                .policy("Responsible Disclosure Policy: Please report any vulnerabilities discovered to security@examplecompany.com.")
-                .build();
 
-        bugBountyProgram.setCompany(companyRepository.findAll().get(0));
-        programsRepository.save(bugBountyProgram);
+        CompanyEntity company = companyRepository.findByEmail("string@gmail.com");
+        // Create a new BugBountyProgramWithAssetTypePayload instance
+        BugBountyProgramWithAssetTypePayload payload = new BugBountyProgramWithAssetTypePayload();
 
-        AssetTypeEntity assetTypeEntity = new AssetTypeEntity();
-        assetTypeEntity.setLevel("High");
-        assetTypeEntity.setAssetType("Web Application");
-        assetTypeEntity.setPrice("$500");
-        assetTypeEntity.setBugBountyProgram(programsRepository.findById(bugBountyProgram.getId()).orElse(null));
-        assetTypeRepository.save(assetTypeEntity);
+        // Set data into the payload
+        payload.setFromDate(LocalDate.of(2024, 4, 15));
+        payload.setToDate(LocalDate.of(2024, 5, 15));
+        payload.setPolicy("Responsible Disclosure Policy");
+        payload.setNotes("Bug Bounty program for ExampleCompany's web assets.");
+        payload.setCompanyId(1L); // Assuming company ID is 1
 
-        StrictEntity strictEntity = new StrictEntity();
-        strictEntity.setProhibitAdded("Prohibits the use of automated scanners without prior permission.");
-        strictEntity.setBugBountyProgramForStrict(bugBountyProgram);
-        strictRepository.save(strictEntity);
+        // Create and set asset type payloads
+        AssetTypePayload assetTypePayload = new AssetTypePayload();
+        assetTypePayload.setLevel("High");
+        assetTypePayload.setAssetType("Web Application");
+        assetTypePayload.setPrice(500.0); // Assuming price is 500.0
+        payload.setAssetTypes(Arrays.asList(assetTypePayload));
 
-        bugBountyProgram.setAssetTypes(Collections.singletonList(assetTypeEntity));
-        bugBountyProgram.setProhibits(Collections.singletonList(strictEntity));
-        programsRepository.save(bugBountyProgram);
+        // Create and set prohibits payloads
+        StrictPayload strictPayload = new StrictPayload();
+        strictPayload.setProhibitAdded("Prohibits the use of automated scanners without prior permission.");
+        payload.setProhibits(Arrays.asList(strictPayload));
+        programsService.createBugBountyProgramForTest(payload,company);
+
+
     }
 
     private void insertReports() {
@@ -273,38 +282,39 @@ public class TuringSecApplication implements CommandLineRunner {
     }
 
     private void insertAdditionalBugBountyPrograms() {
-        // Insert 5 additional Bug Bounty programs and associate each with a company
+        // Retrieve all companies
         List<CompanyEntity> companies = companyRepository.findAll();
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 1; i < 6; i++) {
+            // Get the company for this iteration
             CompanyEntity company = companies.get(i);
 
-            BugBountyProgramEntity bugBountyProgram = BugBountyProgramEntity.builder()
-                    .fromDate(LocalDate.of(2024, 5, i + 1))
-                    .notes("Notes for Program " + (i + 1))
-                    .policy("Policy for Program " + (i + 1))
-                    .build();
+            // Create a new BugBountyProgramWithAssetTypePayload instance
+            BugBountyProgramWithAssetTypePayload payload = new BugBountyProgramWithAssetTypePayload();
 
-            bugBountyProgram.setCompany(company);
-            programsRepository.save(bugBountyProgram);
+            // Set data into the payload
+            payload.setFromDate(LocalDate.of(2024, 5, i + 1));
+            payload.setPolicy("Policy for Program " + (i + 1));
+            payload.setNotes("Notes for Program " + (i + 1));
+            payload.setCompanyId(company.getId()); // Set company ID
 
-            AssetTypeEntity assetTypeEntity = new AssetTypeEntity();
-            assetTypeEntity.setLevel("Medium");
-            assetTypeEntity.setAssetType("Asset " + (i + 1));
-            assetTypeEntity.setPrice("$" + (i + 1) + "00");
-            assetTypeEntity.setBugBountyProgram(programsRepository.findById(bugBountyProgram.getId()).orElse(null));
-            assetTypeRepository.save(assetTypeEntity);
+            // Create and set asset type payloads
+            AssetTypePayload assetTypePayload = new AssetTypePayload();
+            assetTypePayload.setLevel("Medium");
+            assetTypePayload.setAssetType("Asset " + (i + 1));
+            assetTypePayload.setPrice((i * 10 + 80.0)); // Set price
+            payload.setAssetTypes(Collections.singletonList(assetTypePayload));
 
-            StrictEntity strictEntity = new StrictEntity();
-            strictEntity.setProhibitAdded("Prohibits for Program " + (i + 1));
-            strictEntity.setBugBountyProgramForStrict(bugBountyProgram);
-            strictRepository.save(strictEntity);
+            // Create and set prohibits payloads
+            StrictPayload strictPayload = new StrictPayload();
+            strictPayload.setProhibitAdded("Prohibits for Program " + (i + 1));
+            payload.setProhibits(Collections.singletonList(strictPayload));
 
-            bugBountyProgram.setAssetTypes(Collections.singletonList(assetTypeEntity));
-            bugBountyProgram.setProhibits(Collections.singletonList(strictEntity));
-            programsRepository.save(bugBountyProgram);
+            // Call the service method to create the bug bounty program
+            programsService.createBugBountyProgramForTest(payload, company);
         }
     }
+
 
     private void insertAdditionalBugBountyReports() {
         // Insert 5 additional Bug Bounty reports and associate each with a program

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authorization.AuthorizationDecision;
@@ -61,7 +62,8 @@ public class SecurityConfig {
 
                     // Bug Bounty Program Controller
                     request
-                            .requestMatchers("/api/bug-bounty-programs").permitAll()
+                            .requestMatchers("/api/bug-bounty-programs").hasRole("COMPANY")
+                            .requestMatchers(HttpMethod.DELETE,"/api/bug-bounty-programs/**").hasRole("COMPANY")
                             .requestMatchers("/api/bug-bounty-programs/**").permitAll();
 
                     // User Controller
@@ -71,15 +73,15 @@ public class SecurityConfig {
 
                             .requestMatchers("/api/auth/change-password").authenticated()
                             .requestMatchers("/api/auth/change-email").authenticated()
-                            .requestMatchers("/api/auth/update-profile").authenticated() //todo: it must be admin or currentUser
+                            .requestMatchers("/api/auth/update-profile").authenticated()
                             .requestMatchers("/api/auth/test").authenticated()
                             .requestMatchers("/api/auth/current-user").authenticated()
                             .requestMatchers("/api/auth/allUsers").permitAll()
-                            .requestMatchers("/api/auth/activate").permitAll() // Public endpoints for registration and login
+                            .requestMatchers("/api/auth/activate").permitAll()
                             .requestMatchers("/api/auth/users/{userId}").authenticated()
                             .requestMatchers("/api/auth/delete-user").authenticated()
-                            .requestMatchers("/api/auth/programs").permitAll()
-                            .requestMatchers("/api/auth/programsById/{id}").permitAll()
+                            .requestMatchers("/api/auth/programs").hasRole("HACKER")// ALL PROGRAMS
+                            .requestMatchers("/api/auth/programsById/{id}").hasRole("HACKER")
                             .requestMatchers("/api/auth/users/**").permitAll();
 
                     // Company Controller

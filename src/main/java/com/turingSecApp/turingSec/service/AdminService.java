@@ -43,21 +43,6 @@ public class AdminService implements IAdminService {
     private final RoleRepository roleRepository;
 
     @Override
-    public String approveCompanyRegistration(Long companyId) {
-        // Assuming you have a method in the CompanyService to approve company registration
-        String generatedPassword = approveCompanyAndGeneratePass(companyId);
-
-        if (generatedPassword != null) {
-            CompanyEntity company = companyRepository.findById(companyId).orElseThrow(()-> new CompanyNotFoundException("Company not found with id:" + companyId));
-            notifyCompanyForApproval(company,generatedPassword);
-
-            return  generatedPassword;
-        } else {
-            throw new RuntimeException("Failed to approve company registration.");
-        }
-    }
-
-    @Override
     public AdminAuthResponse loginAdmin(LoginRequest user) {
         // Check if the input is an email
         AdminEntity adminEntity = adminRepository.findByEmail(user.getUsernameOrEmail());
@@ -83,6 +68,22 @@ public class AdminService implements IAdminService {
             throw new BadCredentialsException("Invalid username/email or password.");
         }
     }
+    @Override
+    public String approveCompanyRegistration(Long companyId) {
+        // Assuming you have a method in the CompanyService to approve company registration
+        String generatedPassword = approveCompanyAndGeneratePass(companyId);
+
+        if (generatedPassword != null) {
+            CompanyEntity company = companyRepository.findById(companyId).orElseThrow(()-> new CompanyNotFoundException("Company not found with id:" + companyId));
+            notifyCompanyForApproval(company,generatedPassword);
+
+            return  generatedPassword;
+        } else {
+            throw new RuntimeException("Failed to approve company registration.");
+        }
+    }
+
+
 
     // Util
     public String approveCompanyAndGeneratePass(Long companyId) {
@@ -105,8 +106,6 @@ public class AdminService implements IAdminService {
 
             // Save the company
             companyRepository.save(company);
-
-            //todo: send password to company gmail with smtp
 
             // Return the generated password
             return generatedPassword;

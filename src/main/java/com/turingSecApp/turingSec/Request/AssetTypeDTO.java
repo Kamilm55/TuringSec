@@ -13,7 +13,7 @@ public class AssetTypeDTO {
    // private Long id;
     private String level;
     private String assetType;
-    private String price;
+    private Double price;
     private Long programId; // New field for program ID
 
     // Getters and setters

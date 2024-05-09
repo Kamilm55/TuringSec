@@ -20,7 +20,7 @@ public class AssetTypeEntity {
 
     private String assetType;
 
-    private String price;
+    private Double price;
 
 
     @ManyToOne(fetch = FetchType.LAZY)

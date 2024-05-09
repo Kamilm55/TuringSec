@@ -19,8 +19,8 @@ import java.util.List;
 public class BugBountyProgramController {
     private final IProgramsService bugBountyProgramService;
     @GetMapping
-    public BaseResponse<List<BugBountyProgramDTO>> getAllBugBountyPrograms() {
-        return BaseResponse.success(bugBountyProgramService.getAllBugBountyPrograms());
+    public BaseResponse<List<BugBountyProgramDTO>> getCompanyAllBugBountyPrograms() {
+        return BaseResponse.success(bugBountyProgramService.getCompanyAllBugBountyPrograms());
     }
 
     @PostMapping
@@ -35,7 +35,6 @@ public class BugBountyProgramController {
     }
 
     @DeleteMapping("/{id}")
-    @Secured("ROLE_COMPANY")// refactorThis
     public BaseResponse<Void> deleteBugBountyProgram(@PathVariable Long id) {
        bugBountyProgramService.deleteBugBountyProgram(id);
 //        refactorThis: NOCONTENT RESPONSE MESSAGE 204

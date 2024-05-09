@@ -6,6 +6,6 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestBody;
 
 public interface IAdminService {
-    String approveCompanyRegistration(Long companyId);
     AdminAuthResponse loginAdmin(LoginRequest user);
+    String approveCompanyRegistration(Long companyId);
 }

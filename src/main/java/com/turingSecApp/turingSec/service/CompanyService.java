@@ -3,11 +3,13 @@ package com.turingSecApp.turingSec.service;
 import com.turingSecApp.turingSec.dao.entities.AdminEntity;
 import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
 import com.turingSecApp.turingSec.dao.entities.role.Role;
+import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.AdminRepository;
 import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
 import com.turingSecApp.turingSec.dao.repository.RoleRepository;
 import com.turingSecApp.turingSec.exception.custom.EmailAlreadyExistsException;
 import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
+import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.payload.CompanyLoginPayload;
 import com.turingSecApp.turingSec.payload.RegisterCompanyPayload;
@@ -46,17 +48,39 @@ public class CompanyService implements ICompanyService {
     @Override
     public void registerCompany(RegisterCompanyPayload companyPayload) {
         // Ensure the company doesn't already exist
-        if (companyRepository.findByEmail(companyPayload.getEmail()) != null) {
-            throw new EmailAlreadyExistsException("Email is already taken.");
-        }
+        checkCompanyEmailUnique(companyPayload.getEmail());
 
         // Set the "COMPANY" role for the company
+        Role companyRole = findCompanyRole();
+
+        CompanyEntity company = buildCompanyEntity(companyPayload, companyRole);
+
+        // Save the company
+        CompanyEntity savedCompany = companyRepository.save(company);
+
+        // Notify admins for approval
+        notifyAdminsForApproval(savedCompany);
+    }
+
+    // Method to check if the company email is unique
+    private void checkCompanyEmailUnique(String email) {
+        if (companyRepository.findByEmail(email) != null) {
+            throw new EmailAlreadyExistsException("Email is already taken.");
+        }
+    }
+
+    // Method to find the "COMPANY" role
+    private Role findCompanyRole() {
         Role companyRole = roleRepository.findByName("COMPANY");
         if (companyRole == null) {
             throw new NotFoundException("Company role not found.");
         }
+        return companyRole;
+    }
 
-        CompanyEntity company = CompanyEntity.builder()
+    // Method to build the CompanyEntity
+    private CompanyEntity buildCompanyEntity(RegisterCompanyPayload companyPayload, Role companyRole) {
+        return CompanyEntity.builder()
                 .job_title(companyPayload.getJobTitle())
                 .company_name(companyPayload.getCompanyName())
                 .email(companyPayload.getEmail())
@@ -64,18 +88,10 @@ public class CompanyService implements ICompanyService {
                 .first_name(companyPayload.getFirstName())
                 .last_name(companyPayload.getLastName())
                 .approved(false)
+                .roles(Collections.singleton(companyRole))
                 .build();
-        //todo:add default mock data
-
-        company.setRoles(Collections.singleton(companyRole));
-
-
-        // Save the company
-        CompanyEntity savedCompany = companyRepository.save(company);
-
-
-        notifyAdminsForApproval(savedCompany);
     }
+
 
     @Override
     public Map<String, String> loginCompany(CompanyLoginPayload companyLoginPayload) {
@@ -104,10 +120,9 @@ public class CompanyService implements ICompanyService {
 
     @Override
     public List<CompanyResponse> getAllCompanies() {
-        List<CompanyEntity> companyEntities = userService.getAllCompanies();
-        List<CompanyResponse> companyResponses = companyEntities.stream().map(CompanyMapper.INSTANCE::convertToResponse).collect(Collectors.toList());
+        List<CompanyEntity> companyEntities = companyRepository.findAll();
 
-        return companyResponses;
+        return companyEntities.stream().map(CompanyMapper.INSTANCE::convertToResponse).collect(Collectors.toList());
     }
 
     @Override
@@ -119,22 +134,26 @@ public class CompanyService implements ICompanyService {
 
     @Override
     public CompanyResponse getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // Retrieve user details from the database
+        CompanyEntity company = getAuthenticatedUser();
 
+        return CompanyMapper.INSTANCE.convertToResponse(company);
+    }
+
+    // Method to retrieve authenticated company
+    private CompanyEntity getAuthenticatedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
             String email = authentication.getName();
-
-            // Retrieve user details from the database
             CompanyEntity company = companyRepository.findByEmail(email);
-
-            return CompanyMapper.INSTANCE.convertToResponse(company);
+            if(company==null){
+               throw  new UserNotFoundException("Company with email " + email + " not found");
+            }
+            return company;
         } else {
             throw new UnauthorizedException();
         }
     }
-
-
-
 
     // Utils
     private void notifyAdminsForApproval(CompanyEntity company) {

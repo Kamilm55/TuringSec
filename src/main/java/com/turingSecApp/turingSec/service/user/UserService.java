@@ -27,6 +27,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -47,14 +48,13 @@ public class UserService implements IUserService {
     private final CompanyRepository companyRepository;
     private final RoleRepository roleRepository;
     private final ProgramsRepository programsRepository;
-    private final ReportsRepository bugBountyReportRepository;
     @Override
     public AuthResponse registerHacker(RegisterPayload registerPayload) {
         // Ensure the user doesn't exist
         checkUserDoesNotExist(registerPayload);
 
         // Create and save the user entity
-        UserEntity user = createUserEntity(registerPayload);
+        UserEntity user = createUserEntity(registerPayload , false);
 
         // Create and save the hacker entity
         HackerEntity hackerEntity = createAndSaveHackerEntity(user);
@@ -80,7 +80,7 @@ public class UserService implements IUserService {
     }
 
     // Method to create and save the user entity
-    private UserEntity createUserEntity(RegisterPayload registerPayload) {
+    private UserEntity createUserEntity(RegisterPayload registerPayload , boolean activated) {
         UserEntity user = UserEntity.builder()
                 .first_name(registerPayload.getFirstName())
                 .last_name(registerPayload.getLastName())
@@ -88,16 +88,21 @@ public class UserService implements IUserService {
                 .username(registerPayload.getUsername())
                 .email(registerPayload.getEmail())
                 .password(passwordEncoder.encode(registerPayload.getPassword()))
-                .activated(false)
+                .activated(activated)// false for register method
                 .build();
 
         // Set user roles
-        Set<Role> roles = new HashSet<>();
-        roles.add(roleRepository.findByName("HACKER"));
+        Set<Role> roles = getHackerRoles();
         user.setRoles(roles);
 
         // Save the user
         return userRepository.save(user);
+    }
+    // Method to get hacker roles
+    private Set<Role> getHackerRoles() {
+        Set<Role> roles = new HashSet<>();
+        roles.add(roleRepository.findByName("HACKER"));
+        return roles;
     }
 
     // Method to create and save the hacker entity
@@ -142,6 +147,7 @@ public class UserService implements IUserService {
     ///////////\\\\\\\\\\\
 
     @Override
+    @Transactional // A collection with cascade="all-delete-orphan" was no longer referenced by the owning entity instance: com.turingSecApp.turingSec.dao.entities.user.UserEntity.reports
     public void insertActiveHacker(RegisterPayload registerPayload) {
         // Ensure the user doesn't exist
         checkUserDoesNotExist(registerPayload);
@@ -156,33 +162,10 @@ public class UserService implements IUserService {
         associateUserWithHacker(user, hackerEntity);
     }
 
-    // Method to create and save the user entity
-    private UserEntity createUserEntity(RegisterPayload registerPayload, boolean activated) {
-        UserEntity user = UserEntity.builder()
-                .first_name(registerPayload.getFirstName())
-                .last_name(registerPayload.getLastName())
-                .country(registerPayload.getCountry())
-                .username(registerPayload.getUsername())
-                .email(registerPayload.getEmail())
-                .password(passwordEncoder.encode(registerPayload.getPassword()))
-                .activated(activated)
-                .roles(getHackerRoles())
-                .build();
-
-        return userRepository.save(user);
-    }
-
     // Method to accomplish associations between user and hacker
     private void associateUserWithHacker(UserEntity user, HackerEntity hackerEntity) {
         user.setHacker(hackerEntity);
         userRepository.save(user);
-    }
-
-    // Method to get hacker roles
-    private Set<Role> getHackerRoles() {
-        Set<Role> roles = new HashSet<>();
-        roles.add(roleRepository.findByName("HACKER"));
-        return roles;
     }
 
 
@@ -335,59 +318,40 @@ public class UserService implements IUserService {
 
     @Override
     public UserHackerDTO updateProfile(UserUpdateRequest userUpdateRequest) {
-        // Get the authenticated user details from the security context
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserEntity userEntity = getAuthenticatedUser();
 
-        // Extract the username from the authenticated user details
-        String username = userDetails.getUsername();
-
-        // Current username can be same
-        if(!username.equals(userUpdateRequest.getUsername()))
-            isUserExistWithUsername(userUpdateRequest.getUsername());
-
-        // Retrieve the user entity from the repository based on the username
-        UserEntity userEntity = userRepository.findByUsername(username).orElseThrow(()-> new UserNotFoundException("User with username " + username + " not found"));
-
-
-        // Update the user's first name and last name with the new values
-
-        userEntity.setUsername(userUpdateRequest.getUsername());
-
-        userEntity.setFirst_name(userUpdateRequest.getFirstName());
-        userEntity.setLast_name(userUpdateRequest.getLastName());
-        userEntity.setCountry(userUpdateRequest.getCountry());
-
-        // Save the updated user entity
+        updateProfile(userEntity, userUpdateRequest);
         userRepository.save(userEntity);
 
-        // Update the corresponding HackerEntity if it exists
         HackerEntity hackerEntity = hackerRepository.findByUser(userEntity);
         if (hackerEntity != null) {
-            hackerEntity.setFirst_name(userUpdateRequest.getFirstName());
-            hackerEntity.setLast_name(userUpdateRequest.getLastName());
-            hackerEntity.setCountry(userUpdateRequest.getCountry());
-            hackerEntity.setCity(userUpdateRequest.getCity());
-
-            hackerEntity.setWebsite(userUpdateRequest.getWebsite());
-//            hackerEntity.setBackground_pic(profileUpdateRequest.getBackground_pic());
-//            hackerEntity.setProfile_pic(profileUpdateRequest.getProfile_pic());
-
-            hackerEntity.setBio(userUpdateRequest.getBio());
-            hackerEntity.setLinkedin(userUpdateRequest.getLinkedin());
-            hackerEntity.setTwitter(userUpdateRequest.getTwitter());
-            hackerEntity.setGithub(userUpdateRequest.getGithub());
-
-            hackerEntity.setUser(userEntity);
-
+            updateHackerProfile(hackerEntity, userUpdateRequest);
             hackerRepository.save(hackerEntity);
         }
 
-        userEntity.setHacker(hackerEntity);
         userRepository.save(userEntity);
 
-        return  UserMapper.INSTANCE.toDto(userEntity, hackerEntity);
+        return UserMapper.INSTANCE.toDto(userEntity, hackerEntity);
     }
 
+    private void updateProfile(UserEntity userEntity, UserUpdateRequest userUpdateRequest) {
+        userEntity.setUsername(userUpdateRequest.getUsername());
+        userEntity.setFirst_name(userUpdateRequest.getFirstName());
+        userEntity.setLast_name(userUpdateRequest.getLastName());
+        userEntity.setCountry(userUpdateRequest.getCountry());
+    }
+
+    private void updateHackerProfile(HackerEntity hackerEntity, UserUpdateRequest userUpdateRequest) {
+        hackerEntity.setFirst_name(userUpdateRequest.getFirstName());
+        hackerEntity.setLast_name(userUpdateRequest.getLastName());
+        hackerEntity.setCountry(userUpdateRequest.getCountry());
+        hackerEntity.setCity(userUpdateRequest.getCity());
+        hackerEntity.setWebsite(userUpdateRequest.getWebsite());
+        hackerEntity.setBio(userUpdateRequest.getBio());
+        hackerEntity.setLinkedin(userUpdateRequest.getLinkedin());
+        hackerEntity.setTwitter(userUpdateRequest.getTwitter());
+        hackerEntity.setGithub(userUpdateRequest.getGithub());
+    }
 
     public String generateNewToken(UserHackerDTO updatedUser) {
         UserDetails userDetailsFromDB = userDetailsService.loadUserByUsername(updatedUser.getUsername());
@@ -397,36 +361,17 @@ public class UserService implements IUserService {
 
     @Override
     public UserDTO getUserById(Long userId) {
-        // Retrieve user information by ID
-        Optional<UserEntity> userOptional = userRepository.findById(userId);
-
-        if (userOptional.isPresent()) {
-            UserEntity user = userOptional.get();
-            return UserMapper.INSTANCE.convert(user);
-        } else {
-            throw new UserNotFoundException("User is not found with id:" + userId);
-        }
+        UserEntity user = findUserById(userId);
+        return UserMapper.INSTANCE.convert(user);
     }
 
     @Override
     public UserDTO getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication != null && authentication.isAuthenticated()) {
-            String username = authentication.getName();
-            // Retrieve user details from the database
-            return UserMapper.INSTANCE.convert(userRepository.findByUsername(username).orElseThrow(()-> new UserNotFoundException("User with username " + username + " not found")));
-
-        } else {
-            // Handle case where user is not authenticated
-            // You might return an error response or throw an exception
-            throw new UnauthorizedException();
-        }
+        return UserMapper.INSTANCE.convert(getAuthenticatedUser());
     }
 
     @Override
-    public List<UserHackerDTO> getAllUsers() {
-
+    public List<UserHackerDTO> getAllActiveUsers() {
       return userRepository.findAllByActivated(true)
               .stream()
               .map(userEntity -> UserMapper.INSTANCE.toDto(userEntity, userEntity.getHacker()))
@@ -460,59 +405,36 @@ public class UserService implements IUserService {
         return UUID.randomUUID().toString();
     }
 
-
-    public String findUsernameByEmail(String email) {
-        UserEntity user = userRepository.findByEmail(email);
-        if (user != null) {
-            return user.getUsername();
-        } else {
-            // Handle the case where the email is not found
-            // You may throw an exception or return null based on your application's requirements
-            return null;
-        }
-    }
-
-    public List<CompanyEntity> getAllCompanies() {
-        return companyRepository.findAll();
-    }
-
     @Override
+    @Transactional// This annotation ensures that the method is executed within a transactional context, allowing database operations like deletion to be performed reliably.
     public void deleteUser() {
         // Get the authenticated user's username from the security context
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String username = authentication.getName();
+        UserEntity authenticatedUser = getAuthenticatedUser();
 
         // Find the user by username
-        UserEntity user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
-
-        // Manually delete associated records
-        bugBountyReportRepository.deleteAllByUser(user); // Assuming repository method exists
+        UserEntity user = findUserByUsername(authenticatedUser.getUsername());
 
         // Delete the user
         userRepository.delete(user);
 
         // Clear the authorization header
-//        request.removeAttribute("Authorization"); //Not Working
+//        request.removeAttribute("Authorization"); //Not Working , do this (clear auth header) in client side
     }
-    //
+    /////////////////////////////////Programs\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
     @Override
     public List<BugBountyProgramWithAssetTypeDTO> getAllBugBountyPrograms() {
         List<BugBountyProgramEntity> programs = programsService.getAllBugBountyProgramsAsEntity();
 
         // Map BugBountyProgramEntities to BugBountyProgramDTOs
-    return programs.stream()
+        return programs.stream()
                 .map(programEntity -> {
                     BugBountyProgramWithAssetTypeDTO dto = mapToDTO(programEntity);
                     dto.setCompanyId(programEntity.getCompany().getId());
-//                    dto.getProgramId();
+                    //                    dto.getProgramId();
                     return dto;
                 })
                 .collect(Collectors.toList());
-
-//        return programs.stream()
-//                .map(ProgramMapper.INSTANCE::toDTO)
-//                .collect(Collectors.toList());
 
     }
 

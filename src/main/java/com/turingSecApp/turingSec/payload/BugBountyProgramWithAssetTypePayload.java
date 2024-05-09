@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
 public class BugBountyProgramWithAssetTypePayload {
     // private Long id; // New field for company ID
 
@@ -29,8 +30,8 @@ public class BugBountyProgramWithAssetTypePayload {
 
     @NotNull(message = "Company Id is required")
     private Long companyId;
-    @NotNull(message = "Program Id is required")
-    private Long programId;
+//    @NotNull(message = "Program Id is required")
+//    private Long programId;
 
     // Getters and setters
 }

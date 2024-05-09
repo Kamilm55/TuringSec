@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.Date;
 import java.util.List;
@@ -56,7 +58,7 @@ public class ReportsEntity {
     private String vulnerabilityUrl;
 
 
-    @ManyToOne(fetch = FetchType.LAZY   )//todo: fix cascade type
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private UserEntity user;

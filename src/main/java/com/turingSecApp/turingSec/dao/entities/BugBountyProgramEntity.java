@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import lombok.*;
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,8 +17,8 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Builder
-@EqualsAndHashCode(exclude = {"company", "assetTypes", "prohibits"})
-@ToString(exclude = {"company", "assetTypes", "prohibits"})
+@EqualsAndHashCode(exclude = {"company", "assetTypes", "prohibits","reports"})
+@ToString(exclude = {"company", "assetTypes", "prohibits","reports"})
 @Entity
 @Table(name = "bug_bounty_programs")
 public class BugBountyProgramEntity {
@@ -38,8 +40,12 @@ public class BugBountyProgramEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private CompanyEntity company;
+
+    @OneToMany(mappedBy = "bugBountyProgram",fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReportsEntity> reports = new ArrayList<>();
 
     @OneToMany(mappedBy = "bugBountyProgram", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AssetTypeEntity> assetTypes = new ArrayList<>();

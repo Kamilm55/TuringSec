@@ -9,7 +9,6 @@ import com.turingSecApp.turingSec.response.BugBountyProgramDTO;
 import com.turingSecApp.turingSec.response.UserHackerDTO;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.interfaces.IUserService;
-import com.turingSecApp.turingSec.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -58,7 +57,7 @@ public class UserController {
         return BaseResponse.success(null,"Email updated successfully");
     }
 
-    @PostMapping("/update-profile")
+    @PutMapping("/update-profile")
     public BaseResponse<UserHackerDTO> updateProfile(@RequestBody @Valid UserUpdateRequest profileUpdateRequest) {
         UserHackerDTO updateProfile = userService.updateProfile(profileUpdateRequest);
 
@@ -86,7 +85,7 @@ public class UserController {
 
     @GetMapping("/allUsers")
     public BaseResponse<List<UserHackerDTO>> getAllUsers() {
-        return BaseResponse.success(userService.getAllUsers());
+        return BaseResponse.success(userService.getAllActiveUsers());
     }
 
     @DeleteMapping("/delete-user")
@@ -95,6 +94,7 @@ public class UserController {
         return BaseResponse.success(null,"User deleted successfully. You must delete Authorization header (Bearer token)");
     }
 
+    // All bug bounty programs for user(hacker)
     @GetMapping("/programs")
     public BaseResponse<List<BugBountyProgramWithAssetTypeDTO>> getAllBugBountyPrograms() {
         return BaseResponse.success(userService.getAllBugBountyPrograms());

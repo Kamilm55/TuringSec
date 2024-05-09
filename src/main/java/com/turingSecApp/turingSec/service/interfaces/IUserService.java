@@ -19,7 +19,7 @@ public interface IUserService {
     UserHackerDTO updateProfile(UserUpdateRequest userUpdateRequest);
     UserDTO getUserById(Long userId);
     UserDTO getCurrentUser();
-    List<UserHackerDTO> getAllUsers();
+    List<UserHackerDTO> getAllActiveUsers();
     void deleteUser();
 
     List<BugBountyProgramWithAssetTypeDTO> getAllBugBountyPrograms();
