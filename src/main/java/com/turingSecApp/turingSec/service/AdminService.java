@@ -26,7 +26,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class AdminService implements IAdminService {
-    private final EmailNotificationService emailNotificationService;
+    private final IEmailNotificationService IEmailNotificationService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtTokenProvider;
     private final AdminRepository adminRepository;
@@ -121,6 +121,6 @@ public class AdminService implements IAdminService {
                 + "Please login to the app with this generated password: " + pass ;
 
         // Send email notification to the company
-        emailNotificationService.sendEmail(company.getEmail(), subject, content);
+        IEmailNotificationService.sendEmail(company.getEmail(), subject, content);
     }
 }

@@ -26,6 +26,10 @@ public class BugBountyProgramDTO {
 
     //private Long companyId;
 
+    private List<String> inScope = new ArrayList<>();
+
+    private List<String> outOfScope = new ArrayList<>();
+
     private List<AssetTypeEntity> assetTypes = new ArrayList<>();
 
     private List<StrictEntity> prohibits = new ArrayList<>();

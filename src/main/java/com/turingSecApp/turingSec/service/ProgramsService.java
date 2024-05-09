@@ -1,6 +1,6 @@
 package com.turingSecApp.turingSec.service;
 
-import com.turingSecApp.turingSec.Request.AssetTypeDTO;
+import com.turingSecApp.turingSec.response.AssetTypeDTO;
 import com.turingSecApp.turingSec.dao.entities.AssetTypeEntity;
 import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
 import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
@@ -57,10 +57,11 @@ public class ProgramsService implements IProgramsService {
         BugBountyProgramEntity createdOrUpdateProgram = createOrUpdateBugBountyProgram(program);
         return ProgramMapper.INSTANCE.toDto(createdOrUpdateProgram);
     }
-    @Transactional
+    @Transactional // For commandlineRunner (mock data)
     public void createBugBountyProgramForTest(BugBountyProgramWithAssetTypePayload programDTO , CompanyEntity company) {
 //        CompanyEntity company = getAuthenticatedUser();
         BugBountyProgramEntity program = convertToBugBountyProgramEntity(programDTO, company);
+
         BugBountyProgramEntity createdOrUpdateProgram = createOrUpdateBugBountyProgram(program);
         ProgramMapper.INSTANCE.toDto(createdOrUpdateProgram);
     }
@@ -72,6 +73,8 @@ public class ProgramsService implements IProgramsService {
         program.setNotes(programDTO.getNotes());
         program.setPolicy(programDTO.getPolicy());
         program.setCompany(company);
+        program.setInScope(programDTO.getInScope());
+        program.setOutOfScope(programDTO.getOutOfScope());
         program.setAssetTypes(convertToAssetTypeEntities(programDTO.getAssetTypes(), program));
         program.setProhibits(convertToStrictEntities(programDTO.getProhibits(), program));
         return program;
@@ -116,40 +119,28 @@ public class ProgramsService implements IProgramsService {
 
     }
     private void updateProgramFields(BugBountyProgramEntity existingProgram, BugBountyProgramEntity newProgram) {
-        // Update fields of the existing program with the new program data
-        existingProgram.setFromDate(newProgram.getFromDate());
-        existingProgram.setToDate(newProgram.getToDate());
+        updateProgramDates(existingProgram, newProgram);
         existingProgram.setNotes(newProgram.getNotes());
         existingProgram.setPolicy(newProgram.getPolicy());
+        updateProgramScope(existingProgram, newProgram);
+        updateProgramAssetTypes(existingProgram, newProgram);
+        updateProgramProhibits(existingProgram, newProgram);
+    }
 
-        // Update or add new asset types (if needed)
-        List<AssetTypeEntity> existingAssetTypes = existingProgram.getAssetTypes();
+    private void updateProgramDates(BugBountyProgramEntity existingProgram, BugBountyProgramEntity newProgram) {
+        existingProgram.setFromDate(newProgram.getFromDate());
+        existingProgram.setToDate(newProgram.getToDate());
+    }
+
+    private void updateProgramScope(BugBountyProgramEntity existingProgram, BugBountyProgramEntity newProgram) {
+        existingProgram.setInScope(newProgram.getInScope());
+        existingProgram.setOutOfScope(newProgram.getOutOfScope());
+    }
+
+    private void updateProgramAssetTypes(BugBountyProgramEntity existingProgram, BugBountyProgramEntity newProgram) {
         List<AssetTypeEntity> updatedAssetTypes = new ArrayList<>();
-
-        // Update or add new strict  (if needed)
-        List<StrictEntity> existingProgramProhibits = existingProgram.getProhibits();
-        List<StrictEntity> updateProhibits = new ArrayList<>();
-
-        for (StrictEntity strictEntity : newProgram.getProhibits()) {
-            StrictEntity existingProhibit = findExistingProhibits(existingProgramProhibits, strictEntity);
-            if (existingProhibit != null) {
-                // Update existing asset type
-                existingProhibit.setProhibitAdded(strictEntity.getProhibitAdded());
-
-                updateProhibits.add(existingProhibit);
-            } else {
-                // Add new asset type
-                strictEntity.setBugBountyProgramForStrict(existingProgram);
-                updateProhibits.add(strictEntity);
-            }
-        }
-
-        existingProgram.getProhibits().clear();
-        existingProgram.getProhibits().addAll(updateProhibits);
-
-//////////////////////////////////////////
         for (AssetTypeEntity assetType : newProgram.getAssetTypes()) {
-            AssetTypeEntity existingAssetType = findExistingAssetType(existingAssetTypes, assetType);
+            AssetTypeEntity existingAssetType = findExistingAssetType(existingProgram.getAssetTypes(), assetType);
             if (existingAssetType != null) {
                 // Update existing asset type
                 existingAssetType.setLevel(assetType.getLevel());
@@ -162,9 +153,26 @@ public class ProgramsService implements IProgramsService {
                 updatedAssetTypes.add(assetType);
             }
         }
-
         existingProgram.getAssetTypes().clear();
         existingProgram.getAssetTypes().addAll(updatedAssetTypes);
+    }
+
+    private void updateProgramProhibits(BugBountyProgramEntity existingProgram, BugBountyProgramEntity newProgram) {
+        List<StrictEntity> updatedProhibits = new ArrayList<>();
+        for (StrictEntity strictEntity : newProgram.getProhibits()) {
+            StrictEntity existingProhibit = findExistingProhibits(existingProgram.getProhibits(), strictEntity);
+            if (existingProhibit != null) {
+                // Update existing prohibit
+                existingProhibit.setProhibitAdded(strictEntity.getProhibitAdded());
+                updatedProhibits.add(existingProhibit);
+            } else {
+                // Add new prohibit
+                strictEntity.setBugBountyProgramForStrict(existingProgram);
+                updatedProhibits.add(strictEntity);
+            }
+        }
+        existingProgram.getProhibits().clear();
+        existingProgram.getProhibits().addAll(updatedProhibits);
     }
 
 
@@ -218,7 +226,7 @@ public class ProgramsService implements IProgramsService {
             throw new PermissionDeniedException();
         }
     }
-    @Transactional
+    @Transactional // TEST \\
     public void deleteBugBountyProgramForTest(Long id){
 //        // Get the company associated with the authenticated user
 //        CompanyEntity company = getAuthenticatedUser();

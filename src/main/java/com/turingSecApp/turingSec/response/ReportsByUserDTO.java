@@ -1,7 +1,7 @@
-package com.turingSecApp.turingSec.Request;
+package com.turingSecApp.turingSec.response;
 
 import com.turingSecApp.turingSec.dao.entities.ReportsEntity;
-import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
+import com.turingSecApp.turingSec.response.UserDTO;
 import lombok.*;
 
 import java.util.List;

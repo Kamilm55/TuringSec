@@ -1,12 +1,9 @@
 package com.turingSecApp.turingSec.controller;
 
 
-import com.turingSecApp.turingSec.Request.*;
 import com.turingSecApp.turingSec.exception.custom.InvalidTokenException;
 import com.turingSecApp.turingSec.payload.*;
-import com.turingSecApp.turingSec.response.AuthResponse;
-import com.turingSecApp.turingSec.response.BugBountyProgramDTO;
-import com.turingSecApp.turingSec.response.UserHackerDTO;
+import com.turingSecApp.turingSec.response.*;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.interfaces.IUserService;
 import jakarta.validation.Valid;

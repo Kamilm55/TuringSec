@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CompanyService implements ICompanyService {
     private final UserService userService;
-    private final EmailNotificationService emailNotificationService;
+    private final IEmailNotificationService IEmailNotificationService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtTokenProvider;
     private final UtilService utilService;
@@ -156,7 +156,7 @@ public class CompanyService implements ICompanyService {
 
         // Send email notification to each admin
         for (AdminEntity admin : admins) {
-            emailNotificationService.sendEmail(admin.getEmail(), subject, content);
+            IEmailNotificationService.sendEmail(admin.getEmail(), subject, content);
         }
     }
 

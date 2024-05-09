@@ -38,6 +38,12 @@ public class BugBountyProgramEntity {
     @Column
     private String policy;
 
+    @ElementCollection
+    private List<String> inScope = new ArrayList<>();
+
+    @ElementCollection
+    private List<String> outOfScope = new ArrayList<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id")
     @OnDelete(action = OnDeleteAction.CASCADE)

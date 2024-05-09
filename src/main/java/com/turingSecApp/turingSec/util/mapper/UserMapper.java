@@ -1,6 +1,6 @@
 package com.turingSecApp.turingSec.util.mapper;
 
-import com.turingSecApp.turingSec.Request.UserDTO;
+import com.turingSecApp.turingSec.response.UserDTO;
 import com.turingSecApp.turingSec.dao.entities.AdminEntity;
 import com.turingSecApp.turingSec.dao.entities.HackerEntity;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;

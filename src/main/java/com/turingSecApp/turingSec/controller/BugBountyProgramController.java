@@ -1,13 +1,12 @@
 package com.turingSecApp.turingSec.controller;
 
-import com.turingSecApp.turingSec.Request.AssetTypeDTO;
+import com.turingSecApp.turingSec.response.AssetTypeDTO;
 import com.turingSecApp.turingSec.payload.BugBountyProgramWithAssetTypePayload;
 import com.turingSecApp.turingSec.response.BugBountyProgramDTO;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.interfaces.IProgramsService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

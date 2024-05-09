@@ -1,11 +1,8 @@
 package com.turingSecApp.turingSec.service.interfaces;
 
-import com.turingSecApp.turingSec.Request.*;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.payload.*;
-import com.turingSecApp.turingSec.response.AuthResponse;
-import com.turingSecApp.turingSec.response.BugBountyProgramDTO;
-import com.turingSecApp.turingSec.response.UserHackerDTO;
+import com.turingSecApp.turingSec.response.*;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.Request;
+package com.turingSecApp.turingSec.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,9 +9,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class StrictDTO {
-    //private Long id;
-    private String prohibitAdded;
+public class AssetTypeDTO {
+   // private Long id;
+    private String level;
+    private String assetType;
+    private Double price;
     private Long programId; // New field for program ID
 
     // Getters and setters

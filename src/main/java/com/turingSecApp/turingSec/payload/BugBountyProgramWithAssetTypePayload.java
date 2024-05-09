@@ -28,8 +28,12 @@ public class BugBountyProgramWithAssetTypePayload {
 
     private List<@Valid StrictPayload> prohibits = new ArrayList<>();
 
-    @NotNull(message = "Company Id is required")
-    private Long companyId;
+    private List<String> inScope = new ArrayList<>();
+
+    private List<String> outOfScope = new ArrayList<>();
+
+//    @NotNull(message = "Company Id is required")
+//    private Long companyId;
 //    @NotNull(message = "Program Id is required")
 //    private Long programId;
 

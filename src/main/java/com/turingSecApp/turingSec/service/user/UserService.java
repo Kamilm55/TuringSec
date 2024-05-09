@@ -1,7 +1,6 @@
 package com.turingSecApp.turingSec.service.user;
 
 
-import com.turingSecApp.turingSec.Request.*;
 import com.turingSecApp.turingSec.dao.entities.AssetTypeEntity;
 import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
 import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
@@ -12,10 +11,8 @@ import com.turingSecApp.turingSec.dao.repository.*;
 import com.turingSecApp.turingSec.exception.custom.*;
 import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.payload.*;
-import com.turingSecApp.turingSec.response.AuthResponse;
-import com.turingSecApp.turingSec.response.BugBountyProgramDTO;
-import com.turingSecApp.turingSec.response.UserHackerDTO;
-import com.turingSecApp.turingSec.service.EmailNotificationService;
+import com.turingSecApp.turingSec.response.*;
+import com.turingSecApp.turingSec.service.IEmailNotificationService;
 import com.turingSecApp.turingSec.service.ProgramsService;
 import com.turingSecApp.turingSec.service.interfaces.IUserService;
 import com.turingSecApp.turingSec.util.UtilService;
@@ -36,7 +33,7 @@ import static com.turingSecApp.turingSec.util.GlobalConstants.ROOT_LINK;
 @Service
 @RequiredArgsConstructor
 public class UserService implements IUserService {
-    private final EmailNotificationService emailNotificationService;
+    private final IEmailNotificationService IEmailNotificationService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtTokenProvider;
     private final UserDetailsService userDetailsService;
@@ -382,7 +379,7 @@ public class UserService implements IUserService {
                 + activationLink + "\n\n"
                 + "Best regards,\nThe Application Team";
 
-        emailNotificationService.sendEmail(user.getEmail(), subject, content);
+        IEmailNotificationService.sendEmail(user.getEmail(), subject, content);
     }
 
     private String generateActivationToken() {

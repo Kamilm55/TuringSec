@@ -1,6 +1,5 @@
 package com.turingSecApp.turingSec.response;
 
-import com.turingSecApp.turingSec.Request.UserDTO;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

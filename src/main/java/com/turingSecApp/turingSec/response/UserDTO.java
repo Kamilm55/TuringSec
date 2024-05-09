@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.Request;
+package com.turingSecApp.turingSec.response;
 
 import lombok.*;
 

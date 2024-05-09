@@ -1,7 +1,5 @@
-package com.turingSecApp.turingSec.Request;
+package com.turingSecApp.turingSec.response;
 
-import com.turingSecApp.turingSec.payload.AssetTypePayload;
-import com.turingSecApp.turingSec.payload.StrictPayload;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

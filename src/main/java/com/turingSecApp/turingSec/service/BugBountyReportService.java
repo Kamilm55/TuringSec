@@ -1,19 +1,17 @@
 package com.turingSecApp.turingSec.service;
 
-import com.turingSecApp.turingSec.Request.ReportsByUserDTO;
-import com.turingSecApp.turingSec.Request.ReportsByUserWithCompDTO;
-import com.turingSecApp.turingSec.Request.UserDTO;
+import com.turingSecApp.turingSec.response.ReportsByUserDTO;
+import com.turingSecApp.turingSec.response.ReportsByUserWithCompDTO;
+import com.turingSecApp.turingSec.response.UserDTO;
 import com.turingSecApp.turingSec.dao.entities.*;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.*;
 import com.turingSecApp.turingSec.exception.custom.PermissionDeniedException;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
-import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.payload.BugBountyReportPayload;
 import com.turingSecApp.turingSec.payload.BugBountyReportUpdatePayload;
 import com.turingSecApp.turingSec.payload.CollaboratorWithIdPayload;
-import com.turingSecApp.turingSec.response.CollaboratorDTO;
 import com.turingSecApp.turingSec.service.interfaces.IBugBountyReportService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import com.turingSecApp.turingSec.util.UtilService;
@@ -37,7 +35,6 @@ public class BugBountyReportService implements IBugBountyReportService {
     private final UtilService utilService;
 
     private final ProgramsRepository programsRepository;
-    private final HackerRepository hackerRepository;
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
     private final CollaboratorRepository collaboratorRepository;

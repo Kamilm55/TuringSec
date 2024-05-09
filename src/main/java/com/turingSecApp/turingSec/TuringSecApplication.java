@@ -6,24 +6,16 @@ import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.*;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.payload.*;
-import com.turingSecApp.turingSec.response.CollaboratorDTO;
 import com.turingSecApp.turingSec.service.BugBountyReportService;
-import com.turingSecApp.turingSec.service.EmailNotificationService;
-import com.turingSecApp.turingSec.service.HackerService;
+import com.turingSecApp.turingSec.service.IEmailNotificationService;
 import com.turingSecApp.turingSec.service.ProgramsService;
-import com.turingSecApp.turingSec.service.interfaces.IBugBountyReportService;
 import com.turingSecApp.turingSec.service.interfaces.IHackerService;
-import com.turingSecApp.turingSec.service.interfaces.IProgramsService;
 import com.turingSecApp.turingSec.service.interfaces.IUserService;
-import com.turingSecApp.turingSec.service.user.UserService;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.ws.rs.NotFoundException;
@@ -48,7 +40,7 @@ public class TuringSecApplication implements CommandLineRunner {
     private final ProgramsService programsService;
     private final AssetTypeRepository assetTypeRepository;
     private final StrictRepository strictRepository;
-    private final EmailNotificationService emailNotificationService;
+    private final IEmailNotificationService IEmailNotificationService;
     private final BugBountyReportService bugBountyReportService;
     public static void main(String[] args) {
         SpringApplication.run(TuringSecApplication.class, args);
@@ -70,7 +62,7 @@ public class TuringSecApplication implements CommandLineRunner {
         insertAdditionalData();
 
 //        programsRepository.delete(programsRepository.findById(1L).get());
-
+//
 //        programsService.deleteBugBountyProgramForTest(1L);
 
     }
@@ -174,7 +166,7 @@ public class TuringSecApplication implements CommandLineRunner {
         payload.setToDate(LocalDate.of(2024, 5, 15));
         payload.setPolicy("Responsible Disclosure Policy");
         payload.setNotes("Bug Bounty program for ExampleCompany's web assets.");
-        payload.setCompanyId(1L); // Assuming company ID is 1
+//        payload.setCompanyId(1L); // Assuming company ID is 1
 
         // Create and set asset type payloads
         AssetTypePayload assetTypePayload = new AssetTypePayload();
@@ -294,7 +286,6 @@ public class TuringSecApplication implements CommandLineRunner {
             payload.setFromDate(LocalDate.of(2024, 5, i + 1));
             payload.setPolicy("Policy for Program " + (i + 1));
             payload.setNotes("Notes for Program " + (i + 1));
-            payload.setCompanyId(company.getId()); // Set company ID
 
             // Create and set asset type payloads
             AssetTypePayload assetTypePayload = new AssetTypePayload();
