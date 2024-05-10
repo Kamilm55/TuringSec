@@ -48,6 +48,7 @@ public class BugBountyReportPayload {
 //    @NotNull(message = "User Id is required")
 //    private Long userId;
 
+    @NotNull(message = "Own percentage of work is required")
     private Double ownPercentage = 100.0; // Default own percentage is 100%
     private List<CollaboratorPayload> collaboratorPayload = new ArrayList<>();
 }
