@@ -1,7 +1,7 @@
 package com.turingSecApp.turingSec.controller;
 
-import com.turingSecApp.turingSec.payload.LoginRequest;
-import com.turingSecApp.turingSec.response.AdminAuthResponse;
+import com.turingSecApp.turingSec.payload.user.LoginRequest;
+import com.turingSecApp.turingSec.response.admin.AdminAuthResponse;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.interfaces.IAdminService;
 import jakarta.validation.Valid;

@@ -1,8 +1,8 @@
 package com.turingSecApp.turingSec.service.interfaces;
 
-import com.turingSecApp.turingSec.payload.CompanyLoginPayload;
-import com.turingSecApp.turingSec.payload.RegisterCompanyPayload;
-import com.turingSecApp.turingSec.response.CompanyResponse;
+import com.turingSecApp.turingSec.payload.company.CompanyLoginPayload;
+import com.turingSecApp.turingSec.payload.company.RegisterCompanyPayload;
+import com.turingSecApp.turingSec.response.company.CompanyResponse;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;

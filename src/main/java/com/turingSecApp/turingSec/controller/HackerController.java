@@ -1,12 +1,9 @@
 package com.turingSecApp.turingSec.controller;
 
-import com.turingSecApp.turingSec.response.HackerDTO;
-import com.turingSecApp.turingSec.response.HackerResponse;
+import com.turingSecApp.turingSec.response.user.HackerDTO;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
-import com.turingSecApp.turingSec.service.HackerService;
 import com.turingSecApp.turingSec.service.interfaces.IHackerService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.FileNotFoundException;

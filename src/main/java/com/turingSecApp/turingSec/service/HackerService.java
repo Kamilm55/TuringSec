@@ -1,6 +1,6 @@
 package com.turingSecApp.turingSec.service;
 
-import com.turingSecApp.turingSec.response.HackerDTO;
+import com.turingSecApp.turingSec.response.user.HackerDTO;
 import com.turingSecApp.turingSec.dao.entities.HackerEntity;
 import com.turingSecApp.turingSec.dao.repository.HackerRepository;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;

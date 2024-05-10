@@ -1,11 +1,11 @@
 package com.turingSecApp.turingSec.util.mapper;
 
-import com.turingSecApp.turingSec.response.UserDTO;
+import com.turingSecApp.turingSec.response.user.UserDTO;
 import com.turingSecApp.turingSec.dao.entities.AdminEntity;
 import com.turingSecApp.turingSec.dao.entities.HackerEntity;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
-import com.turingSecApp.turingSec.response.AdminDTO;
-import com.turingSecApp.turingSec.response.UserHackerDTO;
+import com.turingSecApp.turingSec.response.admin.AdminDTO;
+import com.turingSecApp.turingSec.response.user.UserHackerDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;

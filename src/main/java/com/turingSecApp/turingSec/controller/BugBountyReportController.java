@@ -1,10 +1,9 @@
 package com.turingSecApp.turingSec.controller;
 
-import com.turingSecApp.turingSec.response.ReportsByUserDTO;
-import com.turingSecApp.turingSec.response.ReportsByUserWithCompDTO;
-import com.turingSecApp.turingSec.dao.entities.ReportsEntity;
-import com.turingSecApp.turingSec.payload.BugBountyReportPayload;
-import com.turingSecApp.turingSec.payload.BugBountyReportUpdatePayload;
+import com.turingSecApp.turingSec.payload.report.BugBountyReportPayload;
+import com.turingSecApp.turingSec.response.report.ReportDTO;
+import com.turingSecApp.turingSec.response.report.ReportsByUserDTO;
+import com.turingSecApp.turingSec.response.report.ReportsByUserWithCompDTO;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.interfaces.IBugBountyReportService;
 import jakarta.validation.Valid;
@@ -22,21 +21,21 @@ public class BugBountyReportController {
     private final IBugBountyReportService bugBountyReportService;
 
     @GetMapping("/{id}")
-    public BaseResponse<ReportsEntity> getBugBountyReportById(@PathVariable Long id) {
-        ReportsEntity bugBountyReport = bugBountyReportService.getBugBountyReportById(id);
+    public BaseResponse<ReportDTO> getBugBountyReportById(@PathVariable Long id) {
+        ReportDTO bugBountyReport = bugBountyReportService.getBugBountyReportById(id);
         return BaseResponse.success(bugBountyReport);
     }
 
     @PostMapping("/submit")
-    public BaseResponse<?> submitBugBountyReport(@RequestBody @Valid BugBountyReportPayload reportPayload, @RequestParam Long bugBountyProgramId) {
-        bugBountyReportService.submitBugBountyReport(reportPayload,bugBountyProgramId);
-       return BaseResponse.success(null,"Bug bounty report submitted successfully");
+    public BaseResponse<ReportDTO> submitBugBountyReport(@RequestBody @Valid BugBountyReportPayload reportPayload, @RequestParam Long bugBountyProgramId) {
+        ReportDTO submittedBugBountyReport = bugBountyReportService.submitBugBountyReport(reportPayload, bugBountyProgramId);
+        return BaseResponse.success(submittedBugBountyReport,"Bug bounty report submitted successfully");
     }
 
     @PutMapping("/{id}")
-    public BaseResponse<ReportsEntity> updateBugBountyReport(@PathVariable Long id,
-                                                                  @RequestBody @Valid BugBountyReportUpdatePayload bugBountyReportUpdatePayload) {
-        ReportsEntity updatedReport = bugBountyReportService.updateBugBountyReport(id, bugBountyReportUpdatePayload);
+    public BaseResponse<ReportDTO> updateBugBountyReport(@PathVariable Long id,
+                                                                  @RequestBody @Valid BugBountyReportPayload bugBountyReportUpdatePayload) {
+        ReportDTO updatedReport = bugBountyReportService.updateBugBountyReport(id, bugBountyReportUpdatePayload);
         return BaseResponse.success(updatedReport);
     }
 

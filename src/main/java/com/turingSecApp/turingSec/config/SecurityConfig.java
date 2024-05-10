@@ -106,6 +106,10 @@ public class SecurityConfig {
                             .requestMatchers("/api/bug-bounty-reports/reports/company").hasRole("COMPANY")
                             .requestMatchers("/api/bug-bounty-reports/submit").hasRole("HACKER")
                             .requestMatchers("/api/bug-bounty-reports/user").hasRole("HACKER")
+
+
+                            .requestMatchers(HttpMethod.GET , "/api/bug-bounty-reports/{id}").authenticated()
+
                             .requestMatchers("/api/bug-bounty-reports/{id}").hasRole("HACKER");
 
 

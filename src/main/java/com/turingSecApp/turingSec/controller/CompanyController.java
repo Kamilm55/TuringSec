@@ -1,8 +1,8 @@
 package com.turingSecApp.turingSec.controller;
 
-import com.turingSecApp.turingSec.payload.CompanyLoginPayload;
-import com.turingSecApp.turingSec.payload.RegisterCompanyPayload;
-import com.turingSecApp.turingSec.response.CompanyResponse;
+import com.turingSecApp.turingSec.payload.company.CompanyLoginPayload;
+import com.turingSecApp.turingSec.payload.company.RegisterCompanyPayload;
+import com.turingSecApp.turingSec.response.company.CompanyResponse;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.interfaces.ICompanyService;
 import jakarta.validation.Valid;

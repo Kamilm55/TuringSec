@@ -1,6 +1,6 @@
 package com.turingSecApp.turingSec.service;
 
-import com.turingSecApp.turingSec.response.AssetTypeDTO;
+import com.turingSecApp.turingSec.response.program.AssetTypeDTO;
 import com.turingSecApp.turingSec.dao.entities.AssetTypeEntity;
 import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
 import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
@@ -9,10 +9,10 @@ import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
 import com.turingSecApp.turingSec.dao.repository.ProgramsRepository;
 import com.turingSecApp.turingSec.exception.custom.PermissionDeniedException;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
-import com.turingSecApp.turingSec.payload.AssetTypePayload;
-import com.turingSecApp.turingSec.payload.BugBountyProgramWithAssetTypePayload;
-import com.turingSecApp.turingSec.payload.StrictPayload;
-import com.turingSecApp.turingSec.response.BugBountyProgramDTO;
+import com.turingSecApp.turingSec.payload.program.AssetTypePayload;
+import com.turingSecApp.turingSec.payload.program.BugBountyProgramWithAssetTypePayload;
+import com.turingSecApp.turingSec.payload.program.StrictPayload;
+import com.turingSecApp.turingSec.response.program.BugBountyProgramDTO;
 import com.turingSecApp.turingSec.service.interfaces.IProgramsService;
 import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.ProgramMapper;

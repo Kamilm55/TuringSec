@@ -1,8 +1,8 @@
 package com.turingSecApp.turingSec.controller;
 
-import com.turingSecApp.turingSec.response.AssetTypeDTO;
-import com.turingSecApp.turingSec.payload.BugBountyProgramWithAssetTypePayload;
-import com.turingSecApp.turingSec.response.BugBountyProgramDTO;
+import com.turingSecApp.turingSec.response.program.AssetTypeDTO;
+import com.turingSecApp.turingSec.payload.program.BugBountyProgramWithAssetTypePayload;
+import com.turingSecApp.turingSec.response.program.BugBountyProgramDTO;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.interfaces.IProgramsService;
 import jakarta.validation.Valid;

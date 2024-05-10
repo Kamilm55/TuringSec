@@ -1,8 +1,8 @@
 package com.turingSecApp.turingSec.util.mapper;
 
-import com.turingSecApp.turingSec.response.BugBountyProgramWithAssetTypeDTO;
+import com.turingSecApp.turingSec.response.program.BugBountyProgramWithAssetTypeDTO;
 import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
-import com.turingSecApp.turingSec.response.BugBountyProgramDTO;
+import com.turingSecApp.turingSec.response.program.BugBountyProgramDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

@@ -1,8 +1,8 @@
 package com.turingSecApp.turingSec.service.interfaces;
 
-import com.turingSecApp.turingSec.response.AssetTypeDTO;
-import com.turingSecApp.turingSec.payload.BugBountyProgramWithAssetTypePayload;
-import com.turingSecApp.turingSec.response.BugBountyProgramDTO;
+import com.turingSecApp.turingSec.response.program.AssetTypeDTO;
+import com.turingSecApp.turingSec.payload.program.BugBountyProgramWithAssetTypePayload;
+import com.turingSecApp.turingSec.response.program.BugBountyProgramDTO;
 
 import java.util.List;
 

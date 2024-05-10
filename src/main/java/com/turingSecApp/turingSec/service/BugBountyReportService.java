@@ -1,20 +1,24 @@
 package com.turingSecApp.turingSec.service;
 
-import com.turingSecApp.turingSec.response.ReportsByUserDTO;
-import com.turingSecApp.turingSec.response.ReportsByUserWithCompDTO;
-import com.turingSecApp.turingSec.response.UserDTO;
-import com.turingSecApp.turingSec.dao.entities.*;
+import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
+import com.turingSecApp.turingSec.dao.entities.CollaboratorEntity;
+import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
+import com.turingSecApp.turingSec.dao.entities.ReportsEntity;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.*;
 import com.turingSecApp.turingSec.exception.custom.PermissionDeniedException;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
-import com.turingSecApp.turingSec.payload.BugBountyReportPayload;
-import com.turingSecApp.turingSec.payload.BugBountyReportUpdatePayload;
-import com.turingSecApp.turingSec.payload.CollaboratorWithIdPayload;
+import com.turingSecApp.turingSec.payload.report.BugBountyReportPayload;
+import com.turingSecApp.turingSec.response.report.CollaboratorPayload;
+import com.turingSecApp.turingSec.response.report.ReportDTO;
+import com.turingSecApp.turingSec.response.report.ReportsByUserDTO;
+import com.turingSecApp.turingSec.response.report.ReportsByUserWithCompDTO;
+import com.turingSecApp.turingSec.response.user.UserDTO;
 import com.turingSecApp.turingSec.service.interfaces.IBugBountyReportService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import com.turingSecApp.turingSec.util.UtilService;
+import com.turingSecApp.turingSec.util.mapper.ReportMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -40,11 +44,12 @@ public class BugBountyReportService implements IBugBountyReportService {
     private final CollaboratorRepository collaboratorRepository;
 
     @Override
-    public ReportsEntity getBugBountyReportById(Long id) {
-        return bugBountyReportRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Report not found with id:"+id));
+    public ReportDTO getBugBountyReportById(Long id) {
+        ReportsEntity report = bugBountyReportRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Report not found with id:" + id));
+        return ReportMapper.INSTANCE.toDTO(report);
     }
     @Override
-    public void submitBugBountyReport(BugBountyReportPayload reportPayload, Long bugBountyProgramId) {
+    public ReportDTO submitBugBountyReport(BugBountyReportPayload reportPayload, Long bugBountyProgramId) {
         // Check the authenticated hacker
         UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
 
@@ -65,37 +70,28 @@ public class BugBountyReportService implements IBugBountyReportService {
 
         // Save the report and its collaborators
         ReportsEntity savedReport = bugBountyReportRepository.save(report);
-        saveCollaborators(reportPayload.getCollaboratorDTO(), savedReport);
+        saveCollaborators(reportPayload.getCollaboratorPayload(), savedReport);
+
+        return ReportMapper.INSTANCE.toDTO(savedReport);
     }
 
-    private ReportsEntity createReportsEntityFromPayload(BugBountyReportPayload reportPayload) {
-        ReportsEntity report = new ReportsEntity();
-        report.setAsset(reportPayload.getAsset());
-        report.setWeakness(reportPayload.getWeakness());
-        report.setSeverity(reportPayload.getSeverity());
-        report.setMethodName(reportPayload.getMethodName());
-        report.setProofOfConcept(reportPayload.getProofOfConcept());
-        report.setDiscoveryDetails(reportPayload.getDiscoveryDetails());
-        report.setLastActivity(reportPayload.getLastActivity());
-        report.setReportTitle(reportPayload.getReportTitle());
-        report.setRewardsStatus(reportPayload.getRewardsStatus());
-        report.setVulnerabilityUrl(reportPayload.getVulnerabilityUrl());
-        return report;
-    }
-
-    private void saveCollaborators(List<CollaboratorWithIdPayload> collaboratorDTOs, ReportsEntity report) {
-        for (CollaboratorWithIdPayload collaboratorDTO : collaboratorDTOs) {
+    private void saveCollaborators(List<CollaboratorPayload> collaboratorDTOs, ReportsEntity report) {
+        for (var collaboratorDTO : collaboratorDTOs) {
             CollaboratorEntity collaboratorEntity = new CollaboratorEntity();
+            userRepository.findByUsername(collaboratorDTO.getHackerUsername()).orElseThrow(() -> new UserNotFoundException("User with username '" + collaboratorDTO.getHackerUsername() + "' not found for collaborating"));
             collaboratorEntity.setCollaborationPercentage(collaboratorDTO.getCollaborationPercentage());
             collaboratorEntity.setHackerUsername(collaboratorDTO.getHackerUsername());
             collaboratorEntity.setBugBountyReport(report);
+
             collaboratorRepository.save(collaboratorEntity);
+
+            report.addCollaborator(collaboratorEntity);
         }
+        bugBountyReportRepository.save(report);
     }
 
-
     @Override
-    public ReportsEntity updateBugBountyReport(Long id, BugBountyReportUpdatePayload reportPayload) {
+    public ReportDTO updateBugBountyReport(Long id, BugBountyReportPayload reportPayload) {
         // Retrieve existing report from the repository
         ReportsEntity existingReport = bugBountyReportRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Report not found with id:" + id));
@@ -112,14 +108,13 @@ public class BugBountyReportService implements IBugBountyReportService {
                 .orElseThrow(() -> new UserNotFoundException("User with id " +authenticatedUser.getId() + " not found"));
         existingReport.setUser(userFromDB);
 
-        // Update collaborators
-        List<CollaboratorEntity> updatedCollaborators = updateCollaborators(existingReport, reportPayload.getCollaborator());
+        // Clear previous collaborators, what you give in list i paste into  collaborators and update
+        existingReport.setCollaborators(new ArrayList<>());
 
-        existingReport.setCollaborators(updatedCollaborators);
-        bugBountyReportRepository.save(existingReport);
+        // Update collaborators and save report
+        saveCollaborators(reportPayload.getCollaboratorPayload() , existingReport);
 
-        // Save the updated report and return it
-        return bugBountyReportRepository.save(existingReport);
+        return ReportMapper.INSTANCE.toDTO(existingReport);
     }
 
     private void checkReportOwnership(ReportsEntity report) {
@@ -130,7 +125,17 @@ public class BugBountyReportService implements IBugBountyReportService {
         }
     }
 
-    private void updateReportProperties(ReportsEntity report, BugBountyReportUpdatePayload reportPayload) {
+    private void updateReportProperties(ReportsEntity report, BugBountyReportPayload reportPayload) {
+        setReportProperties(report, reportPayload);
+    }
+
+    private ReportsEntity createReportsEntityFromPayload(BugBountyReportPayload reportPayload) {
+        ReportsEntity report = new ReportsEntity();
+        setReportProperties(report, reportPayload);
+        return report;
+    }
+
+    private void setReportProperties(ReportsEntity report, BugBountyReportPayload reportPayload) {
         report.setAsset(reportPayload.getAsset());
         report.setWeakness(reportPayload.getWeakness());
         report.setSeverity(reportPayload.getSeverity());
@@ -141,20 +146,7 @@ public class BugBountyReportService implements IBugBountyReportService {
         report.setReportTitle(reportPayload.getReportTitle());
         report.setRewardsStatus(reportPayload.getRewardsStatus());
         report.setVulnerabilityUrl(reportPayload.getVulnerabilityUrl());
-    }
-
-    private List<CollaboratorEntity> updateCollaborators(ReportsEntity report, List<CollaboratorWithIdPayload> collaboratorPayloads) {
-        List<CollaboratorEntity> collaboratorEntities = new ArrayList<>();
-        for (CollaboratorWithIdPayload collaboratorDTO : collaboratorPayloads) {
-            CollaboratorEntity collaboratorEntityFromDB = collaboratorRepository.findById(collaboratorDTO.getId())
-                    .orElseThrow(() -> new UserNotFoundException("Collaborator with id " + collaboratorDTO.getId() + " not found"));
-            collaboratorEntityFromDB.setCollaborationPercentage(collaboratorDTO.getCollaborationPercentage());
-            collaboratorEntityFromDB.setHackerUsername(collaboratorDTO.getHackerUsername());
-            collaboratorEntityFromDB.setBugBountyReport(report);
-            collaboratorEntities.add(collaboratorEntityFromDB);
-//            collaboratorRepository.save(collaboratorEntityFromDB);
-        }
-        return collaboratorEntities;
+        report.setOwnPercentage(reportPayload.getOwnPercentage());
     }
 
 
@@ -323,6 +315,8 @@ public class BugBountyReportService implements IBugBountyReportService {
         report.setRewardsStatus(reportPayload.getRewardsStatus());
         report.setVulnerabilityUrl(reportPayload.getVulnerabilityUrl());
 
+        report.setOwnPercentage(reportPayload.getOwnPercentage());
+
         // Set the user for the bug bounty report
         UserEntity userFromDB = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found"));
         report.setUser(userFromDB);
@@ -334,7 +328,7 @@ public class BugBountyReportService implements IBugBountyReportService {
 
         ReportsEntity reportFromDB = bugBountyReportRepository.findById(saved.getId()).orElseThrow(() -> new ResourceNotFoundException("Report not found"));
         // Set the bug bounty report for each collaborator
-        for (var collaboratorDTO : reportPayload.getCollaboratorDTO()) {
+        for (var collaboratorDTO : reportPayload.getCollaboratorPayload()) {
             CollaboratorEntity collaboratorEntity = new CollaboratorEntity();
             collaboratorEntity.setCollaborationPercentage(collaboratorDTO.getCollaborationPercentage());
             collaboratorEntity.setHackerUsername(collaboratorDTO.getHackerUsername());

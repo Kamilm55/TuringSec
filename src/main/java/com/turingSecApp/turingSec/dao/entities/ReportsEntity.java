@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -69,10 +70,15 @@ public class ReportsEntity {
     @JsonIgnore
     private BugBountyProgramEntity bugBountyProgram;
 
-
+    @Column(name = "own_percentage")
+    private Double ownPercentage = 100.0; // Default own percentage is 100%
 
     @OneToMany(mappedBy = "bugBountyReport", cascade = CascadeType.ALL)
-    private List<CollaboratorEntity> collaborators;
+    private List<CollaboratorEntity> collaborators = new ArrayList<>();
 
+    public void addCollaborator(CollaboratorEntity collaborator) {
+        collaborators.add(collaborator);
+        collaborator.setBugBountyReport(this);
+    }
 
 }

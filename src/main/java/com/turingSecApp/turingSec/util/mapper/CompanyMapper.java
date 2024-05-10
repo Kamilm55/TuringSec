@@ -2,8 +2,8 @@ package com.turingSecApp.turingSec.util.mapper;
 
 import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
 import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
-import com.turingSecApp.turingSec.response.CompanyDTO;
-import com.turingSecApp.turingSec.response.CompanyResponse;
+import com.turingSecApp.turingSec.response.company.CompanyDTO;
+import com.turingSecApp.turingSec.response.company.CompanyResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;

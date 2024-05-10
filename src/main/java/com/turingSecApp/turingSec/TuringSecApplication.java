@@ -5,7 +5,12 @@ import com.turingSecApp.turingSec.dao.entities.role.Role;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.*;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
-import com.turingSecApp.turingSec.payload.*;
+import com.turingSecApp.turingSec.payload.program.AssetTypePayload;
+import com.turingSecApp.turingSec.payload.program.BugBountyProgramWithAssetTypePayload;
+import com.turingSecApp.turingSec.payload.program.StrictPayload;
+import com.turingSecApp.turingSec.payload.report.BugBountyReportPayload;
+import com.turingSecApp.turingSec.payload.user.RegisterPayload;
+import com.turingSecApp.turingSec.response.report.CollaboratorPayload;
 import com.turingSecApp.turingSec.service.BugBountyReportService;
 import com.turingSecApp.turingSec.service.IEmailNotificationService;
 import com.turingSecApp.turingSec.service.ProgramsService;
@@ -104,7 +109,7 @@ public class TuringSecApplication implements CommandLineRunner {
                 .firstName("Hackerrrr")
                 .lastName("Lastname")
                 .country("Azerbaijan")
-                    .username("Hacker 2")
+                .username("Hacker_2")
                 .email("kamilmmmdov2905@gmail.com")
                 .password("userPass") // encode inside service
                 .build();
@@ -197,13 +202,14 @@ public class TuringSecApplication implements CommandLineRunner {
                 .reportTitle("Critical SQL Injection Vulnerability in ExampleCompany Website")
                 .rewardsStatus("Pending")
                 .vulnerabilityUrl("https://example.com/login")
-                .collaboratorDTO(
+                .ownPercentage(20.0)
+                .collaboratorPayload(
                         List.of(
-                                CollaboratorWithIdPayload.builder()
+                                CollaboratorPayload.builder()
                                         .hackerUsername("Username")
-                                        .collaborationPercentage(50.0)
+                                        .collaborationPercentage(30.0)
                                         .build(),
-                                CollaboratorWithIdPayload.builder()
+                                CollaboratorPayload.builder()
                                         .hackerUsername("Hacker_2")
                                         .collaborationPercentage(50.0)
                                         .build()
@@ -222,15 +228,12 @@ public class TuringSecApplication implements CommandLineRunner {
                 .reportTitle("XSS Vulnerability in ExampleCompany Mobile App")
                 .rewardsStatus("Pending")
                 .vulnerabilityUrl("https://example.com/search")
-                .collaboratorDTO(
+                .ownPercentage(30.0)
+                .collaboratorPayload(
                         List.of(
-                                CollaboratorWithIdPayload.builder()
-                                        .hackerUsername("securitypro789")
+                                CollaboratorPayload.builder()
+                                        .hackerUsername("Username")
                                         .collaborationPercentage(70.0)
-                                        .build(),
-                                CollaboratorWithIdPayload.builder()
-                                        .hackerUsername("cyberninja007")
-                                        .collaborationPercentage(30.0)
                                         .build()
                         )
                 )
@@ -323,15 +326,16 @@ public class TuringSecApplication implements CommandLineRunner {
                     .reportTitle("Report " + (i + 1))
                     .rewardsStatus("Pending")
                     .vulnerabilityUrl("https://example.com/report" + (i + 1))
-                    .collaboratorDTO(
+                    .ownPercentage(50.0)
+                    .collaboratorPayload(
                             List.of(
-                                    CollaboratorWithIdPayload.builder()
+                                    CollaboratorPayload.builder()
                                             .hackerUsername("Username")
-                                            .collaborationPercentage(50.0)
+                                            .collaborationPercentage(30.0)
                                             .build(),
-                                    CollaboratorWithIdPayload.builder()
+                                    CollaboratorPayload.builder()
                                             .hackerUsername("Hacker_2")
-                                            .collaborationPercentage(50.0)
+                                            .collaborationPercentage(20.0)
                                             .build()
                             )
                     )
