@@ -51,7 +51,7 @@ public class UtilService {
             String email = authentication.getName();
             CompanyEntity company = companyRepository.findByEmail(email);
             if(company==null){
-                throw  new UserNotFoundException("Company with email " + email + " not found");
+                throw  new CompanyNotFoundException("Company with email " + email + " not found , in getAuthenticatedCompany()");
             }
             return company;
         } else {

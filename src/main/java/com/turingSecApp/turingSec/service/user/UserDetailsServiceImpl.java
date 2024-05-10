@@ -34,7 +34,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity user = userRepository.findByUsername(username).orElse(null);
         System.out.println("(loadUserByUsername) -> username: " + username);
-        System.out.println("(loadUserByUsername) -> user: " +user);
+        System.out.println("(loadUserByUsername) -> user: " + user);
         if (user != null) {
             return new CustomUserDetails(user);
         }
@@ -54,6 +54,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         CompanyEntity companyEntity = companyRepository.findByEmail(username);
         if (companyEntity != null) {
+            System.out.println("Company entity exists , Works in loadUserbyUsername");
             return new CustomUserDetails(companyEntity);
         }else {
             throw new CompanyNotFoundException("Company does not found in UserDetailsServiceImpl.");

@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,14 +43,14 @@ public class BugBountyProgramEntity {
     @ElementCollection
     private List<String> outOfScope = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "company_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private CompanyEntity company;
 
     @OneToMany(mappedBy = "bugBountyProgram",fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReportsEntity> reports = new ArrayList<>();
+    private List<ReportEntity> reports = new ArrayList<>();
 
     @OneToMany(mappedBy = "bugBountyProgram", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AssetTypeEntity> assetTypes = new ArrayList<>();
@@ -60,5 +59,12 @@ public class BugBountyProgramEntity {
     @OneToMany(mappedBy = "bugBountyProgramForStrict", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StrictEntity> prohibits = new ArrayList<>();
 
-    // Getters and setters
+    // Getters and setters...
+
+    public void removeReport(Long reportId) {
+        if (reports != null) {
+            reports.removeIf(report -> report.getId().equals(reportId));
+
+        }
+    }
 }

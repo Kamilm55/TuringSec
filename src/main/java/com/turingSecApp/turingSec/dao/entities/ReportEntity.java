@@ -6,8 +6,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
 import jakarta.persistence.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,7 +19,7 @@ import java.util.List;
 @EqualsAndHashCode(exclude = {"user", "bugBountyProgram", "collaborators"})
 @ToString(exclude = {"user", "bugBountyProgram", "collaborators"})
 @Table(name = "bug_bounty_reports")
-public class ReportsEntity {
+public class ReportEntity {
     @Id
    // @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -80,5 +78,4 @@ public class ReportsEntity {
         collaborators.add(collaborator);
         collaborator.setBugBountyReport(this);
     }
-
 }

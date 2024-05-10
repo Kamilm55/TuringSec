@@ -22,7 +22,7 @@ public class CollaboratorEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bug_bounty_report_id")
     @JsonIgnore
-    private ReportsEntity bugBountyReport;
+    private ReportEntity bugBountyReport;
 
     @Column(name = "hacker_username")
     private String hackerUsername;
@@ -32,7 +32,4 @@ public class CollaboratorEntity {
 
     // Constructors, getters, and setters
 
-
-
-    // Getters and Setters
 }

@@ -1,5 +1,6 @@
 package com.turingSecApp.turingSec.service;
 
+import com.turingSecApp.turingSec.exception.custom.CompanyNotFoundException;
 import com.turingSecApp.turingSec.response.program.AssetTypeDTO;
 import com.turingSecApp.turingSec.dao.entities.AssetTypeEntity;
 import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
@@ -17,6 +18,8 @@ import com.turingSecApp.turingSec.service.interfaces.IProgramsService;
 import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.ProgramMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -208,7 +211,6 @@ public class ProgramsService implements IProgramsService {
     @Override
     @Transactional
     public void deleteBugBountyProgram(Long id){
-
         // Get the company associated with the authenticated user
         CompanyEntity company = utilService.getAuthenticatedCompany();
 
@@ -217,33 +219,13 @@ public class ProgramsService implements IProgramsService {
 
         // Check if the authenticated company is the owner of the program
         if (program.getCompany().getId().equals(company.getId())) {
-            System.out.println(program);
-//        System.out.println("comp id:" + company.getId());
-        System.out.println("program id:" + program.getId());
+            company.removeProgram(program.getId());// without this not work , we remove program from set in company entity then we can delete
             programsRepository.delete(program);
         } else {
             // If the authenticated company is not the owner, return forbidden status
             throw new PermissionDeniedException();
         }
     }
-    @Transactional // TEST \\
-    public void deleteBugBountyProgramForTest(Long id){
-//        // Get the company associated with the authenticated user
-//        CompanyEntity company = getAuthenticatedUser();
-
-        // Retrieve the bug bounty program by ID
-        BugBountyProgramEntity program = getBugBountyProgramById(id);
-
-        // Check if the authenticated company is the owner of the program
-//        if (program.getCompany().getId().equals(company.getId())) {
-            System.out.println(program);
-            programsRepository.delete(program);
-//        } else {
-//            // If the authenticated company is not the owner, return forbidden status
-//            throw new PermissionDeniedException();
-//        }
-    }
-
 
     // Utils
     private AssetTypeEntity findExistingAssetType(List<AssetTypeEntity> existingAssetTypes, AssetTypeEntity assetType) {
@@ -272,9 +254,7 @@ public class ProgramsService implements IProgramsService {
 
 
     public BugBountyProgramEntity getBugBountyProgramById(Long id) {
-        Optional<BugBountyProgramEntity> program = programsRepository.findById(id);
-
-        return program.orElseThrow(() -> new ResourceNotFoundException("Bug Bounty Program not found"));
+        return programsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Bug Bounty Program not found"));
     }
     //
 

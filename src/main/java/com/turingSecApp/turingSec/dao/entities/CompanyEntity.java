@@ -6,6 +6,7 @@ import com.turingSecApp.turingSec.dao.entities.role.UserRoles;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Iterator;
 import java.util.Set;
 
 @Entity
@@ -47,4 +48,13 @@ public class CompanyEntity {
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<UserRoles> userRoles;
+
+    public void removeProgram(Long programId) {
+        if (bugBountyPrograms != null) {
+            // If cascading deletion is needed, it will be handled based on the CascadeType.ALL
+            // defined in the association
+            bugBountyPrograms.removeIf(program -> program.getId().equals(programId));
+        }
+    }
+
 }
