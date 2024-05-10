@@ -23,6 +23,7 @@ public interface IUserService {
     List<UserHackerDTO> getAllActiveUsers();
     void deleteUser();
 
+    // Programs for users
     List<BugBountyProgramWithAssetTypeDTO> getAllBugBountyPrograms();
     BugBountyProgramDTO getBugBountyProgramById(Long id);
     UserEntity findUserByUsername(String username);

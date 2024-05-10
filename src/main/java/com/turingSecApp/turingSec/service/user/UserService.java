@@ -1,17 +1,18 @@
 package com.turingSecApp.turingSec.service.user;
 
 
-import com.turingSecApp.turingSec.dao.entities.AssetTypeEntity;
 import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
 import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
 import com.turingSecApp.turingSec.dao.entities.HackerEntity;
 import com.turingSecApp.turingSec.dao.entities.role.Role;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.*;
-import com.turingSecApp.turingSec.exception.custom.*;
+import com.turingSecApp.turingSec.exception.custom.BadCredentialsException;
+import com.turingSecApp.turingSec.exception.custom.EmailAlreadyExistsException;
+import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
+import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.payload.user.*;
-import com.turingSecApp.turingSec.response.program.AssetTypeDTO;
 import com.turingSecApp.turingSec.response.program.BugBountyProgramDTO;
 import com.turingSecApp.turingSec.response.program.BugBountyProgramWithAssetTypeDTO;
 import com.turingSecApp.turingSec.response.user.AuthResponse;
@@ -30,7 +31,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.turingSecApp.turingSec.util.GlobalConstants.ROOT_LINK;
@@ -72,13 +76,13 @@ public class UserService implements IUserService {
         HackerEntity hackerFromDB = findHackerByUser(userById);
 
         // Build and return the authentication response
-        return buildAuthResponse(token, userById, hackerFromDB);
+        return utilService.buildAuthResponse(token, userById, hackerFromDB);
     }
 
     // Method to check if user already exists with the provided username or email
     private void checkUserDoesNotExist(RegisterPayload registerPayload) {
-        isUserExistWithUsername(registerPayload.getUsername());
-        isUserExistWithEmail(registerPayload.getEmail());
+        utilService.isUserExistWithUsername(registerPayload.getUsername());
+        utilService.isUserExistWithEmail(registerPayload.getEmail());
     }
 
     // Method to create and save the user entity
@@ -94,18 +98,13 @@ public class UserService implements IUserService {
                 .build();
 
         // Set user roles
-        Set<Role> roles = getHackerRoles();
+        Set<Role> roles = utilService.getHackerRoles();
         user.setRoles(roles);
 
         // Save the user
         return userRepository.save(user);
     }
-    // Method to get hacker roles
-    private Set<Role> getHackerRoles() {
-        Set<Role> roles = new HashSet<>();
-        roles.add(roleRepository.findByName("HACKER"));
-        return roles;
-    }
+
 
     // Method to create and save the hacker entity
     private HackerEntity createAndSaveHackerEntity(UserEntity user) {
@@ -133,19 +132,11 @@ public class UserService implements IUserService {
         return jwtTokenProvider.generateToken(userDetails);
     }
 
-
     // Method to retrieve hacker details by associated user
     private HackerEntity findHackerByUser(UserEntity user) {
         return hackerRepository.findByUser(user);
     }
 
-    // Method to build authentication response
-    private AuthResponse buildAuthResponse(String token, UserEntity user, HackerEntity hacker) {
-        return AuthResponse.builder()
-                .accessToken(token)
-                .userInfo(UserMapper.INSTANCE.toDto(user, hacker))
-                .build();
-    }
     ///////////\\\\\\\\\\\
 
     @Override
@@ -172,19 +163,6 @@ public class UserService implements IUserService {
 
 
     /////////////////////\\\\\\\\\\\\\\\\
-
-    private void isUserExistWithEmail(String email) {
-//        System.out.println(email);
-        if (userRepository.findByEmail(email) != null) {
-            throw new EmailAlreadyExistsException("Email is already taken.");
-        }
-    }
-
-    private void isUserExistWithUsername(String username) {
-        if (userRepository.findByUsername(username).isPresent()) {
-            throw new UserAlreadyExistsException("Username is already taken.");
-        }
-    }
 
     @Override
     public boolean activateAccount(String token) {
@@ -213,7 +191,7 @@ public class UserService implements IUserService {
         // Authenticate user if found
         if (userEntity != null && passwordEncoder.matches(loginRequest.getPassword(), userEntity.getPassword())) {
             // Check if the user is activated
-            checkUserIsActivated(userEntity);
+            utilService.checkUserIsActivated(userEntity);
 
             // Generate token using the user details
             String token = generateTokenForUser(userEntity);
@@ -223,7 +201,7 @@ public class UserService implements IUserService {
             HackerEntity hackerFromDB = findHackerByUser(userById);
 
             // Create and return authentication response
-            return buildAuthResponse(token, userById, hackerFromDB);
+            return utilService.buildAuthResponse(token, userById, hackerFromDB);
         } else {
             // Authentication failed
             throw new BadCredentialsException("Invalid username/email or password.");
@@ -234,14 +212,6 @@ public class UserService implements IUserService {
     private UserEntity findUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
-
-    // Method to check if the user is activated
-    private void checkUserIsActivated(UserEntity userEntity) {
-        if (!userEntity.isActivated()) {
-            throw new UserNotActivatedException("User is not activated yet.");
-        }
-    }
-
 
     @Override
     public void changePassword(ChangePasswordRequest request) {
@@ -419,7 +389,7 @@ public class UserService implements IUserService {
         // Map BugBountyProgramEntities to BugBountyProgramDTOs
         return programs.stream()
                 .map(programEntity -> {
-                    BugBountyProgramWithAssetTypeDTO dto = mapToDTO(programEntity);
+                    BugBountyProgramWithAssetTypeDTO dto = utilService.mapToDTO(programEntity);
                     dto.setCompanyId(programEntity.getCompany().getId());
                     //                    dto.getProgramId();
                     return dto;
@@ -450,33 +420,6 @@ public class UserService implements IUserService {
     private UserEntity findUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User not found with this id: " + userId));
     }
-    private BugBountyProgramWithAssetTypeDTO mapToDTO(BugBountyProgramEntity programEntity) {
-        BugBountyProgramWithAssetTypeDTO dto = new BugBountyProgramWithAssetTypeDTO();
-//        dto.setId(programEntity.getId());
-        dto.setFromDate(programEntity.getFromDate());
-        dto.setToDate(programEntity.getToDate());
-        dto.setNotes(programEntity.getNotes());
-        dto.setPolicy(programEntity.getPolicy());
 
-        // Map associated asset types
-        List<AssetTypeDTO> assetTypeDTOs = programEntity.getAssetTypes().stream()
-                .map(this::mapAssetTypeToDTO)
-                .collect(Collectors.toList());
-        dto.setAssetTypes(assetTypeDTOs);
-
-        // You can map other fields as needed
-
-        return dto;
-    }
-    private AssetTypeDTO mapAssetTypeToDTO(AssetTypeEntity assetTypeEntity) {
-        AssetTypeDTO dto = new AssetTypeDTO();
-//        dto.setId(assetTypeEntity.getId());
-        dto.setLevel(assetTypeEntity.getLevel());
-        dto.setAssetType(assetTypeEntity.getAssetType());
-        dto.setPrice(assetTypeEntity.getPrice());
-        dto.setProgramId(assetTypeEntity.getBugBountyProgram().getId());
-
-        return dto;
-    }
 }
 

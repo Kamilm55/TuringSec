@@ -21,7 +21,6 @@ public class AdminController {
     }
 
 
-
     @PostMapping("/login")
     public BaseResponse<AdminAuthResponse> loginAdmin(@RequestBody @Valid LoginRequest user) {
        return BaseResponse.success(adminService.loginAdmin(user));
