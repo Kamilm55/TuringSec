@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.file_upload_for_hacker.entity;
+package com.turingSecApp.turingSec.file_upload.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

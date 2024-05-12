@@ -1,8 +1,10 @@
-package com.turingSecApp.turingSec.background_file_upload_for_hacker.controller;
+package com.turingSecApp.turingSec.file_upload.controller;
 
-import com.turingSecApp.turingSec.background_file_upload_for_hacker.entity.BackgroundImageForHacker;
-import com.turingSecApp.turingSec.background_file_upload_for_hacker.response.FileResponse;
-import com.turingSecApp.turingSec.background_file_upload_for_hacker.service.IFileService;
+import com.turingSecApp.turingSec.file_upload.entity.BackgroundImageForHacker;
+import com.turingSecApp.turingSec.file_upload.entity.ImageForHacker;
+import com.turingSecApp.turingSec.file_upload.response.FileResponse;
+import com.turingSecApp.turingSec.file_upload.service.BackgroundImageForHackerService;
+import com.turingSecApp.turingSec.file_upload.service.IFileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +21,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class BackgroundImageForHackerController {
-    private final IFileService fileService;
+    private final BackgroundImageForHackerService fileService;
 
     @PostMapping("/upload")
     public FileResponse uploadVideo(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal UserDetails userDetails) throws IOException {
@@ -30,8 +32,9 @@ public class BackgroundImageForHackerController {
     }
 
     @GetMapping("/download/{hackerId}")
-    public ResponseEntity<?> downloadVideo(@PathVariable Long hackerId) throws FileNotFoundException {
+    public ResponseEntity<?> downloadVideo(@PathVariable Long hackerId) {
         BackgroundImageForHacker media = fileService.getVideoById(hackerId);
+
        return ResponseEntity.status(HttpStatus.OK)
                 .header("Content-Type", media.getContentType())
                 .body(

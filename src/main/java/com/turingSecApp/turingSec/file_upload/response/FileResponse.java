@@ -1,11 +1,11 @@
-package com.turingSecApp.turingSec.file_upload_for_hacker.response;
+package com.turingSecApp.turingSec.file_upload.response;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class ImageForHackerResponse {
+public class FileResponse {
 
     private Long id;
 
@@ -14,6 +14,5 @@ public class ImageForHackerResponse {
     private Long hackerId;
 
     private byte[] fileData;
-
 
 }

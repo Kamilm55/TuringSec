@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.background_file_upload_for_hacker.exception;
+package com.turingSecApp.turingSec.file_upload.exception;
 
 public class FileNotFoundException extends RuntimeException {
 

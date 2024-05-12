@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -115,22 +114,14 @@ public class GlobalExceptionHandler {
         );
     }
     // BackgroundImageForHackerController
-    @ExceptionHandler(com.turingSecApp.turingSec.background_file_upload_for_hacker.exception.FileNotFoundException.class)
-    public ResponseEntity<ExceptionResponseMessages> handleFileNotFoundException(com.turingSecApp.turingSec.background_file_upload_for_hacker.exception.FileNotFoundException ex) {
+    @ExceptionHandler(com.turingSecApp.turingSec.file_upload.exception.FileNotFoundException.class)
+    public ResponseEntity<ExceptionResponseMessages> handleFileNotFoundException(com.turingSecApp.turingSec.file_upload.exception.FileNotFoundException ex) {
          return new ResponseEntity<>(
                 new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.NOT_FOUND) ,
                 HttpStatus.NOT_FOUND
         );
     }
 
-    // ImageForHackerController for Image and video download
-    @ExceptionHandler(com.turingSecApp.turingSec.file_upload_for_hacker.exception.FileNotFoundException.class)
-    public ResponseEntity<ExceptionResponseMessages> handleFileNotFoundExceptionForImage(com.turingSecApp.turingSec.file_upload_for_hacker.exception.FileNotFoundException ex) {
-        return new ResponseEntity<>(
-                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.NOT_FOUND) ,
-                HttpStatus.NOT_FOUND
-        );
-    }
     // Company Controller
     @ExceptionHandler(CompanyNotFoundException.class)
     public ResponseEntity<ExceptionResponseMessages> handleCompanyNotFoundException(CompanyNotFoundException ex) {

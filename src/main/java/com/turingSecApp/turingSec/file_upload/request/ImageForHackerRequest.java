@@ -1,11 +1,11 @@
-package com.turingSecApp.turingSec.background_file_upload_for_hacker.request;
+package com.turingSecApp.turingSec.file_upload.request;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class FileRequest {
+public class ImageForHackerRequest {
 
     private String name;
     private String contentType;

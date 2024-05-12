@@ -4,10 +4,10 @@ import com.turingSecApp.turingSec.response.user.HackerDTO;
 import com.turingSecApp.turingSec.dao.entities.HackerEntity;
 import com.turingSecApp.turingSec.dao.repository.HackerRepository;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
-import com.turingSecApp.turingSec.background_file_upload_for_hacker.entity.BackgroundImageForHacker;
-import com.turingSecApp.turingSec.background_file_upload_for_hacker.repository.FileRepository;
-import com.turingSecApp.turingSec.file_upload_for_hacker.entity.ImageForHacker;
-import com.turingSecApp.turingSec.file_upload_for_hacker.repository.ImageForHackerRepository;
+import com.turingSecApp.turingSec.file_upload.entity.BackgroundImageForHacker;
+import com.turingSecApp.turingSec.file_upload.repository.BackgroundImageForHackerRepository;
+import com.turingSecApp.turingSec.file_upload.entity.ImageForHacker;
+import com.turingSecApp.turingSec.file_upload.repository.ImageForHackerRepository;
 import com.turingSecApp.turingSec.service.interfaces.IHackerService;
 import com.turingSecApp.turingSec.util.mapper.HackerMapper;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class HackerService implements IHackerService {
     private final HackerRepository hackerRepository;
-    private final FileRepository fileRepository;
+    private final BackgroundImageForHackerRepository backgroundImageForHackerRepository;
     private final ImageForHackerRepository imageForHackerRepository;
 
     @Override
@@ -30,7 +30,7 @@ public class HackerService implements IHackerService {
         HackerDTO hackerResponse = HackerMapper.INSTANCE.convert(hackerEntity);
 
         // Set background image ID or null
-        BackgroundImageForHacker backgroundImageForHacker = fileRepository.findBackgroundImageForHackerByHackerId(hackerId).orElse(null);
+        BackgroundImageForHacker backgroundImageForHacker = backgroundImageForHackerRepository.findBackgroundImageForHackerByHackerId(hackerId).orElse(null);
         if (backgroundImageForHacker != null) {
             hackerResponse.setBackgroundImageId(backgroundImageForHacker.getId());
         }

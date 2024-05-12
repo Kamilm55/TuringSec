@@ -1,7 +1,7 @@
-package com.turingSecApp.turingSec.file_upload_for_hacker.repository;
+package com.turingSecApp.turingSec.file_upload.repository;
 
 
-import com.turingSecApp.turingSec.file_upload_for_hacker.entity.ImageForHacker;
+import com.turingSecApp.turingSec.file_upload.entity.ImageForHacker;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
