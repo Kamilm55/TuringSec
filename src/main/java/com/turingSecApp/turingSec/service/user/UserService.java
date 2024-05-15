@@ -18,7 +18,7 @@ import com.turingSecApp.turingSec.response.program.BugBountyProgramWithAssetType
 import com.turingSecApp.turingSec.response.user.AuthResponse;
 import com.turingSecApp.turingSec.response.user.UserDTO;
 import com.turingSecApp.turingSec.response.user.UserHackerDTO;
-import com.turingSecApp.turingSec.service.IEmailNotificationService;
+import com.turingSecApp.turingSec.service.EmailNotificationService;
 import com.turingSecApp.turingSec.service.ProgramsService;
 import com.turingSecApp.turingSec.service.interfaces.IUserService;
 import com.turingSecApp.turingSec.util.UtilService;
@@ -42,7 +42,7 @@ import static com.turingSecApp.turingSec.util.GlobalConstants.ROOT_LINK;
 @Service
 @RequiredArgsConstructor
 public class UserService implements IUserService {
-    private final IEmailNotificationService IEmailNotificationService;
+    private final EmailNotificationService EmailNotificationService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtTokenProvider;
     private final UserDetailsService userDetailsService;
@@ -354,7 +354,7 @@ public class UserService implements IUserService {
                 + activationLink + "\n\n"
                 + "Best regards,\nThe Application Team";
 
-        IEmailNotificationService.sendEmail(user.getEmail(), subject, content);
+        EmailNotificationService.sendEmail(user.getEmail(), subject, content);
     }
 
     private String generateActivationToken() {

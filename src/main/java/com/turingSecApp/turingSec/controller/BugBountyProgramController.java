@@ -19,6 +19,7 @@ public class BugBountyProgramController {
     private final IProgramsService bugBountyProgramService;
     @GetMapping
     public BaseResponse<List<BugBountyProgramDTO>> getCompanyAllBugBountyPrograms() {
+        // Get programs belonging to the company
         return BaseResponse.success(bugBountyProgramService.getCompanyAllBugBountyPrograms());
     }
 

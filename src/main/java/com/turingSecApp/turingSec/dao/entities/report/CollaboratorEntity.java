@@ -1,6 +1,7 @@
-package com.turingSecApp.turingSec.dao.entities;
+package com.turingSecApp.turingSec.dao.entities.report;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.turingSecApp.turingSec.dao.entities.report.ReportEntity;
 import lombok.*;
 
 

@@ -1,6 +1,9 @@
 package com.turingSecApp.turingSec.controller;
 
-import com.turingSecApp.turingSec.payload.report.BugBountyReportPayload;
+import com.turingSecApp.turingSec.dao.entities.report.ReportCVSS;
+import com.turingSecApp.turingSec.dao.entities.report.ReportManual;
+import com.turingSecApp.turingSec.payload.report.ReportCVSSPayload;
+import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
 import com.turingSecApp.turingSec.response.report.ReportDTO;
 import com.turingSecApp.turingSec.response.report.ReportsByUserDTO;
 import com.turingSecApp.turingSec.response.report.ReportsByUserWithCompDTO;
@@ -26,18 +29,33 @@ public class BugBountyReportController {
         return BaseResponse.success(bugBountyReport);
     }
 
-    @PostMapping("/submit")
-    public BaseResponse<ReportDTO> submitBugBountyReport(@RequestBody @Valid BugBountyReportPayload reportPayload, @RequestParam Long bugBountyProgramId) {
-        ReportDTO submittedBugBountyReport = bugBountyReportService.submitBugBountyReport(reportPayload, bugBountyProgramId);
+    @PostMapping("/manualReport")
+    public BaseResponse<ReportManual> submitManualReport(@RequestBody @Valid ReportManualPayload reportPayload, @RequestParam Long bugBountyProgramId) {
+        ReportManual submittedBugBountyReport = bugBountyReportService.submitManualReport(reportPayload, bugBountyProgramId);
         return BaseResponse.success(submittedBugBountyReport,"Bug bounty report submitted successfully");
     }
 
-    @PutMapping("/{id}")
-    public BaseResponse<ReportDTO> updateBugBountyReport(@PathVariable Long id,
-                                                                  @RequestBody @Valid BugBountyReportPayload bugBountyReportUpdatePayload) {
-        ReportDTO updatedReport = bugBountyReportService.updateBugBountyReport(id, bugBountyReportUpdatePayload);
+    @PutMapping("/manualReport/{id}")
+    public BaseResponse<ReportManual> updateManualReport(@PathVariable Long id,
+                                                         @RequestBody @Valid ReportManualPayload bugBountyReportUpdatePayload) {
+        ReportManual updatedReport = bugBountyReportService.updateManualReport(id, bugBountyReportUpdatePayload);
         return BaseResponse.success(updatedReport);
     }
+
+    //
+    @PostMapping("/CVSSReport")
+    public BaseResponse<ReportCVSS> submitManualReport(@RequestBody @Valid ReportCVSSPayload reportPayload, @RequestParam Long bugBountyProgramId) {
+        ReportCVSS submittedBugBountyReport = bugBountyReportService.submitCVSSReport(reportPayload, bugBountyProgramId);
+        return BaseResponse.success(submittedBugBountyReport,"Bug bounty report submitted successfully");
+    }
+
+    @PutMapping("/CVSSReport/{id}")
+    public BaseResponse<ReportCVSS> updateManualReport(@PathVariable Long id,
+                                                         @RequestBody @Valid ReportCVSSPayload bugBountyReportUpdatePayload) {
+        ReportCVSS updatedReport = bugBountyReportService.updateCVSSReport(id, bugBountyReportUpdatePayload);
+        return BaseResponse.success(updatedReport);
+    }
+
 
     @DeleteMapping("/{id}")
     public BaseResponse<?> deleteBugBountyReport(@PathVariable Long id) {

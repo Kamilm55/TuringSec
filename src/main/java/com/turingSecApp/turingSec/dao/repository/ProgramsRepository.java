@@ -2,7 +2,7 @@ package com.turingSecApp.turingSec.dao.repository;
 
 import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
 import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
-import com.turingSecApp.turingSec.dao.entities.ReportEntity;
+import com.turingSecApp.turingSec.dao.entities.report.ReportEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

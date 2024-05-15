@@ -1,6 +1,11 @@
-package com.turingSecApp.turingSec.dao.entities;
+package com.turingSecApp.turingSec.dao.entities.report;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
+import com.turingSecApp.turingSec.dao.entities.report.embedded.DiscoveryDetails;
+import com.turingSecApp.turingSec.dao.entities.report.embedded.ProofOfConcept;
+import com.turingSecApp.turingSec.dao.entities.report.embedded.ReportAssetEntity;
+import com.turingSecApp.turingSec.dao.entities.report.embedded.ReportWeakness;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -16,46 +21,29 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@EqualsAndHashCode(exclude = {"user", "bugBountyProgram", "collaborators"})
-@ToString(exclude = {"user", "bugBountyProgram", "collaborators"})
+@EqualsAndHashCode(exclude = {"user", "bugBountyProgram", "collaborators","asset","weakness"})
+@ToString(exclude = {"user", "bugBountyProgram", "collaborators","asset","weakness"})
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "report_type", discriminatorType = DiscriminatorType.STRING)
 @Table(name = "bug_bounty_reports")
 public class ReportEntity {
     @Id
-   // @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "asset")
-    private String asset;
+    @Embedded
+    private ReportWeakness weakness;
+    @Embedded
+    private ReportAssetEntity asset;
+    @Embedded
+    private ProofOfConcept proofOfConcept;
+    @Embedded
+    private DiscoveryDetails discoveryDetails;
 
-    @Column(name = "weakness")
-    private String weakness;
-
-    @Column(name = "severity")
-    private String severity;
-
-    @Column(name = "method_name")
     private String methodName;
-
-
-    @Column(name = "proof_of_concept")
-    private String proofOfConcept;
-
-    @Column(name = "discovery_details")
-    private String discoveryDetails;
-
-    @Column(name = "last_activity")
     private Date lastActivity;
-
-    @Column(name = "report_title")
-    private String reportTitle;
-
-    @Column(name = "rewards_status")
     private String rewardsStatus;
-
-    @Column(name = "vulnerability_url")
-    private String vulnerabilityUrl;
-
+    private String reportTemplate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -68,7 +56,6 @@ public class ReportEntity {
     @JsonIgnore
     private BugBountyProgramEntity bugBountyProgram;
 
-    @Column(name = "own_percentage")
     private Double ownPercentage = 100.0; // Default own percentage is 100%
 
     @OneToMany(mappedBy = "bugBountyReport", cascade = CascadeType.ALL)

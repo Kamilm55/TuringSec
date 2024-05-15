@@ -1,6 +1,6 @@
 package com.turingSecApp.turingSec.response.report;
 
-import com.turingSecApp.turingSec.dao.entities.ReportEntity;
+import com.turingSecApp.turingSec.dao.entities.report.ReportEntity;
 import com.turingSecApp.turingSec.response.user.UserDTO;
 import lombok.*;
 

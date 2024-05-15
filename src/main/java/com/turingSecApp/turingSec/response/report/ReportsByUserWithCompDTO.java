@@ -1,6 +1,6 @@
 package com.turingSecApp.turingSec.response.report;
 
-import com.turingSecApp.turingSec.dao.entities.ReportEntity;
+import com.turingSecApp.turingSec.dao.entities.report.ReportEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

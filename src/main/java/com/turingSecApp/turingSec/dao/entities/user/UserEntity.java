@@ -2,7 +2,7 @@ package com.turingSecApp.turingSec.dao.entities.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.turingSecApp.turingSec.dao.entities.HackerEntity;
-import com.turingSecApp.turingSec.dao.entities.ReportEntity;
+import com.turingSecApp.turingSec.dao.entities.report.ReportEntity;
 import com.turingSecApp.turingSec.dao.entities.role.Role;
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,6 +1,9 @@
 package com.turingSecApp.turingSec;
 
 import com.turingSecApp.turingSec.dao.entities.*;
+import com.turingSecApp.turingSec.dao.entities.report.embedded.DiscoveryDetails;
+import com.turingSecApp.turingSec.dao.entities.report.embedded.ProofOfConcept;
+import com.turingSecApp.turingSec.dao.entities.report.embedded.ReportWeakness;
 import com.turingSecApp.turingSec.dao.entities.role.Role;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.*;
@@ -9,10 +12,11 @@ import com.turingSecApp.turingSec.payload.program.AssetTypePayload;
 import com.turingSecApp.turingSec.payload.program.BugBountyProgramWithAssetTypePayload;
 import com.turingSecApp.turingSec.payload.program.StrictPayload;
 import com.turingSecApp.turingSec.payload.report.BugBountyReportPayload;
+import com.turingSecApp.turingSec.payload.report.child.ReportAssetPayload;
 import com.turingSecApp.turingSec.payload.user.RegisterPayload;
-import com.turingSecApp.turingSec.response.report.CollaboratorPayload;
+import com.turingSecApp.turingSec.payload.report.child.CollaboratorPayload;
 import com.turingSecApp.turingSec.service.BugBountyReportService;
-import com.turingSecApp.turingSec.service.IEmailNotificationService;
+import com.turingSecApp.turingSec.service.EmailNotificationService;
 import com.turingSecApp.turingSec.service.ProgramsService;
 import com.turingSecApp.turingSec.service.interfaces.IHackerService;
 import com.turingSecApp.turingSec.service.interfaces.IUserService;
@@ -22,6 +26,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.NotFoundException;
 import java.time.LocalDate;
@@ -43,17 +48,32 @@ public class TuringSecApplication implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
     private final ProgramsRepository programsRepository;
     private final ProgramsService programsService;
+    private final ReportsRepository reportsRepository;
     private final AssetTypeRepository assetTypeRepository;
     private final StrictRepository strictRepository;
-    private final IEmailNotificationService IEmailNotificationService;
+    private final EmailNotificationService EmailNotificationService;
     private final BugBountyReportService bugBountyReportService;
     public static void main(String[] args) {
         SpringApplication.run(TuringSecApplication.class, args);
     }
 
     @Override
+    @Transactional
     public void run(String... args) throws Exception {
         insertMockData();
+
+//        programsRepository.delete(programsRepository.findById(1L).get());
+//
+//        BugBountyProgramEntity bountyProgramById = programsService.getBugBountyProgramById(1L);
+//
+//        System.out.println(bountyProgramById.getId());
+//        System.out.println(bountyProgramById.getCompany());
+//        System.out.println(bountyProgramById.getReports());
+//        System.out.println(reportsRepository.findByBugBountyProgram(bountyProgramById));
+//        programsRepository.delete(bountyProgramById);
+
+//        programsService.getBugBountyProgramById(1L);
+//        programsService.deleteBugBountyProgramForTest(1L);
     }
 
     private void insertMockData() {
@@ -66,9 +86,6 @@ public class TuringSecApplication implements CommandLineRunner {
 
         insertAdditionalData();
 
-//        programsRepository.delete(programsRepository.findById(1L).get());
-//
-//        programsService.deleteBugBountyProgramForTest(1L);
 
     }
 
@@ -192,16 +209,14 @@ public class TuringSecApplication implements CommandLineRunner {
     private void insertReports() {
         // Insert 2 reports
         BugBountyReportPayload reportPayload = BugBountyReportPayload.builder()
-                .asset("ExampleCompany Website")
-                .weakness("SQL Injection")
-                .severity("High")
+                .reportAssetPayload(new ReportAssetPayload("Domain", "Asset 2"))
+                .weakness(new ReportWeakness("Memory Corruption" , "SQL Injection"))
                 .methodName("POST")
-                .proofOfConcept("Injecting SQL code into the login form's username field allows unauthorized access to sensitive data.")
-                .discoveryDetails( "Discovered during a routine penetration test of the login functionality.")
+                .proofOfConcept(new ProofOfConcept("Remote Code Execution in Application X","https://example.com/vulnerabilities/appx/rce","https://example.com/vulnerabilities/appx/rce"))
+                .discoveryDetails(new DiscoveryDetails("15.0"))
                 .lastActivity(Date.from(LocalDateTime.parse("2024-05-01T09:46:19.700").toInstant(ZoneOffset.UTC)))
-                .reportTitle("Critical SQL Injection Vulnerability in ExampleCompany Website")
                 .rewardsStatus("Pending")
-                .vulnerabilityUrl("https://example.com/login")
+                .reportTemplate("Average Bounty")
                 .ownPercentage(20.0)
                 .collaboratorPayload(
                         List.of(
@@ -218,16 +233,14 @@ public class TuringSecApplication implements CommandLineRunner {
                 .build();
 
         BugBountyReportPayload reportPayload2 = BugBountyReportPayload.builder()
-                .asset("ExampleCompany Mobile App")
-                .weakness("Cross-Site Scripting (XSS)")
-                .severity("Medium")
+                .reportAssetPayload(new ReportAssetPayload("Domain", "Asset 3"))
+                .weakness(new ReportWeakness("Memory Corruption" , "SQL Injection"))
                 .methodName("GET")
-                .proofOfConcept("Injecting JavaScript code through the search input allows execution on other users' sessions.")
-                .discoveryDetails("Identified during a code review of the search functionality.")
+                .proofOfConcept(new ProofOfConcept("Remote Code Execution in Application X","https://example.com/vulnerabilities/appx/rce","https://example.com/vulnerabilities/appx/rce"))
+                .discoveryDetails(new DiscoveryDetails("45.0"))
                 .lastActivity(Date.from(LocalDateTime.parse("2024-04-30T15:20:00").toInstant(ZoneOffset.UTC)))
-                .reportTitle("XSS Vulnerability in ExampleCompany Mobile App")
                 .rewardsStatus("Pending")
-                .vulnerabilityUrl("https://example.com/search")
+                .reportTemplate("Average Bounty")
                 .ownPercentage(30.0)
                 .collaboratorPayload(
                         List.of(
@@ -316,16 +329,14 @@ public class TuringSecApplication implements CommandLineRunner {
             BugBountyProgramEntity program = programs.get(i);
 
             BugBountyReportPayload reportPayload = BugBountyReportPayload.builder()
-                    .asset("Asset " + (i + 1))
-                    .weakness("Weakness " + (i + 1))
-                    .severity("High")
+                    .reportAssetPayload(new ReportAssetPayload("Domain", "Asset " + i ))
+                    .weakness(new ReportWeakness("Memory Corruption" , "SQL Injection"))
                     .methodName("POST")
-                    .proofOfConcept("Proof of Concept " + (i + 1))
-                    .discoveryDetails("Discovery Details " + (i + 1))
+                    .proofOfConcept(new ProofOfConcept("Remote Code Execution in Application X" + (i + 1),"https://example.com/vulnerabilities/appx/rce" + (i + 1),"https://example.com/vulnerabilities/appx/rce" + (i + 1)))
+                    .discoveryDetails(new DiscoveryDetails("time spend"))
                     .lastActivity(Date.from(LocalDateTime.now().toInstant(ZoneOffset.UTC)))
-                    .reportTitle("Report " + (i + 1))
                     .rewardsStatus("Pending")
-                    .vulnerabilityUrl("https://example.com/report" + (i + 1))
+                    .reportTemplate("Average Bounty")
                     .ownPercentage(50.0)
                     .collaboratorPayload(
                             List.of(

@@ -1,18 +1,19 @@
 package com.turingSecApp.turingSec.service;
 
 import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
-import com.turingSecApp.turingSec.dao.entities.CollaboratorEntity;
 import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
-import com.turingSecApp.turingSec.dao.entities.ReportEntity;
+import com.turingSecApp.turingSec.dao.entities.report.ReportCVSS;
+import com.turingSecApp.turingSec.dao.entities.report.ReportEntity;
+import com.turingSecApp.turingSec.dao.entities.report.ReportManual;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.*;
 import com.turingSecApp.turingSec.exception.custom.PermissionDeniedException;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.helper.entityHelper.IReportEntityHelper;
-import com.turingSecApp.turingSec.helper.entityHelper.ReportEntityHelper;
 import com.turingSecApp.turingSec.payload.report.BugBountyReportPayload;
-import com.turingSecApp.turingSec.response.report.CollaboratorPayload;
+import com.turingSecApp.turingSec.payload.report.ReportCVSSPayload;
+import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
 import com.turingSecApp.turingSec.response.report.ReportDTO;
 import com.turingSecApp.turingSec.response.report.ReportsByUserDTO;
 import com.turingSecApp.turingSec.response.report.ReportsByUserWithCompDTO;
@@ -39,6 +40,8 @@ import static com.turingSecApp.turingSec.util.GlobalConstants.ROOT_LINK;
 @Slf4j
 public class BugBountyReportService implements IBugBountyReportService {
     private final ReportsRepository bugBountyReportRepository;
+    private final ReportManualRepository reportManualRepository;
+    private final ReportCVSSRepository reportCVSSRepository;
     private final UtilService utilService;
     private final IReportEntityHelper reportEntityHelper;
 
@@ -53,7 +56,7 @@ public class BugBountyReportService implements IBugBountyReportService {
         return ReportMapper.INSTANCE.toDTO(report);
     }
     @Override
-    public ReportDTO submitBugBountyReport(BugBountyReportPayload reportPayload, Long bugBountyProgramId) {
+    public /*ReportManualDTO*/ReportManual submitManualReport(ReportManualPayload reportPayload, Long bugBountyProgramId) {
         // Check the authenticated hacker
         UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
 
@@ -61,43 +64,62 @@ public class BugBountyReportService implements IBugBountyReportService {
         BugBountyProgramEntity program = programsRepository.findById(bugBountyProgramId)
                 .orElseThrow(() -> new ResourceNotFoundException("Program not found with id:" + bugBountyProgramId));
 
-        // Create a new report entity
-        ReportEntity report = createReportsEntityFromPayload(reportPayload);
+        // Create a new report entity -> for basic type fields or embeddable
+        ReportManual report = reportEntityHelper.createReportManualFromPayload(reportPayload);
+
+        // refactorThis: Set related entities (user and program)
 
         // Set the user for the bug bounty report
-        UserEntity userFromDB = userRepository.findById(authenticatedUser.getId())
-                .orElseThrow(() -> new UserNotFoundException("User with id " + authenticatedUser.getId() + " not found"));
-        report.setUser(userFromDB);
+        setAuthenticatedUserToReport(authenticatedUser.getId(), report);
 
         // Set the bug bounty program for the bug bounty report
         report.setBugBountyProgram(program);
+        ReportEntity savedReport1 = reportManualRepository.save(report);
 
-        // Save the report and its collaborators
-        ReportEntity savedReport = bugBountyReportRepository.save(report);
-        saveCollaborators(reportPayload.getCollaboratorPayload(), savedReport);
+        ///
+        // Set child reference type fields with the relation
+        ReportManual savedReport = (ReportManual) reportEntityHelper.setChildReferenceFieldsFromPayload(reportPayload,savedReport1);
 
-        return ReportMapper.INSTANCE.toDTO(savedReport);
+        return /*ReportMapper.INSTANCE.toDTO(savedReport)*/savedReport;
+
     }
+//    @Override
+//    public ReportDTO submitBugBountyReport(BugBountyReportPayload reportPayload, Long bugBountyProgramId) {
+//        // Check the authenticated hacker
+//        UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
+//
+//        // Fetch the BugBountyProgramEntity from the repository
+//        BugBountyProgramEntity program = programsRepository.findById(bugBountyProgramId)
+//                .orElseThrow(() -> new ResourceNotFoundException("Program not found with id:" + bugBountyProgramId));
+//
+//        // Create a new report entity -> for basic type fields or embeddable
+//        ReportEntity report = reportEntityHelper.createReportsEntityFromPayload(reportPayload);
+//
+//        // refactorThis: Set related entities (user and program)
+//
+//        // Set the user for the bug bounty report
+//        setAuthenticatedUserToReport(authenticatedUser.getId(), report);
+//
+//        // Set the bug bounty program for the bug bounty report
+//        report.setBugBountyProgram(program);
+//        ReportEntity savedReport1 = bugBountyReportRepository.save(report);
+//
+//        ///
+//        // Set child reference type fields with the relation
+//        ReportEntity savedReport = reportEntityHelper.setChildReferenceFieldsFromPayload(reportPayload,savedReport1);
+//
+//        return ReportMapper.INSTANCE.toDTO(savedReport);
+//    }
 
-    private void saveCollaborators(List<CollaboratorPayload> collaboratorDTOs, ReportEntity report) {
-        for (var collaboratorDTO : collaboratorDTOs) {
-            CollaboratorEntity collaboratorEntity = new CollaboratorEntity();
-            userRepository.findByUsername(collaboratorDTO.getHackerUsername()).orElseThrow(() -> new UserNotFoundException("User with username '" + collaboratorDTO.getHackerUsername() + "' not found for collaborating"));
-            collaboratorEntity.setCollaborationPercentage(collaboratorDTO.getCollaborationPercentage());
-            collaboratorEntity.setHackerUsername(collaboratorDTO.getHackerUsername());
-            collaboratorEntity.setBugBountyReport(report);
-
-            collaboratorRepository.save(collaboratorEntity);
-
-            report.addCollaborator(collaboratorEntity);
-        }
-        bugBountyReportRepository.save(report);
+    private void setAuthenticatedUserToReport(Long authenticatedUser, ReportEntity report) {
+        UserEntity userFromDB = userRepository.findById(authenticatedUser)
+                .orElseThrow(() -> new UserNotFoundException("User with id " + authenticatedUser + " not found"));
+        report.setUser(userFromDB);
     }
-
     @Override
-    public ReportDTO updateBugBountyReport(Long id, BugBountyReportPayload reportPayload) {
+    public ReportManual updateManualReport(Long id, ReportManualPayload reportPayload) {
         // Retrieve existing report from the repository
-        ReportEntity existingReport = bugBountyReportRepository.findById(id)
+        ReportManual existingReport = reportManualRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Report not found with id:" + id));
 
         // Ensure that the authenticated hacker can only update their own report
@@ -107,18 +129,76 @@ public class BugBountyReportService implements IBugBountyReportService {
         // Update existing report properties with values from the update payload
         updateReportProperties(existingReport, reportPayload);
 
-        // Set the user for the bug bounty report
-        UserEntity userFromDB = userRepository.findById(authenticatedUser.getId())
-                .orElseThrow(() -> new UserNotFoundException("User with id " +authenticatedUser.getId() + " not found"));
-        existingReport.setUser(userFromDB);
 
+        // Set the user for the bug bounty report
+        setAuthenticatedUserToReport(authenticatedUser.getId(), existingReport);
+
+        // todo: updating related bidirectional fields like submit method to combine post and put methods
         // Clear previous collaborators, what you give in list i paste into  collaborators and update
         existingReport.setCollaborators(new ArrayList<>());
 
         // Update collaborators and save report
-        saveCollaborators(reportPayload.getCollaboratorPayload() , existingReport);
+        reportEntityHelper.saveCollaborators(reportPayload.getCollaboratorPayload() , existingReport);
 
-        return ReportMapper.INSTANCE.toDTO(existingReport);
+        return /*ReportMapper.INSTANCE.toDTO(existingReport)*/existingReport;
+    }
+
+    @Override
+    public ReportCVSS submitCVSSReport(ReportCVSSPayload reportPayload, Long bugBountyProgramId) {
+        // Check the authenticated hacker
+        UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
+
+        // Fetch the BugBountyProgramEntity from the repository
+        BugBountyProgramEntity program = programsRepository.findById(bugBountyProgramId)
+                .orElseThrow(() -> new ResourceNotFoundException("Program not found with id:" + bugBountyProgramId));
+
+        // Create a new report entity -> for basic type fields or embeddable
+        ReportCVSS report = reportEntityHelper.createReportCVSSFromPayload(reportPayload);
+
+        // refactorThis: Set related entities (user and program)
+
+        // Set the user for the bug bounty report
+        setAuthenticatedUserToReport(authenticatedUser.getId(), report);
+
+        // Set the bug bounty program for the bug bounty report
+        report.setBugBountyProgram(program);
+        ReportEntity savedReport1 = reportCVSSRepository.save(report);
+
+        ///
+        // Set child reference type fields with the relation
+        ReportCVSS savedReport = (ReportCVSS) reportEntityHelper.setChildReferenceFieldsFromPayload(reportPayload,savedReport1);
+
+        return /*ReportMapper.INSTANCE.toDTO(savedReport)*/savedReport;
+
+
+    }
+
+    @Override
+    public ReportCVSS updateCVSSReport(Long id, ReportCVSSPayload bugBountyReportUpdatePayload) {
+        // Retrieve existing report from the repository
+        ReportCVSS existingReport = reportCVSSRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Report not found with id:" + id));
+
+        // Ensure that the authenticated hacker can only update their own report
+        UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
+        checkReportOwnership(existingReport);
+
+        // Update existing report properties with values from the update payload
+        updateReportProperties(existingReport, bugBountyReportUpdatePayload);
+
+
+        // Set the user for the bug bounty report
+        setAuthenticatedUserToReport(authenticatedUser.getId(), existingReport);
+
+        // todo: updating related bidirectional fields like submit method to combine post and put methods
+        // Clear previous collaborators, what you give in list i paste into  collaborators and update
+        existingReport.setCollaborators(new ArrayList<>());
+
+        // Update collaborators and save report
+        reportEntityHelper.saveCollaborators(bugBountyReportUpdatePayload.getCollaboratorPayload() , existingReport);
+
+        return /*ReportMapper.INSTANCE.toDTO(existingReport)*/existingReport;
+
     }
 
     private void checkReportOwnership(ReportEntity report) {
@@ -129,28 +209,13 @@ public class BugBountyReportService implements IBugBountyReportService {
         }
     }
 
-    private void updateReportProperties(ReportEntity report, BugBountyReportPayload reportPayload) {
-        setReportProperties(report, reportPayload);
-    }
-
-    private ReportEntity createReportsEntityFromPayload(BugBountyReportPayload reportPayload) {
-        ReportEntity report = new ReportEntity();
-        setReportProperties(report, reportPayload);
-        return report;
-    }
-
-    private void setReportProperties(ReportEntity report, BugBountyReportPayload reportPayload) {
-        report.setAsset(reportPayload.getAsset());
-        report.setWeakness(reportPayload.getWeakness());
+    private void updateReportProperties(ReportManual report, ReportManualPayload reportPayload) {
+        reportEntityHelper.setCommonReportProperties(report, reportPayload);
         report.setSeverity(reportPayload.getSeverity());
-        report.setMethodName(reportPayload.getMethodName());
-        report.setProofOfConcept(reportPayload.getProofOfConcept());
-        report.setDiscoveryDetails(reportPayload.getDiscoveryDetails());
-        report.setLastActivity(reportPayload.getLastActivity());
-        report.setReportTitle(reportPayload.getReportTitle());
-        report.setRewardsStatus(reportPayload.getRewardsStatus());
-        report.setVulnerabilityUrl(reportPayload.getVulnerabilityUrl());
-        report.setOwnPercentage(reportPayload.getOwnPercentage());
+    }
+    private void updateReportProperties(ReportCVSS report, ReportCVSSPayload reportPayload) {
+        reportEntityHelper.setCommonReportProperties(report, reportPayload);
+        reportEntityHelper.setCVSSFields(report,reportPayload);
     }
 
 
@@ -224,6 +289,8 @@ public class BugBountyReportService implements IBugBountyReportService {
        // Retrieve bug bounty reports submitted for the company's programs
        return getReportsForCompanyPrograms(company);
    }
+
+
 
     private CompanyEntity extractCompanyFromUserDetails(CustomUserDetails userDetails) {
         Object user = userDetails.getUser();
@@ -306,51 +373,21 @@ public class BugBountyReportService implements IBugBountyReportService {
         BugBountyProgramEntity program = programsRepository.findById(bugBountyProgramId)
                 .orElseThrow(() -> new ResourceNotFoundException("Program not found with id:" + bugBountyProgramId));
 
-
-//        String username = authentication.getName();
-//        userRepository.findByUsername(username)
-//                .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
-
-        ReportEntity report = new ReportEntity();
-
-        // Populate report entity
-        report.setAsset(reportPayload.getAsset());
-        report.setWeakness(reportPayload.getWeakness());
-        report.setSeverity(reportPayload.getSeverity());
-        report.setMethodName(reportPayload.getMethodName());
-        report.setProofOfConcept(reportPayload.getProofOfConcept());
-        report.setDiscoveryDetails(reportPayload.getDiscoveryDetails());
-        report.setLastActivity(reportPayload.getLastActivity());
-        report.setReportTitle(reportPayload.getReportTitle());
-        report.setRewardsStatus(reportPayload.getRewardsStatus());
-        report.setVulnerabilityUrl(reportPayload.getVulnerabilityUrl());
-
-        report.setOwnPercentage(reportPayload.getOwnPercentage());
+        // Create a new report entity
+        ReportEntity report = reportEntityHelper.createReportsEntityFromPayload(reportPayload);
 
         // Set the user for the bug bounty report
-        UserEntity userFromDB = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User with id " + userId + " not found"));
-        report.setUser(userFromDB);
+        setAuthenticatedUserToReport(userId, report);
 
         // Set the bug bounty program for the bug bounty report
         report.setBugBountyProgram(program);
 
-        ReportEntity saved = bugBountyReportRepository.save(report);
-
-        ReportEntity reportFromDB = bugBountyReportRepository.findById(saved.getId()).orElseThrow(() -> new ResourceNotFoundException("Report not found"));
-        // Set the bug bounty report for each collaborator
-        for (var collaboratorDTO : reportPayload.getCollaboratorPayload()) {
-            CollaboratorEntity collaboratorEntity = new CollaboratorEntity();
-            collaboratorEntity.setCollaborationPercentage(collaboratorDTO.getCollaborationPercentage());
-            collaboratorEntity.setHackerUsername(collaboratorDTO.getHackerUsername());
-            collaboratorEntity.setBugBountyReport(reportFromDB);
-
-//                collaborator.setBugBountyReport(report);
-//                System.out.println(collaborator);
-            collaboratorRepository.save(collaboratorEntity); // Save each collaborator to manage them
-        }
+        // Set child reference type fields
 
         // Save the report and its collaborators
-        bugBountyReportRepository.save(report);
-    }
+        ReportEntity savedReport = bugBountyReportRepository.save(report);
+        reportEntityHelper.saveCollaborators(reportPayload.getCollaboratorPayload(), savedReport);
 
+
+    }
 }

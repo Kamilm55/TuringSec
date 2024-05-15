@@ -1,16 +1,32 @@
 package com.turingSecApp.turingSec.helper.entityHelper;
 
-import com.turingSecApp.turingSec.dao.entities.ReportEntity;
+import com.turingSecApp.turingSec.dao.entities.report.CollaboratorEntity;
+import com.turingSecApp.turingSec.dao.entities.report.ReportCVSS;
+import com.turingSecApp.turingSec.dao.entities.report.ReportManual;
+import com.turingSecApp.turingSec.dao.entities.report.embedded.ReportAssetEntity;
+import com.turingSecApp.turingSec.dao.entities.report.ReportEntity;
 import com.turingSecApp.turingSec.dao.repository.*;
+import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
+import com.turingSecApp.turingSec.payload.report.BugBountyReportPayload;
+import com.turingSecApp.turingSec.payload.report.ReportCVSSPayload;
+import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
+import com.turingSecApp.turingSec.payload.report.child.CollaboratorPayload;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ReportEntityHelper implements IReportEntityHelper {
-    private final CollaboratorRepository collaboratorRepository;
     private final ReportsRepository reportsRepository;
+    private final ReportManualRepository reportManualRepository;
+    private final ReportCVSSRepository reportCVSSRepository;
+
+    private final CollaboratorRepository collaboratorRepository;
+    private final ReportsRepository bugBountyReportRepository;
+    private final UserRepository userRepository;
+    private final ProgramsRepository programsRepository;
 
     public ReportEntity deleteReportChildEntities(ReportEntity report) {
         // Delete children repo first
@@ -23,4 +39,95 @@ public class ReportEntityHelper implements IReportEntityHelper {
 
        return reportsRepository.save(report);
     }
+
+    @Override
+    public ReportEntity createReportsEntityFromPayload(BugBountyReportPayload reportPayload) {
+        ReportEntity report = new ReportEntity();
+        setCommonReportProperties(report, reportPayload);
+        return report;
+    }
+
+    @Override
+    public ReportManual createReportManualFromPayload(ReportManualPayload reportPayload) {
+        ReportManual reportManual = new ReportManual();
+        setCommonReportProperties(reportManual,reportPayload);
+        reportManual.setSeverity(reportPayload.getSeverity());
+
+        return reportManual;
+    }
+
+    @Override
+    public ReportCVSS createReportCVSSFromPayload(ReportCVSSPayload reportPayload) {
+
+        ReportCVSS reportCVSS = new ReportCVSS();
+        setCommonReportProperties(reportCVSS,reportPayload);
+
+        setCVSSFields(reportCVSS,reportPayload);
+
+        return reportCVSS;
+    }
+
+    @Override
+    public void setCVSSFields(ReportCVSS reportCVSS,ReportCVSSPayload reportPayload){
+        reportCVSS.setAttackVector(reportPayload.getAttackVector());
+        reportCVSS.setAttackComplexity(reportPayload.getAttackComplexity());
+        reportCVSS.setPrivilegesRequired(reportPayload.getPrivilegesRequired());
+        reportCVSS.setUserInteractions(reportPayload.getUserInteractions());
+        reportCVSS.setScope(reportPayload.getScope());
+        reportCVSS.setConfidentiality(reportPayload.getConfidentiality());
+        reportCVSS.setIntegrity(reportPayload.getIntegrity());
+        reportCVSS.setAvailability(reportPayload.getAvailability());
+    }
+    @Override
+    public void setCommonReportProperties(ReportEntity report, BugBountyReportPayload reportPayload) {
+        // Set basic type fields or embeddable
+        report.setAsset(new ReportAssetEntity(reportPayload.getReportAssetPayload().getAssetName(),reportPayload.getReportAssetPayload().getAssetType()));
+        report.setWeakness(reportPayload.getWeakness());
+        report.setProofOfConcept(reportPayload.getProofOfConcept());
+        report.setDiscoveryDetails(reportPayload.getDiscoveryDetails());
+
+//        report.setSeverity(reportPayload.getSeverity());
+        report.setLastActivity(reportPayload.getLastActivity());
+        report.setRewardsStatus(reportPayload.getRewardsStatus());
+        report.setOwnPercentage(reportPayload.getOwnPercentage());
+        report.setReportTemplate(reportPayload.getReportTemplate());
+        report.setMethodName(reportPayload.getMethodName());
+    }
+
+    @Override
+    public ReportEntity setChildReferenceFieldsFromPayload(BugBountyReportPayload reportPayload, ReportEntity report) {
+        // Save the report and its collaborators
+        saveCollaborators(reportPayload.getCollaboratorPayload(), report);
+
+        return saveForReportType(report);
+    }
+
+    @Override
+    public ReportEntity saveForReportType(ReportEntity report) {
+        ReportEntity report1 = null;
+
+        if(report instanceof ReportManual reportManual){
+             report1 = reportManualRepository.save(reportManual);
+        }else if(report instanceof ReportCVSS reportCVSS) {
+            report1 = reportCVSSRepository.save(reportCVSS);
+        }
+        return report1;
+    }
+
+    @Override
+    public void saveCollaborators(List<CollaboratorPayload> collaboratorDTOs, ReportEntity report) {
+        for (var collaboratorDTO : collaboratorDTOs) {
+            CollaboratorEntity collaboratorEntity = new CollaboratorEntity();
+            userRepository.findByUsername(collaboratorDTO.getHackerUsername()).orElseThrow(() -> new UserNotFoundException("User with username '" + collaboratorDTO.getHackerUsername() + "' not found for collaborating"));
+            collaboratorEntity.setCollaborationPercentage(collaboratorDTO.getCollaborationPercentage());
+            collaboratorEntity.setHackerUsername(collaboratorDTO.getHackerUsername());
+            collaboratorEntity.setBugBountyReport(report);
+
+            collaboratorRepository.save(collaboratorEntity);
+
+            report.addCollaborator(collaboratorEntity);
+        }
+        saveForReportType(report);
+    }
+
 }

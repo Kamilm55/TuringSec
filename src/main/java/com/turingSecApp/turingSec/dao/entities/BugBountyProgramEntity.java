@@ -1,6 +1,7 @@
 package com.turingSecApp.turingSec.dao.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.turingSecApp.turingSec.dao.entities.report.ReportEntity;
 import jakarta.persistence.Entity;
 import lombok.*;
 import jakarta.persistence.*;

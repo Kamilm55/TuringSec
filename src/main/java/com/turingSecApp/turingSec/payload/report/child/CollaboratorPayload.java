@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.response.report;
+package com.turingSecApp.turingSec.payload.report.child;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,6 +1,11 @@
 package com.turingSecApp.turingSec.payload.report;
 
-import com.turingSecApp.turingSec.response.report.CollaboratorPayload;
+import com.turingSecApp.turingSec.dao.entities.report.embedded.DiscoveryDetails;
+import com.turingSecApp.turingSec.dao.entities.report.embedded.ProofOfConcept;
+import com.turingSecApp.turingSec.dao.entities.report.embedded.ReportWeakness;
+import com.turingSecApp.turingSec.payload.report.child.CollaboratorPayload;
+import com.turingSecApp.turingSec.payload.report.child.ReportAssetPayload;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -16,39 +21,32 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class BugBountyReportPayload {
-    @NotBlank(message = "Asset is required")
-    private String asset;
-
-    @NotBlank(message = "Weakness is required")
-    private String weakness;
-
-    @NotBlank(message = "Severity is required")
-    private String severity;
-
-    @NotBlank(message = "Proof of Concept is required")
-    private String proofOfConcept;
-
-    @NotBlank(message = "Discovery Details is required")
-    private String discoveryDetails;
-
     @NotNull(message = "Last Activity is required")
     private Date lastActivity;
 
-    @NotBlank(message = "Report Title is required")
-    private String reportTitle;
-
     @NotBlank(message = "Rewards Status is required")
     private String rewardsStatus;
-
-    // vulnerabilityUrl is optional
-    private String vulnerabilityUrl;
-    // methodName is optional
-    private String methodName;
-
-//    @NotNull(message = "User Id is required")
-//    private Long userId;
+    @NotBlank(message = "Report template is required")
+    private String reportTemplate;
 
     @NotNull(message = "Own percentage of work is required")
     private Double ownPercentage = 100.0; // Default own percentage is 100%
     private List<CollaboratorPayload> collaboratorPayload = new ArrayList<>();
+
+    @NotNull(message = "Asset is required")
+    private @Valid ReportAssetPayload reportAssetPayload;
+
+    @NotNull(message = "Weakness is required")
+    private @Valid ReportWeakness weakness;
+
+    @NotNull(message = "Proof of concept is required")
+    private @Valid ProofOfConcept proofOfConcept;
+
+    private @Valid DiscoveryDetails discoveryDetails;
+
+
+
+    // methodName is optional
+    private String methodName;
+
 }

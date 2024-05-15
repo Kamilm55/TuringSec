@@ -104,6 +104,8 @@ public class SecurityConfig {
                     // Bug Bounty Report Controller
                     request
                             .requestMatchers("/api/bug-bounty-reports/reports/company").hasRole("COMPANY")
+                            .requestMatchers(HttpMethod.POST,"/api/bug-bounty-reports/**").hasRole("HACKER")
+                            .requestMatchers(HttpMethod.PUT,"/api/bug-bounty-reports/**").hasRole("HACKER")
                             .requestMatchers("/api/bug-bounty-reports/submit").hasRole("HACKER")
                             .requestMatchers("/api/bug-bounty-reports/user").hasRole("HACKER")
 

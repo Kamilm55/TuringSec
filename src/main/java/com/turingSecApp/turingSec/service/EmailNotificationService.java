@@ -1,6 +1,7 @@
 package com.turingSecApp.turingSec.service;
 
 
+import com.turingSecApp.turingSec.service.interfaces.IEmailNotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class IEmailNotificationService implements com.turingSecApp.turingSec.service.interfaces.IEmailNotificationService {
+public class EmailNotificationService implements IEmailNotificationService {
 
     @Value("${spring.mail.username}")
     private String emailFrom;
