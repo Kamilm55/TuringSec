@@ -1,6 +1,7 @@
 package com.turingSecApp.turingSec.controller;
 
 import com.turingSecApp.turingSec.dao.entities.report.ReportCVSS;
+import com.turingSecApp.turingSec.dao.entities.report.ReportEntity;
 import com.turingSecApp.turingSec.dao.entities.report.ReportManual;
 import com.turingSecApp.turingSec.payload.report.ReportCVSSPayload;
 import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
@@ -24,8 +25,8 @@ public class BugBountyReportController {
     private final IBugBountyReportService bugBountyReportService;
 
     @GetMapping("/{id}")
-    public BaseResponse<ReportDTO> getBugBountyReportById(@PathVariable Long id) {
-        ReportDTO bugBountyReport = bugBountyReportService.getBugBountyReportById(id);
+    public BaseResponse<ReportEntity> getBugBountyReportById(@PathVariable Long id) {
+        ReportEntity bugBountyReport = bugBountyReportService.getBugBountyReportById(id);
         return BaseResponse.success(bugBountyReport);
     }
 

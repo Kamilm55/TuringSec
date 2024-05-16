@@ -16,4 +16,7 @@ public interface ReportMapper {
      //@Mapping(target = "collaborators", expression = "java(reportsEntity.getCollaborators() != null ? new java.util.ArrayList<>(reportsEntity.getCollaborators()) : null)")
     ReportDTO toDTO(ReportEntity reportEntity);
 
+
+
 }
+
