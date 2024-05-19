@@ -17,6 +17,7 @@ import com.turingSecApp.turingSec.util.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -121,5 +122,30 @@ public class UtilService {
 
         return dto;
     }
+
+    // Media services
+    public Long validateHacker(UserDetails userDetails) {
+        validateUserDetails(userDetails);
+        UserEntity userEntity = getUserEntity(userDetails);
+        return getHackerId(userEntity);
+    }
+    private void validateUserDetails(UserDetails userDetails) {
+        if (userDetails == null) {
+            throw new UnauthorizedException();
+        }
+    }
+    private UserEntity getUserEntity(UserDetails userDetails) {
+        String username = userDetails.getUsername();
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
+    }
+    private Long getHackerId(UserEntity userEntity) {
+        HackerEntity hackerEntity = userEntity.getHacker();
+        if (hackerEntity == null) {
+            throw new UserNotFoundException("Hacker ID not found for the authenticated user!");
+        }
+        return hackerEntity.getId();
+    }
+
 
 }

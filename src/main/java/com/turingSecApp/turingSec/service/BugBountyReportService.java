@@ -74,6 +74,8 @@ public class BugBountyReportService implements IBugBountyReportService {
         // Create a new report entity -> for basic type fields or embeddable
         ReportManual report = reportEntityHelper.createReportManualFromPayload(reportPayload);
 
+            //todo: set media
+
         // refactorThis: Set related entities (user and program)
 
         // Set the user for the bug bounty report

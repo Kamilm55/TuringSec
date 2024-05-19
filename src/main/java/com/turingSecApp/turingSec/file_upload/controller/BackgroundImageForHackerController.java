@@ -1,10 +1,9 @@
 package com.turingSecApp.turingSec.file_upload.controller;
 
 import com.turingSecApp.turingSec.file_upload.entity.BackgroundImageForHacker;
-import com.turingSecApp.turingSec.file_upload.entity.ImageForHacker;
 import com.turingSecApp.turingSec.file_upload.response.FileResponse;
 import com.turingSecApp.turingSec.file_upload.service.BackgroundImageForHackerService;
-import com.turingSecApp.turingSec.file_upload.service.IFileService;
+import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 @RestController
@@ -22,10 +20,11 @@ import java.io.IOException;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class BackgroundImageForHackerController {
     private final BackgroundImageForHackerService fileService;
+    private final UtilService utilService;
 
     @PostMapping("/upload")
     public FileResponse uploadVideo(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal UserDetails userDetails) throws IOException {
-        Long hackerId = fileService.validateHacker(userDetails);
+        Long hackerId = utilService.validateHacker(userDetails);
 
         // Call the service method to save the video
         return fileService.saveVideoOrImg(file, hackerId);
@@ -33,7 +32,7 @@ public class BackgroundImageForHackerController {
 
     @GetMapping("/download/{hackerId}")
     public ResponseEntity<?> downloadVideo(@PathVariable Long hackerId) {
-        BackgroundImageForHacker media = fileService.getVideoById(hackerId);
+        BackgroundImageForHacker media = fileService.getMediaById(hackerId);
 
        return ResponseEntity.status(HttpStatus.OK)
                 .header("Content-Type", media.getContentType())

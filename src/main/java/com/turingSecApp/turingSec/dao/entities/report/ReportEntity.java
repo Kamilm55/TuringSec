@@ -40,6 +40,13 @@ public class ReportEntity {
     @Embedded
     private DiscoveryDetails discoveryDetails;
 
+    @OneToMany(mappedBy = "report", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore // only auto-delete (cascading) , because in unidirectional i should delete medias manually
+    private List<Media> media = new ArrayList<>();
+
+    @ElementCollection
+    private List<String> attachments = new ArrayList<>();
+
     private String methodName;
     private Date lastActivity;
     private String rewardsStatus;
@@ -61,8 +68,12 @@ public class ReportEntity {
     @OneToMany(mappedBy = "bugBountyReport", cascade = CascadeType.ALL)
     private List<CollaboratorEntity> collaborators = new ArrayList<>();
 
+
     public void addCollaborator(CollaboratorEntity collaborator) {
         collaborators.add(collaborator);
         collaborator.setBugBountyReport(this);
+    }
+    public void addAttachment(String media_link) {
+        attachments.add(media_link);
     }
 }

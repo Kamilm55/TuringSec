@@ -11,6 +11,7 @@ import com.turingSecApp.turingSec.dao.repository.HackerRepository;
 import com.turingSecApp.turingSec.dao.repository.UserRepository;
 import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
+import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -61,34 +62,9 @@ public class BackgroundImageForHackerService implements IFileService {
     private FileResponse mapToFileResponse(BackgroundImageForHacker file) {
         return modelMapper.map(file, FileResponse.class);
     }
-    @Override
-    public Long validateHacker(UserDetails userDetails) {
-        validateUserDetails(userDetails);
-        UserEntity userEntity = getUserEntity(userDetails);
-        return getHackerId(userEntity);
-    }
-
-    private void validateUserDetails(UserDetails userDetails) {
-        if (userDetails == null) {
-            throw new UnauthorizedException();
-        }
-    }
-    private UserEntity getUserEntity(UserDetails userDetails) {
-        String username = userDetails.getUsername();
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
-    }
-
-    private Long getHackerId(UserEntity userEntity) {
-        HackerEntity hackerEntity = userEntity.getHacker();
-        if (hackerEntity == null) {
-            throw new UserNotFoundException("Hacker ID not found for the authenticated user!");
-        }
-        return hackerEntity.getId();
-    }
 
     @Override
-    public BackgroundImageForHacker getVideoById(Long hackerId) throws FileNotFoundException {
+    public BackgroundImageForHacker getMediaById(Long hackerId) throws FileNotFoundException {
         return backgroundImageForHackerRepository.findBackgroundImageForHackerByHackerId(hackerId)
                 .orElseThrow(() -> new FileNotFoundException("Video/image file not found for hackerId: " + hackerId));
     }

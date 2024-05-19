@@ -24,7 +24,6 @@ public class ImageForHackerService implements IFileService {
     private final ModelMapper modelMapper;
     private final ImageForHackerRepository imageForHackerRepository;
     private final HackerRepository hackerRepository;
-    private final UserRepository userRepository;
 
     @Override
     public FileResponse saveVideoOrImg(MultipartFile multipartFile, Long hackerId) throws IOException {
@@ -61,38 +60,13 @@ public class ImageForHackerService implements IFileService {
         return modelMapper.map(file, FileResponse.class);
     }
 
-    @Override
-    public Long validateHacker(UserDetails userDetails) {
-        validateUserDetails(userDetails);
-        UserEntity userEntity = getUserEntity(userDetails);
-        return getHackerId(userEntity);
-    }
 
     @Override
-    public ImageForHacker getVideoById(Long hackerId) throws FileNotFoundException {
+    public ImageForHacker getMediaById(Long hackerId) throws FileNotFoundException {
         return imageForHackerRepository.findImageForHackerByHackerId(hackerId)
                 .orElseThrow(() -> new FileNotFoundException("Video/image file not found for hackerId: " + hackerId));
     }
 
-    private void validateUserDetails(UserDetails userDetails) {
-        if (userDetails == null) {
-            throw new UnauthorizedException();
-        }
-    }
-
-    private UserEntity getUserEntity(UserDetails userDetails) {
-        String username = userDetails.getUsername();
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
-    }
-
-    private Long getHackerId(UserEntity userEntity) {
-        HackerEntity hackerEntity = userEntity.getHacker();
-        if (hackerEntity == null) {
-            throw new UserNotFoundException("Hacker ID not found for the authenticated user!");
-        }
-        return hackerEntity.getId();
-    }
 
     // Util
     private void setHackerPicturesTrueAndSave(HackerEntity hacker) {

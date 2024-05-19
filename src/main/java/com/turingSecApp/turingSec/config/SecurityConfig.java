@@ -54,8 +54,10 @@ public class SecurityConfig {
                         exception.authenticationEntryPoint(authenticationEntryPoint())
                 )
                 .authorizeHttpRequests(request -> {
-                    request.requestMatchers("/api/background-image-for-hacker/**", "/api/image-for-hacker/**", "/api/hacker/**").permitAll();
                     request.requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll();
+
+                    // Media controller
+                    request.requestMatchers("/api/background-image-for-hacker/**", "/api/image-for-hacker/**", "/api/report-media/**").permitAll();//.authenticated();
 
                     // h2 console
                     request.requestMatchers("/h2-console/**").permitAll(); // permits access to all URLs starting with /h2-console/ without authentication.
