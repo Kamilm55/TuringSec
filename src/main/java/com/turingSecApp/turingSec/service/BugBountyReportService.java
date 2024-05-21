@@ -10,18 +10,17 @@ import com.turingSecApp.turingSec.dao.repository.*;
 import com.turingSecApp.turingSec.exception.custom.PermissionDeniedException;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
+import com.turingSecApp.turingSec.file_upload.service.ReportMediaService;
 import com.turingSecApp.turingSec.helper.entityHelper.IReportEntityHelper;
 import com.turingSecApp.turingSec.payload.report.BugBountyReportPayload;
 import com.turingSecApp.turingSec.payload.report.ReportCVSSPayload;
 import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
-import com.turingSecApp.turingSec.response.report.ReportDTO;
 import com.turingSecApp.turingSec.response.report.ReportsByUserDTO;
 import com.turingSecApp.turingSec.response.report.ReportsByUserWithCompDTO;
 import com.turingSecApp.turingSec.response.user.UserDTO;
 import com.turingSecApp.turingSec.service.interfaces.IBugBountyReportService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import com.turingSecApp.turingSec.util.UtilService;
-import com.turingSecApp.turingSec.util.mapper.ReportMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -29,7 +28,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,6 +45,7 @@ public class BugBountyReportService implements IBugBountyReportService {
     private final ReportCVSSRepository reportCVSSRepository;
     private final UtilService utilService;
     private final IReportEntityHelper reportEntityHelper;
+    private final ReportMediaService reportMediaService;
 
     private final ProgramsRepository programsRepository;
     private final UserRepository userRepository;
@@ -52,18 +54,10 @@ public class BugBountyReportService implements IBugBountyReportService {
 
     @Override
     public ReportEntity getBugBountyReportById(Long id) {
-        //       if(report instanceof ReportManual){
-//           ReportManual reportManual = reportManualRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Report not found with id:" + id));
-//
-//       } else if (report instanceof ReportCVSS) {
-//           ReportCVSS reportCVSS = reportCVSSRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Report not found with id:" + id));
-//
-//       }
-//        ReportMapper.INSTANCE.toDTO(report);
-        return bugBountyReportRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Report not found with id:" + id));
+       return bugBountyReportRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Report not found with id:" + id));
     }
     @Override
-    public /*ReportManualDTO*/ReportManual submitManualReport(ReportManualPayload reportPayload, Long bugBountyProgramId) {
+    public /*ReportManualDTO*/ReportManual submitManualReport(List<MultipartFile> files, UserDetails userDetails, ReportManualPayload reportPayload, Long bugBountyProgramId) throws IOException {
         // Check the authenticated hacker
         UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
 
@@ -74,10 +68,7 @@ public class BugBountyReportService implements IBugBountyReportService {
         // Create a new report entity -> for basic type fields or embeddable
         ReportManual report = reportEntityHelper.createReportManualFromPayload(reportPayload);
 
-            //todo: set media
-
         // refactorThis: Set related entities (user and program)
-
         // Set the user for the bug bounty report
         setAuthenticatedUserToReport(authenticatedUser.getId(), report);
 
@@ -85,12 +76,25 @@ public class BugBountyReportService implements IBugBountyReportService {
         report.setBugBountyProgram(program);
         ReportEntity savedReport1 = reportManualRepository.save(report);
 
+        // Set Attachments
+        setAttachmentsToReportIfFilesExist(files, userDetails, savedReport1);
         ///
         // Set child reference type fields with the relation
         ReportManual savedReport = (ReportManual) reportEntityHelper.setChildReferenceFieldsFromPayload(reportPayload,savedReport1);
 
         return /*ReportMapper.INSTANCE.toDTO(savedReport)*/savedReport;
 
+    }
+
+    private void setAttachmentsToReportIfFilesExist(List<MultipartFile> files, UserDetails userDetails, ReportEntity report) throws IOException {
+        Long hackerId = utilService.validateHacker(userDetails);
+        //todo: check report belongs to this user? do in saveVideoOrImg
+
+        // Call the service method to save the video
+        if (files!=null){
+            if(!files.isEmpty())
+                reportMediaService.saveFiles(files, report.getId());
+        }
     }
 
     private void setAuthenticatedUserToReport(Long authenticatedUser, ReportEntity report) {
@@ -124,7 +128,7 @@ public class BugBountyReportService implements IBugBountyReportService {
     }
 
     @Override
-    public ReportCVSS submitCVSSReport(ReportCVSSPayload reportPayload, Long bugBountyProgramId) {
+    public ReportCVSS submitCVSSReport(List<MultipartFile> files, UserDetails userDetails,ReportCVSSPayload reportPayload, Long bugBountyProgramId) throws IOException {
         // Check the authenticated hacker
         UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
 
@@ -144,6 +148,8 @@ public class BugBountyReportService implements IBugBountyReportService {
         report.setBugBountyProgram(program);
         ReportEntity savedReport1 = reportCVSSRepository.save(report);
 
+        // Set Attachments
+        setAttachmentsToReportIfFilesExist(files, userDetails, savedReport1);
         ///
         // Set child reference type fields with the relation
         ReportCVSS savedReport = (ReportCVSS) reportEntityHelper.setChildReferenceFieldsFromPayload(reportPayload,savedReport1);

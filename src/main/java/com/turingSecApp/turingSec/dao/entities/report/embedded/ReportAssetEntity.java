@@ -12,6 +12,7 @@
     public class ReportAssetEntity {
         private String assetName;
         private String assetType;
+
     //    private String level;
     //    private Double price;
     }
