@@ -51,7 +51,6 @@ public class TuringSecApplication implements CommandLineRunner {
     private final ProgramsRepository programsRepository;
     private final ProgramsService programsService;
     private final ReportsRepository reportsRepository;
-    private final AssetTypeRepository assetTypeRepository;
     private final StrictRepository strictRepository;
     private final EmailNotificationService EmailNotificationService;
     private final BugBountyReportService bugBountyReportService;
