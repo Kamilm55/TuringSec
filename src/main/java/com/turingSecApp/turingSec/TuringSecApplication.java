@@ -1,18 +1,23 @@
 package com.turingSecApp.turingSec;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.turingSecApp.turingSec.dao.entities.Asset;
-import com.turingSecApp.turingSec.dao.entities.program.Program;
-import com.turingSecApp.turingSec.dao.entities.program.asset.ProgramAsset;
-import com.turingSecApp.turingSec.dao.entities.program.asset.child.*;
 import com.turingSecApp.turingSec.dao.entities.role.Role;
 import com.turingSecApp.turingSec.dao.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.dao.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.dao.entities.user.HackerEntity;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.*;
+import com.turingSecApp.turingSec.dao.repository.program.asset.AssetRepository;
+import com.turingSecApp.turingSec.dao.repository.program.asset.BaseProgramAssetRepository;
+import com.turingSecApp.turingSec.dao.repository.program.asset.ProgramAssetRepository;
+import com.turingSecApp.turingSec.dao.repository.program.ProgramsRepository;
+import com.turingSecApp.turingSec.dao.repository.report.ReportsRepository;
+import com.turingSecApp.turingSec.dao.repository.program.StrictRepository;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.payload.program.*;
+import com.turingSecApp.turingSec.payload.program.asset.AssetPayload;
+import com.turingSecApp.turingSec.payload.program.asset.BaseProgramAssetPayload;
+import com.turingSecApp.turingSec.payload.program.asset.ProgramAssetPayload;
 import com.turingSecApp.turingSec.payload.user.RegisterPayload;
 import com.turingSecApp.turingSec.service.BugBountyReportService;
 import com.turingSecApp.turingSec.service.EmailNotificationService;

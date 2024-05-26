@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.dao.entities;
+package com.turingSecApp.turingSec.dao.entities.program;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.turingSecApp.turingSec.dao.entities.program.asset.child.BaseProgramAsset;

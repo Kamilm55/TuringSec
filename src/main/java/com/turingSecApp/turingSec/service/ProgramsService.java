@@ -1,13 +1,13 @@
 package com.turingSecApp.turingSec.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.turingSecApp.turingSec.dao.entities.Asset;
+import com.turingSecApp.turingSec.dao.entities.program.Asset;
 import com.turingSecApp.turingSec.dao.entities.program.asset.ProgramAsset;
 import com.turingSecApp.turingSec.dao.entities.program.asset.child.*;
 import com.turingSecApp.turingSec.dao.repository.*;
-import com.turingSecApp.turingSec.payload.program.AssetPayload;
-import com.turingSecApp.turingSec.response.program.AssetTypeDTO;
-import com.turingSecApp.turingSec.dao.entities.AssetTypeEntity;
+import com.turingSecApp.turingSec.dao.repository.program.*;
+import com.turingSecApp.turingSec.dao.repository.program.asset.*;
+import com.turingSecApp.turingSec.payload.program.asset.AssetPayload;
 import com.turingSecApp.turingSec.dao.entities.program.Program;
 import com.turingSecApp.turingSec.dao.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.dao.entities.program.StrictEntity;
@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProgramsService implements IProgramsService {
 
-    private final AssetTypeService assetTypeService;
     private final ProgramsRepository programsRepository;
     private final UtilService utilService;
     private final ProgramAssetRepository programAssetRepository;
@@ -235,14 +234,6 @@ public class ProgramsService implements IProgramsService {
     }
 
     //
-    private AssetTypeDTO mapToDTO(AssetTypeEntity assetTypeEntity) {
-        AssetTypeDTO dto = new AssetTypeDTO();
-//        dto.setId(assetTypeEntity.getId());
-        dto.setLevel(assetTypeEntity.getLevel());
-        dto.setAssetType(assetTypeEntity.getAssetType());
-        dto.setPrice(assetTypeEntity.getPrice());
-        return dto;
-    }
 
     @Override
     @Transactional

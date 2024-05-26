@@ -2,7 +2,7 @@ package com.turingSecApp.turingSec.file_upload.service;
 
 import com.turingSecApp.turingSec.dao.entities.report.Media;
 import com.turingSecApp.turingSec.dao.entities.report.Report;
-import com.turingSecApp.turingSec.dao.repository.ReportsRepository;
+import com.turingSecApp.turingSec.dao.repository.report.ReportsRepository;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.file_upload.exception.FileNotFoundException;
 import com.turingSecApp.turingSec.file_upload.repository.MediaRepository;

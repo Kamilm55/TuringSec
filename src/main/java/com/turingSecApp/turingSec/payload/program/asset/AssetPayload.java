@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.payload.program;
+package com.turingSecApp.turingSec.payload.program.asset;
 
 import jakarta.persistence.ElementCollection;
 import jakarta.validation.constraints.DecimalMin;

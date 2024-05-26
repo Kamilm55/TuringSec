@@ -1,12 +1,10 @@
 package com.turingSecApp.turingSec.dao.entities.program.asset.child;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.turingSecApp.turingSec.dao.entities.Asset;
+import com.turingSecApp.turingSec.dao.entities.program.Asset;
 import com.turingSecApp.turingSec.dao.entities.program.asset.ProgramAsset;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -7,6 +7,7 @@ import com.turingSecApp.turingSec.dao.entities.user.HackerEntity;
 import com.turingSecApp.turingSec.dao.entities.role.Role;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.*;
+import com.turingSecApp.turingSec.dao.repository.program.ProgramsRepository;
 import com.turingSecApp.turingSec.exception.custom.BadCredentialsException;
 import com.turingSecApp.turingSec.exception.custom.EmailAlreadyExistsException;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;

@@ -1,9 +1,6 @@
-package com.turingSecApp.turingSec.payload.program;
+package com.turingSecApp.turingSec.payload.program.asset;
 
-import com.turingSecApp.turingSec.dao.entities.Asset;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToMany;
+import com.turingSecApp.turingSec.payload.program.asset.AssetPayload;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;

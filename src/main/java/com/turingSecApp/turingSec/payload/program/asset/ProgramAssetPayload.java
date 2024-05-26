@@ -1,10 +1,10 @@
-package com.turingSecApp.turingSec.payload.program;
+package com.turingSecApp.turingSec.payload.program.asset;
 
-import com.turingSecApp.turingSec.dao.entities.program.asset.child.*;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.OneToOne;
 import jakarta.validation.Valid;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor

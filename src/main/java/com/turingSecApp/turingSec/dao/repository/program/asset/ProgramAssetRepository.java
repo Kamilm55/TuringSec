@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.dao.repository;
+package com.turingSecApp.turingSec.dao.repository.program.asset;
 
 import com.turingSecApp.turingSec.dao.entities.program.Program;
 import com.turingSecApp.turingSec.dao.entities.program.asset.ProgramAsset;

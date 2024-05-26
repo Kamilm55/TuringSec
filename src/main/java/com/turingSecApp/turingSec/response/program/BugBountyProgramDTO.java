@@ -1,6 +1,5 @@
 package com.turingSecApp.turingSec.response.program;
 
-import com.turingSecApp.turingSec.dao.entities.AssetTypeEntity;
 import com.turingSecApp.turingSec.dao.entities.program.StrictEntity;
 import lombok.*;
 
@@ -11,8 +10,8 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = { "assetTypes", "prohibits"})
-@ToString(exclude = {"assetTypes", "prohibits"})
+@EqualsAndHashCode(exclude = { "prohibits"})
+@ToString(exclude = {"prohibits"})
 @Builder
 public class BugBountyProgramDTO {
     private Long id;
@@ -27,7 +26,7 @@ public class BugBountyProgramDTO {
 
     private List<String> outOfScope = new ArrayList<>();
 
-    private List<AssetTypeEntity> assetTypes = new ArrayList<>();
+//    private List<AssetTypeEntity> assetTypes = new ArrayList<>();
 
     private List<StrictEntity> prohibits = new ArrayList<>();
 }
