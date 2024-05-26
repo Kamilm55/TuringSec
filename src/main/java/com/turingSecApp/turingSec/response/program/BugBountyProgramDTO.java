@@ -1,10 +1,7 @@
 package com.turingSecApp.turingSec.response.program;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.turingSecApp.turingSec.dao.entities.AssetTypeEntity;
-import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
-import com.turingSecApp.turingSec.dao.entities.StrictEntity;
-import jakarta.persistence.*;
+import com.turingSecApp.turingSec.dao.entities.program.StrictEntity;
 import lombok.*;
 
 import java.time.LocalDate;

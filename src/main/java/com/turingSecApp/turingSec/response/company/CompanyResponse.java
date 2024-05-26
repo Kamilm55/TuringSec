@@ -1,7 +1,6 @@
 package com.turingSecApp.turingSec.response.company;
 
-import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
-import com.turingSecApp.turingSec.dao.entities.role.Role;
+import com.turingSecApp.turingSec.dao.entities.program.Program;
 import com.turingSecApp.turingSec.dao.entities.role.UserRoles;
 import lombok.Data;
 
@@ -21,7 +20,7 @@ public class CompanyResponse {
 
     //private Set<Role> roles;
 
-    private Set<BugBountyProgramEntity> bugBountyPrograms;
+    private Set<Program> bugBountyPrograms;
 
     private Set<UserRoles> userRoles;
 

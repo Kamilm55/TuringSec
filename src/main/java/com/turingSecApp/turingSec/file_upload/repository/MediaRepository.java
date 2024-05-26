@@ -1,7 +1,7 @@
 package com.turingSecApp.turingSec.file_upload.repository;
 
 import com.turingSecApp.turingSec.dao.entities.report.Media;
-import com.turingSecApp.turingSec.dao.entities.report.ReportEntity;
+import com.turingSecApp.turingSec.dao.entities.report.Report;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,6 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface MediaRepository extends JpaRepository<Media,Long> {
-    Optional<Media> findMediaByReport(ReportEntity report);
+    Optional<Media> findMediaByReport(Report report);
     List<Media> findAllByReportId(Long reportId);
 }

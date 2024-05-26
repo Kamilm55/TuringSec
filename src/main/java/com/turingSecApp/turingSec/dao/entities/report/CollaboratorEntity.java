@@ -1,7 +1,6 @@
 package com.turingSecApp.turingSec.dao.entities.report;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.turingSecApp.turingSec.dao.entities.report.ReportEntity;
 import lombok.*;
 
 
@@ -23,7 +22,7 @@ public class CollaboratorEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bug_bounty_report_id")
     @JsonIgnore
-    private ReportEntity bugBountyReport;
+    private Report bugBountyReport;
 
     @Column(name = "hacker_username")
     private String hackerUsername;

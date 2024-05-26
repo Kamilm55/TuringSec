@@ -1,7 +1,7 @@
 package com.turingSecApp.turingSec.service.user;
 
-import com.turingSecApp.turingSec.dao.entities.AdminEntity;
-import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
+import com.turingSecApp.turingSec.dao.entities.user.AdminEntity;
+import com.turingSecApp.turingSec.dao.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.dao.entities.role.Role;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.AdminRepository;
@@ -9,10 +9,7 @@ import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
 import com.turingSecApp.turingSec.dao.repository.RoleRepository;
 import com.turingSecApp.turingSec.dao.repository.UserRepository;
 import com.turingSecApp.turingSec.exception.custom.CompanyNotFoundException;
-import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
-import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

@@ -1,10 +1,10 @@
 package com.turingSecApp.turingSec.dao.entities.report;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
+import com.turingSecApp.turingSec.dao.entities.program.Program;
 import com.turingSecApp.turingSec.dao.entities.report.embedded.DiscoveryDetails;
 import com.turingSecApp.turingSec.dao.entities.report.embedded.ProofOfConcept;
-import com.turingSecApp.turingSec.dao.entities.report.embedded.ReportAssetEntity;
+import com.turingSecApp.turingSec.dao.entities.report.embedded.ReportAsset;
 import com.turingSecApp.turingSec.dao.entities.report.embedded.ReportWeakness;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import jakarta.persistence.Entity;
@@ -26,7 +26,7 @@ import java.util.List;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "report_type", discriminatorType = DiscriminatorType.STRING)
 @Table(name = "bug_bounty_reports")
-public class ReportEntity {
+public class Report {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,7 +34,7 @@ public class ReportEntity {
     @Embedded
     private ReportWeakness weakness;
     @Embedded
-    private ReportAssetEntity asset;
+    private ReportAsset asset;
     @Embedded
     private ProofOfConcept proofOfConcept;
     @Embedded
@@ -61,7 +61,7 @@ public class ReportEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bug_bounty_program_id")
     @JsonIgnore
-    private BugBountyProgramEntity bugBountyProgram;
+    private Program bugBountyProgram;
 
     private Double ownPercentage = 100.0; // Default own percentage is 100%
 

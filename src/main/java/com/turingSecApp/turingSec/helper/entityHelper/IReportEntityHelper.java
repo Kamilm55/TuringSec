@@ -1,7 +1,7 @@
 package com.turingSecApp.turingSec.helper.entityHelper;
 
 import com.turingSecApp.turingSec.dao.entities.report.ReportCVSS;
-import com.turingSecApp.turingSec.dao.entities.report.ReportEntity;
+import com.turingSecApp.turingSec.dao.entities.report.Report;
 import com.turingSecApp.turingSec.dao.entities.report.ReportManual;
 import com.turingSecApp.turingSec.payload.report.BugBountyReportPayload;
 import com.turingSecApp.turingSec.payload.report.ReportCVSSPayload;
@@ -11,12 +11,12 @@ import com.turingSecApp.turingSec.payload.report.child.CollaboratorPayload;
 import java.util.List;
 
 public interface IReportEntityHelper {
-    ReportEntity deleteReportChildEntities(ReportEntity report);
-    ReportEntity createReportsEntityFromPayload(BugBountyReportPayload reportPayload);
-    void setCommonReportProperties(ReportEntity report, BugBountyReportPayload reportPayload);
-    ReportEntity setChildReferenceFieldsFromPayload(BugBountyReportPayload reportPayload, ReportEntity report);
-    void saveCollaborators(List<CollaboratorPayload> collaboratorDTOs, ReportEntity report);
-    ReportEntity saveForReportType(ReportEntity report);
+    Report deleteReportChildEntities(Report report);
+    Report createReportsEntityFromPayload(BugBountyReportPayload reportPayload);
+    void setCommonReportProperties(Report report, BugBountyReportPayload reportPayload);
+    Report setChildReferenceFieldsFromPayload(BugBountyReportPayload reportPayload, Report report);
+    void saveCollaborators(List<CollaboratorPayload> collaboratorDTOs, Report report);
+    Report saveForReportType(Report report);
 
     /////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
     // manual

@@ -1,7 +1,7 @@
 package com.turingSecApp.turingSec.service;
 
 import com.turingSecApp.turingSec.response.user.HackerDTO;
-import com.turingSecApp.turingSec.dao.entities.HackerEntity;
+import com.turingSecApp.turingSec.dao.entities.user.HackerEntity;
 import com.turingSecApp.turingSec.dao.repository.HackerRepository;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.file_upload.entity.BackgroundImageForHacker;

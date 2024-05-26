@@ -1,18 +1,15 @@
 package com.turingSecApp.turingSec.controller;
 
 import com.turingSecApp.turingSec.dao.entities.report.ReportCVSS;
-import com.turingSecApp.turingSec.dao.entities.report.ReportEntity;
+import com.turingSecApp.turingSec.dao.entities.report.Report;
 import com.turingSecApp.turingSec.dao.entities.report.ReportManual;
 import com.turingSecApp.turingSec.payload.report.ReportCVSSPayload;
 import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
-import com.turingSecApp.turingSec.response.report.ReportDTO;
 import com.turingSecApp.turingSec.response.report.ReportsByUserDTO;
 import com.turingSecApp.turingSec.response.report.ReportsByUserWithCompDTO;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.interfaces.IBugBountyReportService;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,13 +26,13 @@ import java.util.List;
 @RequestMapping("/api/bug-bounty-reports")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
-public class BugBountyReportController {
+public class ReportController {
 
     private final IBugBountyReportService bugBountyReportService;
 
     @GetMapping("/{id}")
-    public BaseResponse<ReportEntity> getBugBountyReportById(@PathVariable Long id) {
-        ReportEntity bugBountyReport = bugBountyReportService.getBugBountyReportById(id);
+    public BaseResponse<Report> getBugBountyReportById(@PathVariable Long id) {
+        Report bugBountyReport = bugBountyReportService.getBugBountyReportById(id);
         return BaseResponse.success(bugBountyReport);
     }
 

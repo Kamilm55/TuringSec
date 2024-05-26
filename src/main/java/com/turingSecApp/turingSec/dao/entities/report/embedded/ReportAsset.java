@@ -1,6 +1,5 @@
     package com.turingSecApp.turingSec.dao.entities.report.embedded;
 
-    import com.fasterxml.jackson.annotation.JsonIgnore;
     import jakarta.persistence.*;
     import lombok.*;
 
@@ -9,9 +8,9 @@
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public class ReportAssetEntity {
+    public class ReportAsset {
         private String assetName;
-        private String assetType;
+        private String assetType; // -> todo: Set<type>
 
     //    private String level;
     //    private Double price;

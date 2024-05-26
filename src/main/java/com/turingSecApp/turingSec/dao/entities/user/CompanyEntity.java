@@ -1,12 +1,12 @@
-package com.turingSecApp.turingSec.dao.entities;
+package com.turingSecApp.turingSec.dao.entities.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.turingSecApp.turingSec.dao.entities.program.Program;
 import com.turingSecApp.turingSec.dao.entities.role.Role;
 import com.turingSecApp.turingSec.dao.entities.role.UserRoles;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Iterator;
 import java.util.Set;
 
 @Entity
@@ -43,7 +43,7 @@ public class CompanyEntity {
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIgnore
-    private Set<BugBountyProgramEntity> bugBountyPrograms;
+    private Set<Program> bugBountyPrograms;
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     @JsonIgnore

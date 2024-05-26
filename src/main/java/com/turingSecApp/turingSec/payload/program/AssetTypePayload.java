@@ -24,4 +24,6 @@ public class AssetTypePayload {
     @DecimalMin(value = "0.0", inclusive = false, message = "Price must be number(double) and greater than 0")
 //    @Digits(integer = 10, fraction = 2, message = "Price must be a valid number with up to 10 digits in total, and 2 digits after the decimal point")
     private Double price;
+
+
 }

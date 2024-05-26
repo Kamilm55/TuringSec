@@ -1,8 +1,5 @@
 package com.turingSecApp.turingSec.filter;
 
-import com.turingSecApp.turingSec.dao.entities.AdminEntity;
-import com.turingSecApp.turingSec.dao.entities.role.Role;
-import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;

@@ -1,7 +1,7 @@
 package com.turingSecApp.turingSec.dao.entities.role;
 
 
-import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
+import com.turingSecApp.turingSec.dao.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

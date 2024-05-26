@@ -1,6 +1,6 @@
 package com.turingSecApp.turingSec.util.mapper;
 
-import com.turingSecApp.turingSec.dao.entities.report.ReportEntity;
+import com.turingSecApp.turingSec.dao.entities.report.Report;
 import com.turingSecApp.turingSec.response.report.ReportDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -14,7 +14,7 @@ public interface ReportMapper {
     @Mapping(source = "bugBountyProgram.id", target = "bugBountyProgramId")
     @Mapping(source = "asset", target = "reportAsset")
      //@Mapping(target = "collaborators", expression = "java(reportsEntity.getCollaborators() != null ? new java.util.ArrayList<>(reportsEntity.getCollaborators()) : null)")
-    ReportDTO toDTO(ReportEntity reportEntity);
+    ReportDTO toDTO(Report report);
 
 
 

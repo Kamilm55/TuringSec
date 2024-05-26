@@ -3,8 +3,8 @@ package com.turingSecApp.turingSec.helper.entityHelper;
 import com.turingSecApp.turingSec.dao.entities.report.CollaboratorEntity;
 import com.turingSecApp.turingSec.dao.entities.report.ReportCVSS;
 import com.turingSecApp.turingSec.dao.entities.report.ReportManual;
-import com.turingSecApp.turingSec.dao.entities.report.embedded.ReportAssetEntity;
-import com.turingSecApp.turingSec.dao.entities.report.ReportEntity;
+import com.turingSecApp.turingSec.dao.entities.report.embedded.ReportAsset;
+import com.turingSecApp.turingSec.dao.entities.report.Report;
 import com.turingSecApp.turingSec.dao.repository.*;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.payload.report.BugBountyReportPayload;
@@ -28,7 +28,7 @@ public class ReportEntityHelper implements IReportEntityHelper {
     private final UserRepository userRepository;
     private final ProgramsRepository programsRepository;
 
-    public ReportEntity deleteReportChildEntities(ReportEntity report) {
+    public Report deleteReportChildEntities(Report report) {
         // Delete children repo first
         collaboratorRepository.deleteAll(report.getCollaborators());
 
@@ -41,8 +41,8 @@ public class ReportEntityHelper implements IReportEntityHelper {
     }
 
     @Override
-    public ReportEntity createReportsEntityFromPayload(BugBountyReportPayload reportPayload) {
-        ReportEntity report = new ReportEntity();
+    public Report createReportsEntityFromPayload(BugBountyReportPayload reportPayload) {
+        Report report = new Report();
         setCommonReportProperties(report, reportPayload);
         return report;
     }
@@ -79,9 +79,9 @@ public class ReportEntityHelper implements IReportEntityHelper {
         reportCVSS.setAvailability(reportPayload.getAvailability());
     }
     @Override
-    public void setCommonReportProperties(ReportEntity report, BugBountyReportPayload reportPayload) {
+    public void setCommonReportProperties(Report report, BugBountyReportPayload reportPayload) {
         // Set basic type fields or embeddable
-        report.setAsset(new ReportAssetEntity(reportPayload.getReportAssetPayload().getAssetName(),reportPayload.getReportAssetPayload().getAssetType()));
+        report.setAsset(new ReportAsset(reportPayload.getReportAssetPayload().getAssetName(),reportPayload.getReportAssetPayload().getAssetType()));
         report.setWeakness(reportPayload.getWeakness());
         report.setProofOfConcept(reportPayload.getProofOfConcept());
         report.setDiscoveryDetails(reportPayload.getDiscoveryDetails());
@@ -95,7 +95,7 @@ public class ReportEntityHelper implements IReportEntityHelper {
     }
 
     @Override
-    public ReportEntity setChildReferenceFieldsFromPayload(BugBountyReportPayload reportPayload, ReportEntity report) {
+    public Report setChildReferenceFieldsFromPayload(BugBountyReportPayload reportPayload, Report report) {
         // Save the report and its collaborators
         saveCollaborators(reportPayload.getCollaboratorPayload(), report);
 
@@ -103,8 +103,8 @@ public class ReportEntityHelper implements IReportEntityHelper {
     }
 
     @Override
-    public ReportEntity saveForReportType(ReportEntity report) {
-        ReportEntity report1 = null;
+    public Report saveForReportType(Report report) {
+        Report report1 = null;
 
         if(report instanceof ReportManual reportManual){
              report1 = reportManualRepository.save(reportManual);
@@ -115,7 +115,7 @@ public class ReportEntityHelper implements IReportEntityHelper {
     }
 
     @Override
-    public void saveCollaborators(List<CollaboratorPayload> collaboratorDTOs, ReportEntity report) {
+    public void saveCollaborators(List<CollaboratorPayload> collaboratorDTOs, Report report) {
         for (var collaboratorDTO : collaboratorDTOs) {
             CollaboratorEntity collaboratorEntity = new CollaboratorEntity();
             userRepository.findByUsername(collaboratorDTO.getHackerUsername()).orElseThrow(() -> new UserNotFoundException("User with username '" + collaboratorDTO.getHackerUsername() + "' not found for collaborating"));

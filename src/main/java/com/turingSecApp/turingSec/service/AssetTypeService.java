@@ -1,7 +1,7 @@
 package com.turingSecApp.turingSec.service;
 
 import com.turingSecApp.turingSec.dao.entities.AssetTypeEntity;
-import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
+import com.turingSecApp.turingSec.dao.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.dao.repository.AssetTypeRepository;
 import org.springframework.stereotype.Service;
 

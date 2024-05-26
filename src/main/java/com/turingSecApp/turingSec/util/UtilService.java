@@ -1,9 +1,9 @@
 package com.turingSecApp.turingSec.util;
 
 import com.turingSecApp.turingSec.dao.entities.AssetTypeEntity;
-import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
-import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
-import com.turingSecApp.turingSec.dao.entities.HackerEntity;
+import com.turingSecApp.turingSec.dao.entities.program.Program;
+import com.turingSecApp.turingSec.dao.entities.user.CompanyEntity;
+import com.turingSecApp.turingSec.dao.entities.user.HackerEntity;
 import com.turingSecApp.turingSec.dao.entities.role.Role;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
@@ -94,7 +94,7 @@ public class UtilService {
         }
     }
 
-    public BugBountyProgramWithAssetTypeDTO mapToDTO(BugBountyProgramEntity programEntity) {
+    public BugBountyProgramWithAssetTypeDTO mapToDTO(Program programEntity) {
         BugBountyProgramWithAssetTypeDTO dto = new BugBountyProgramWithAssetTypeDTO();
 //        dto.setId(programEntity.getId());
         dto.setFromDate(programEntity.getFromDate());
@@ -102,23 +102,9 @@ public class UtilService {
         dto.setNotes(programEntity.getNotes());
         dto.setPolicy(programEntity.getPolicy());
 
-        // Map associated asset types
-        List<AssetTypeDTO> assetTypeDTOs = programEntity.getAssetTypes().stream()
-                .map(this::mapAssetTypeToDTO)
-                .collect(Collectors.toList());
-        dto.setAssetTypes(assetTypeDTOs);
+//        dto.setAssets(programEntity.getAsset());
 
         // You can map other fields as needed
-
-        return dto;
-    }
-    public AssetTypeDTO mapAssetTypeToDTO(AssetTypeEntity assetTypeEntity) {
-        AssetTypeDTO dto = new AssetTypeDTO();
-//        dto.setId(assetTypeEntity.getId());
-        dto.setLevel(assetTypeEntity.getLevel());
-        dto.setAssetType(assetTypeEntity.getAssetType());
-        dto.setPrice(assetTypeEntity.getPrice());
-        dto.setProgramId(assetTypeEntity.getBugBountyProgram().getId());
 
         return dto;
     }

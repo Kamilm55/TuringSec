@@ -1,9 +1,9 @@
 package com.turingSecApp.turingSec.service.user;
 
 
-import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
-import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
-import com.turingSecApp.turingSec.dao.entities.HackerEntity;
+import com.turingSecApp.turingSec.dao.entities.program.Program;
+import com.turingSecApp.turingSec.dao.entities.user.CompanyEntity;
+import com.turingSecApp.turingSec.dao.entities.user.HackerEntity;
 import com.turingSecApp.turingSec.dao.entities.role.Role;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.dao.repository.*;
@@ -384,7 +384,7 @@ public class UserService implements IUserService {
 
     @Override
     public List<BugBountyProgramWithAssetTypeDTO> getAllBugBountyPrograms() {
-        List<BugBountyProgramEntity> programs = programsService.getAllBugBountyProgramsAsEntity();
+        List<Program> programs = programsService.getAllBugBountyProgramsAsEntity();
 
         // Map BugBountyProgramEntities to BugBountyProgramDTOs
         return programs.stream()
@@ -400,7 +400,7 @@ public class UserService implements IUserService {
 
     @Override
     public BugBountyProgramDTO getBugBountyProgramById(Long id) {
-      Optional<BugBountyProgramEntity> program = programsRepository.findById(id);
+      Optional<Program> program = programsRepository.findById(id);
 
       return ProgramMapper.INSTANCE.toDto(program.orElseThrow(() -> new ResourceNotFoundException("Bug Bounty Program not found")));
     }

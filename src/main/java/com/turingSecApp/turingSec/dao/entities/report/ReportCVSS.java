@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "report_cvss")
-public class ReportCVSS extends ReportEntity {
+public class ReportCVSS extends Report {
     private String attackVector;
     private String attackComplexity;
     private String privilegesRequired;

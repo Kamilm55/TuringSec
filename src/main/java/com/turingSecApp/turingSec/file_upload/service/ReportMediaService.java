@@ -1,7 +1,7 @@
 package com.turingSecApp.turingSec.file_upload.service;
 
 import com.turingSecApp.turingSec.dao.entities.report.Media;
-import com.turingSecApp.turingSec.dao.entities.report.ReportEntity;
+import com.turingSecApp.turingSec.dao.entities.report.Report;
 import com.turingSecApp.turingSec.dao.repository.ReportsRepository;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.file_upload.exception.FileNotFoundException;
@@ -42,7 +42,7 @@ public class ReportMediaService implements IFileService,IMultiFileService{
     }
     @Override
     public FileResponse saveVideoOrImg(MultipartFile multipartFile, Long reportId) throws IOException {
-        ReportEntity report = reportsRepository.findById(reportId)
+        Report report = reportsRepository.findById(reportId)
                 .orElseThrow(() -> new ResourceNotFoundException("Report not found with id:" + reportId));
 
         Media newFile =  new Media();
@@ -65,7 +65,7 @@ public class ReportMediaService implements IFileService,IMultiFileService{
         return modelMapper.map(file, FileResponse.class);
     }
 
-    private Media updateFileInfo(Media existingFile, MultipartFile multipartFile,ReportEntity report, Long hackerId) throws IOException {
+    private Media updateFileInfo(Media existingFile, MultipartFile multipartFile, Report report, Long hackerId) throws IOException {
         existingFile.setName(multipartFile.getOriginalFilename());
         existingFile.setContentType(multipartFile.getContentType());
         existingFile.setFileData(multipartFile.getBytes());

@@ -1,6 +1,6 @@
 package com.turingSecApp.turingSec.response.report;
 
-import com.turingSecApp.turingSec.dao.entities.report.ReportEntity;
+import com.turingSecApp.turingSec.dao.entities.report.Report;
 import com.turingSecApp.turingSec.response.user.UserDTO;
 import lombok.*;
 
@@ -15,5 +15,5 @@ public class ReportsByUserDTO {
     private UserDTO user;
     private boolean has_hacker_profile_pic;
     //private String userImgUrl; // Add image URL field
-    private List<ReportEntity> reports;
+    private List<Report> reports;
 }

@@ -1,8 +1,7 @@
 package com.turingSecApp.turingSec.dao.repository;
 
 import com.turingSecApp.turingSec.dao.entities.AssetTypeEntity;
-import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
-import com.turingSecApp.turingSec.dao.entities.HackerEntity;
+import com.turingSecApp.turingSec.dao.entities.user.CompanyEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

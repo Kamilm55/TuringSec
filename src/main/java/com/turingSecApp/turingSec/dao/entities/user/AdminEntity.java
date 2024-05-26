@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.dao.entities;
+package com.turingSecApp.turingSec.dao.entities.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.turingSecApp.turingSec.dao.entities.role.Role;

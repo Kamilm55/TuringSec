@@ -1,10 +1,8 @@
 package com.turingSecApp.turingSec.payload.company;
 
-import com.turingSecApp.turingSec.dao.entities.AssetTypeEntity;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

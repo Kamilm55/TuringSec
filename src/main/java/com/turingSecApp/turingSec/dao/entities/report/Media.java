@@ -24,7 +24,7 @@ public class Media {
     @ManyToOne
     @JoinColumn(name = "bug_bounty_report_id")
     @JsonIgnore
-    private ReportEntity report;
+    private Report report;
 
     private Long hackerId;
 }

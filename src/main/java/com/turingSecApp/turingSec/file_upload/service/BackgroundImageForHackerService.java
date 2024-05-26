@@ -1,20 +1,15 @@
 package com.turingSecApp.turingSec.file_upload.service;
 
 import com.turingSecApp.turingSec.file_upload.entity.BackgroundImageForHacker;
-import com.turingSecApp.turingSec.file_upload.entity.ImageForHacker;
 import com.turingSecApp.turingSec.file_upload.exception.FileNotFoundException;
 import com.turingSecApp.turingSec.file_upload.repository.BackgroundImageForHackerRepository;
 import com.turingSecApp.turingSec.file_upload.response.FileResponse;
-import com.turingSecApp.turingSec.dao.entities.HackerEntity;
-import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
+import com.turingSecApp.turingSec.dao.entities.user.HackerEntity;
 import com.turingSecApp.turingSec.dao.repository.HackerRepository;
 import com.turingSecApp.turingSec.dao.repository.UserRepository;
-import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
-import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

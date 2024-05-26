@@ -3,7 +3,7 @@ package com.turingSecApp.turingSec.response.report;
 import com.turingSecApp.turingSec.dao.entities.report.*;
 import com.turingSecApp.turingSec.dao.entities.report.embedded.DiscoveryDetails;
 import com.turingSecApp.turingSec.dao.entities.report.embedded.ProofOfConcept;
-import com.turingSecApp.turingSec.dao.entities.report.embedded.ReportAssetEntity;
+import com.turingSecApp.turingSec.dao.entities.report.embedded.ReportAsset;
 import com.turingSecApp.turingSec.dao.entities.report.embedded.ReportWeakness;
 import lombok.*;
 
@@ -29,7 +29,7 @@ public class ReportDTO {
     private Double ownPercentage;
     private List<CollaboratorEntity> collaborators;
 
-    private /*ReportAssetDTO*/ ReportAssetEntity reportAsset;
+    private /*ReportAssetDTO*/ ReportAsset reportAsset;
     private ReportWeakness weakness;
     private ProofOfConcept proofOfConcept;
     private DiscoveryDetails discoveryDetails;

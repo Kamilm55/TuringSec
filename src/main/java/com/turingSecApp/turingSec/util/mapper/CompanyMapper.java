@@ -1,7 +1,7 @@
 package com.turingSecApp.turingSec.util.mapper;
 
-import com.turingSecApp.turingSec.dao.entities.BugBountyProgramEntity;
-import com.turingSecApp.turingSec.dao.entities.CompanyEntity;
+import com.turingSecApp.turingSec.dao.entities.program.Program;
+import com.turingSecApp.turingSec.dao.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.response.company.CompanyDTO;
 import com.turingSecApp.turingSec.response.company.CompanyResponse;
 import org.mapstruct.Mapper;
@@ -26,9 +26,9 @@ public interface CompanyMapper {
     })
     CompanyResponse convertToResponse(CompanyEntity companyEntity);
 
-    default Set<Long> mapBugBountyPrograms(Set<BugBountyProgramEntity> bugBountyPrograms) {
+    default Set<Long> mapBugBountyPrograms(Set<Program> bugBountyPrograms) {
         return bugBountyPrograms.stream()
-                .map(BugBountyProgramEntity::getId)
+                .map(Program::getId)
                 .collect(Collectors.toSet());
     }
 }

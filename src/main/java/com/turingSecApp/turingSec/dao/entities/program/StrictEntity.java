@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.dao.entities;
+package com.turingSecApp.turingSec.dao.entities.program;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -26,7 +26,7 @@ public class StrictEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "program_id")
     @JsonIgnore
-    private BugBountyProgramEntity bugBountyProgramForStrict;
+    private Program bugBountyProgramForStrict;
 
     // Getters and setters
 }

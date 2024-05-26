@@ -1,7 +1,9 @@
-package com.turingSecApp.turingSec.dao.entities;
+package com.turingSecApp.turingSec.dao.entities.program;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.turingSecApp.turingSec.dao.entities.report.ReportEntity;
+import com.turingSecApp.turingSec.dao.entities.program.asset.ProgramAsset;
+import com.turingSecApp.turingSec.dao.entities.user.CompanyEntity;
+import com.turingSecApp.turingSec.dao.entities.report.Report;
 import jakarta.persistence.Entity;
 import lombok.*;
 import jakarta.persistence.*;
@@ -10,7 +12,9 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @AllArgsConstructor
@@ -21,7 +25,7 @@ import java.util.List;
 @ToString(exclude = {"company", "assetTypes", "prohibits","reports"})
 @Entity
 @Table(name = "bug_bounty_programs")
-public class BugBountyProgramEntity {
+public class Program {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -44,23 +48,22 @@ public class BugBountyProgramEntity {
     @ElementCollection
     private List<String> outOfScope = new ArrayList<>();
 
+    @OneToMany(mappedBy = "bugBountyProgram",fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Report> reports = new ArrayList<>();
+
+    @OneToMany(mappedBy = "bugBountyProgramForStrict", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StrictEntity> prohibits = new ArrayList<>();
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "company_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private CompanyEntity company;
 
-    @OneToMany(mappedBy = "bugBountyProgram",fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReportEntity> reports = new ArrayList<>();
+    @OneToOne(mappedBy = "program", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ProgramAsset asset;
 
-    @OneToMany(mappedBy = "bugBountyProgram", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AssetTypeEntity> assetTypes = new ArrayList<>();
-
-
-    @OneToMany(mappedBy = "bugBountyProgramForStrict", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StrictEntity> prohibits = new ArrayList<>();
-
-    // Getters and setters...
+     // Getters and setters...
 
     public void removeReport(Long reportId) {
         if (reports != null) {

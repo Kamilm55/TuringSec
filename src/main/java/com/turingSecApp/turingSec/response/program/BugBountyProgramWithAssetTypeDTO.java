@@ -1,5 +1,6 @@
 package com.turingSecApp.turingSec.response.program;
 
+import com.turingSecApp.turingSec.dao.entities.program.asset.ProgramAsset;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,7 +20,7 @@ public class BugBountyProgramWithAssetTypeDTO {
     private LocalDate toDate;
     private String notes;
     private String policy;
-    private List<AssetTypeDTO> assetTypes;
+    private Set<ProgramAsset> assets;
     private List<StrictDTO> prohibits; // New field for prohibits
     private Long companyId; // New field for company ID
 //    private Long programId; // every company has one program

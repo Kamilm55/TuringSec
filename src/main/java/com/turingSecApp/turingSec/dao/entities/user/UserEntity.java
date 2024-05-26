@@ -1,8 +1,7 @@
 package com.turingSecApp.turingSec.dao.entities.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.turingSecApp.turingSec.dao.entities.HackerEntity;
-import com.turingSecApp.turingSec.dao.entities.report.ReportEntity;
+import com.turingSecApp.turingSec.dao.entities.report.Report;
 import com.turingSecApp.turingSec.dao.entities.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -51,7 +50,7 @@ public class UserEntity {
     private Set<Role> roles;
 
     @OneToMany(mappedBy = "user",fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ReportEntity> reports = new ArrayList<>();
+    private List<Report> reports = new ArrayList<>();
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private HackerEntity hacker;
