@@ -43,7 +43,7 @@ import static com.turingSecApp.turingSec.util.GlobalConstants.ROOT_LINK;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class BugBountyReportService implements IBugBountyReportService {
+public class ReportService implements IBugBountyReportService {
     private final ReportsRepository bugBountyReportRepository;
     private final ReportManualRepository reportManualRepository;
     private final ReportCVSSRepository reportCVSSRepository;

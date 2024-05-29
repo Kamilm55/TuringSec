@@ -19,7 +19,7 @@ import com.turingSecApp.turingSec.payload.program.asset.AssetPayload;
 import com.turingSecApp.turingSec.payload.program.asset.BaseProgramAssetPayload;
 import com.turingSecApp.turingSec.payload.program.asset.ProgramAssetPayload;
 import com.turingSecApp.turingSec.payload.user.RegisterPayload;
-import com.turingSecApp.turingSec.service.BugBountyReportService;
+import com.turingSecApp.turingSec.service.ReportService;
 import com.turingSecApp.turingSec.service.EmailNotificationService;
 import com.turingSecApp.turingSec.service.ProgramsService;
 import com.turingSecApp.turingSec.service.interfaces.IHackerService;
@@ -53,7 +53,7 @@ public class TuringSecApplication implements CommandLineRunner {
     private final ReportsRepository reportsRepository;
     private final StrictRepository strictRepository;
     private final EmailNotificationService EmailNotificationService;
-    private final BugBountyReportService bugBountyReportService;
+    private final ReportService reportService;
     private final BaseProgramAssetRepository baseProgramAssetRepository;
     private final AssetRepository assetRepository;
     private final ProgramAssetRepository programAssetRepository;

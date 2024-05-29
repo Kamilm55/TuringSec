@@ -32,6 +32,7 @@ public class ReportEntityHelper implements IReportEntityHelper {
     private final UserRepository userRepository;
     private final ProgramsRepository programsRepository;
 
+    //todo: delete auto , not manually
     public Report deleteReportChildEntities(Report report) {
         // Delete children repo first
         collaboratorRepository.deleteAll(report.getCollaborators());

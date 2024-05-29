@@ -48,12 +48,8 @@ public class ProgramsService implements IProgramsService {
         CompanyEntity company = utilService.getAuthenticatedCompany();
 
         // Get programs belonging to the company
-        List<Program> programs = programsRepository.findByCompany(company);
-
-        /*programs.stream().map(ProgramMapper.INSTANCE::toDto).collect(Collectors.toList())*/
-        return programs;
+        return programsRepository.findByCompany(company);
     }
-
 
     @Override
     @Transactional
@@ -131,65 +127,6 @@ public class ProgramsService implements IProgramsService {
                     return strictEntity;
                 })
                 .collect(Collectors.toList());
-    }
-
-//    private Program createOrUpdateBugBountyProgram(Program program) {
-//        // Check if a program with the same parameters already exists for the company
-//        List<Program> programs = programsRepository.findByCompany(program.getCompany());
-//        if (!programs.isEmpty()) {
-//            Program existingProgram = programs.get(0);
-//            // Update existing program with the new data
-//            updateProgramFields(existingProgram, program);
-//            return programsRepository.save(existingProgram);
-//        } else {
-//            // Create new program
-//
-//
-//
-//            return programsRepository.save(program);
-//        }
-
-//    }
-    private void updateProgramFields(Program existingProgram, Program newProgram) {
-        updateProgramDates(existingProgram, newProgram);
-        existingProgram.setNotes(newProgram.getNotes());
-        existingProgram.setPolicy(newProgram.getPolicy());
-        updateProgramScope(existingProgram, newProgram);
-        updateProgramProhibits(existingProgram, newProgram);
-
-        updateProgramAssetTypes(existingProgram, newProgram);
-    }
-
-    private void updateProgramDates(Program existingProgram, Program newProgram) {
-        existingProgram.setFromDate(newProgram.getFromDate());
-        existingProgram.setToDate(newProgram.getToDate());
-    }
-
-    private void updateProgramScope(Program existingProgram, Program newProgram) {
-        existingProgram.setInScope(newProgram.getInScope());
-        existingProgram.setOutOfScope(newProgram.getOutOfScope());
-    }
-
-    private void updateProgramAssetTypes(Program existingProgram, Program newProgram) {
-        existingProgram.setAsset(newProgram.getAsset());
-    }
-
-    private void updateProgramProhibits(Program existingProgram, Program newProgram) {
-        List<StrictEntity> updatedProhibits = new ArrayList<>();
-        for (StrictEntity strictEntity : newProgram.getProhibits()) {
-            StrictEntity existingProhibit = findExistingProhibits(existingProgram.getProhibits(), strictEntity);
-            if (existingProhibit != null) {
-                // Update existing prohibit
-                existingProhibit.setProhibitAdded(strictEntity.getProhibitAdded());
-                updatedProhibits.add(existingProhibit);
-            } else {
-                // Add new prohibit
-                strictEntity.setBugBountyProgramForStrict(existingProgram);
-                updatedProhibits.add(strictEntity);
-            }
-        }
-        existingProgram.getProhibits().clear();
-        existingProgram.getProhibits().addAll(updatedProhibits);
     }
 
 
@@ -324,7 +261,7 @@ public class ProgramsService implements IProgramsService {
             assetSetForCritical.add(asset);
         }
 
-// Create and save criticalProgramAsset
+        // Create and save criticalProgramAsset
         CriticalProgramAsset criticalProgramAsset = new CriticalProgramAsset();
         CriticalProgramAsset savedCriticalProgramAsset = setAssetsToBaseProgramAsset(criticalProgramAsset, assetSetForCritical, programPayload.getAsset().getCriticalAsset().getPrice());
         return savedCriticalProgramAsset;
