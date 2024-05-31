@@ -30,9 +30,9 @@ public class ProgramController {
 //           ResponseEntity.created(URI.create("/api/bug-bounty-programs/" + createdOrUpdateProgram.getId())).body(createdOrUpdateProgram);
         return BaseResponse.success(bugBountyProgramService.createBugBountyProgram(programPayload));
     }
-    @GetMapping("/assets")
-    public BaseResponse<Set<Asset>> getCompanyAssetTypes() {
-        return BaseResponse.success(bugBountyProgramService.getCompanyProgramAssets());
+    @GetMapping("/{id}/assets") // for report dropdown
+    public BaseResponse<Set<Asset>> getAllAssets(@PathVariable Long id) {
+        return BaseResponse.success(bugBountyProgramService.getAllAssets(id));
     }
 
     @DeleteMapping("/{id}")

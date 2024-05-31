@@ -11,7 +11,7 @@ import java.util.Set;
 public interface IProgramsService {
     List<Program> getCompanyAllBugBountyPrograms();
     /*BugBountyProgramDTO*/Program createBugBountyProgram(ProgramPayload programDTO);
-    Set<Asset> getCompanyProgramAssets();
+    Set<Asset> getAllAssets(Long id);
     void deleteBugBountyProgram(Long id);
 
     ProgramAsset saveProgramAssets(ProgramPayload programPayload);

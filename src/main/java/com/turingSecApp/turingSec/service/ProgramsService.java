@@ -133,19 +133,14 @@ public class ProgramsService implements IProgramsService {
     //////////////////////////
     // fixme: fix this method
     @Override
-    public Set<Asset> getCompanyProgramAssets() {
-       // Retrieve the company and its unique program associated with the authenticated user
-        CompanyEntity company = utilService.getAuthenticatedCompany();
-        Program companyProgram = programsRepository.findByCompany(company).get(0);// Always contains one element
-
-        // Get assets belonging to the company
-        Set<ProgramAsset> programAssets = programAssetRepository.findProgramAssetByProgram(companyProgram);
+    public Set<Asset> getAllAssets(Long id) {
+        Program program = getBugBountyProgramById(id);
+        Set<ProgramAsset> programAssets = programAssetRepository.findProgramAssetByProgram(program);
 
         Set<Asset> assets = new HashSet<>();
         for (ProgramAsset programAsset : programAssets) {
             addAssetsFromAllBaseProgramAssets(assets,programAsset);
         }
-
 
         return assets;
     }
