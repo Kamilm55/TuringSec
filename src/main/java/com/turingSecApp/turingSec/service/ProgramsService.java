@@ -130,6 +130,7 @@ public class ProgramsService implements IProgramsService {
     }
 
 
+    //////////////////////////
     // fixme: fix this method
     @Override
     public Set<Asset> getCompanyProgramAssets() {
@@ -339,26 +340,6 @@ public class ProgramsService implements IProgramsService {
     }
 
 
-    // Utils
-//    private ProgramAsset findExistingAssetType(Set<ProgramAsset> existingAssetTypes, ProgramAsset assetType) {
-//        for (ProgramAsset existing : existingAssetTypes) {
-//            if (existing.getId().equals(assetType.getId())) {
-//                return existing;
-//            }
-//        }
-//        return null;
-//    }
-
-    private StrictEntity findExistingProhibits(List<StrictEntity> existingProhibits, StrictEntity strictEntity) {
-        for (StrictEntity existing : existingProhibits) {
-            if (existing.getId().equals(strictEntity.getId())) {
-                return existing;
-            }
-        }
-        return null;
-    }
-
-
     // Related to UserService
     public List<Program> getAllBugBountyProgramsAsEntity() {
         return programsRepository.findAll();
@@ -366,7 +347,7 @@ public class ProgramsService implements IProgramsService {
 
 
     public Program getBugBountyProgramById(Long id) {
-        return programsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Bug Bounty Program not found"));
+        return programsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Bug Bounty Program not found with id:" + id));
     }
     //
 

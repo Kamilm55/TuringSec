@@ -384,26 +384,13 @@ public class UserService implements IUserService {
     /////////////////////////////////Programs\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
     @Override
-    public List<BugBountyProgramWithAssetTypeDTO> getAllBugBountyPrograms() {
-        List<Program> programs = programsService.getAllBugBountyProgramsAsEntity();
-
-        // Map BugBountyProgramEntities to BugBountyProgramDTOs
-        return programs.stream()
-                .map(programEntity -> {
-                    BugBountyProgramWithAssetTypeDTO dto = utilService.mapToDTO(programEntity);
-                    dto.setCompanyId(programEntity.getCompany().getId());
-                    //                    dto.getProgramId();
-                    return dto;
-                })
-                .collect(Collectors.toList());
-
+    public List<Program> getAllBugBountyPrograms() {
+        return programsService.getAllBugBountyProgramsAsEntity();
     }
 
     @Override
-    public BugBountyProgramDTO getBugBountyProgramById(Long id) {
-      Optional<Program> program = programsRepository.findById(id);
-
-      return ProgramMapper.INSTANCE.toDto(program.orElseThrow(() -> new ResourceNotFoundException("Bug Bounty Program not found")));
+    public Program getBugBountyProgramById(Long id) {
+      return programsService.getBugBountyProgramById(id);
     }
 
     @Override

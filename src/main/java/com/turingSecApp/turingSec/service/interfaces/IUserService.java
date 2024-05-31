@@ -1,5 +1,6 @@
 package com.turingSecApp.turingSec.service.interfaces;
 
+import com.turingSecApp.turingSec.dao.entities.program.Program;
 import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
 import com.turingSecApp.turingSec.payload.user.*;
 import com.turingSecApp.turingSec.response.program.BugBountyProgramDTO;
@@ -24,8 +25,8 @@ public interface IUserService {
     void deleteUser();
 
     // Programs for users
-    List<BugBountyProgramWithAssetTypeDTO> getAllBugBountyPrograms();
-    BugBountyProgramDTO getBugBountyProgramById(Long id);
+    List<Program> getAllBugBountyPrograms();
+    Program getBugBountyProgramById(Long id);
     UserEntity findUserByUsername(String username);
 
     String generateNewToken(UserHackerDTO updateProfile);

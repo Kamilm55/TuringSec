@@ -1,6 +1,7 @@
 package com.turingSecApp.turingSec.controller;
 
 
+import com.turingSecApp.turingSec.dao.entities.program.Program;
 import com.turingSecApp.turingSec.exception.custom.InvalidTokenException;
 import com.turingSecApp.turingSec.payload.user.*;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
@@ -97,11 +98,11 @@ public class UserController {
 
     // All bug bounty programs for user(hacker)
     @GetMapping("/programs")
-    public BaseResponse<List<BugBountyProgramWithAssetTypeDTO>> getAllBugBountyPrograms() {
+    public BaseResponse<List<Program>> getAllBugBountyPrograms() {
         return BaseResponse.success(userService.getAllBugBountyPrograms());
     }
     @GetMapping("programsById/{id}")
-    public BaseResponse<BugBountyProgramDTO> getBugBountyProgramById(@PathVariable Long id) {
+    public BaseResponse<Program> getBugBountyProgramById(@PathVariable Long id) {
         return BaseResponse.success(userService.getBugBountyProgramById(id));
     }
 
