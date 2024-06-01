@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.helper.entityHelper;
+package com.turingSecApp.turingSec.helper.entityHelper.report;
 
 import com.turingSecApp.turingSec.dao.entities.report.ReportCVSS;
 import com.turingSecApp.turingSec.dao.entities.report.Report;

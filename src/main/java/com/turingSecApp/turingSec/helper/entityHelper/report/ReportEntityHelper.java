@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.helper.entityHelper;
+package com.turingSecApp.turingSec.helper.entityHelper.report;
 
 import com.turingSecApp.turingSec.dao.entities.report.CollaboratorEntity;
 import com.turingSecApp.turingSec.dao.entities.report.ReportCVSS;
@@ -11,6 +11,7 @@ import com.turingSecApp.turingSec.dao.repository.report.ReportCVSSRepository;
 import com.turingSecApp.turingSec.dao.repository.report.ReportManualRepository;
 import com.turingSecApp.turingSec.dao.repository.report.ReportsRepository;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
+import com.turingSecApp.turingSec.helper.entityHelper.report.IReportEntityHelper;
 import com.turingSecApp.turingSec.payload.report.BugBountyReportPayload;
 import com.turingSecApp.turingSec.payload.report.ReportCVSSPayload;
 import com.turingSecApp.turingSec.payload.report.ReportManualPayload;

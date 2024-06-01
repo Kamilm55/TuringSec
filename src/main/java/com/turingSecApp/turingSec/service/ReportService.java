@@ -15,7 +15,7 @@ import com.turingSecApp.turingSec.exception.custom.PermissionDeniedException;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.file_upload.service.ReportMediaService;
-import com.turingSecApp.turingSec.helper.entityHelper.IReportEntityHelper;
+import com.turingSecApp.turingSec.helper.entityHelper.report.IReportEntityHelper;
 import com.turingSecApp.turingSec.payload.report.BugBountyReportPayload;
 import com.turingSecApp.turingSec.payload.report.ReportCVSSPayload;
 import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
@@ -159,8 +159,6 @@ public class ReportService implements IBugBountyReportService {
         ReportCVSS savedReport = (ReportCVSS) reportEntityHelper.setChildReferenceFieldsFromPayload(reportPayload,savedReport1);
 
         return /*ReportMapper.INSTANCE.toDTO(savedReport)*/savedReport;
-
-
     }
 
     @Override
@@ -199,11 +197,7 @@ public class ReportService implements IBugBountyReportService {
         }
     }
 
-    private void updateReportProperties(ReportManual report, ReportManualPayload reportPayload) {
-        reportEntityHelper.setCommonReportProperties(report, reportPayload);
-        report.setSeverity(reportPayload.getSeverity());
-    }
-    private void updateReportProperties(ReportCVSS report, ReportCVSSPayload reportPayload) {
+     private void updateReportProperties(ReportCVSS report, ReportCVSSPayload reportPayload) {
         reportEntityHelper.setCommonReportProperties(report, reportPayload);
         reportEntityHelper.setCVSSFields(report,reportPayload);
     }

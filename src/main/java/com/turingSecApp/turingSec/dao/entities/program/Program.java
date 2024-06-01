@@ -21,8 +21,8 @@ import java.util.Set;
 @NoArgsConstructor
 @Data
 @Builder
-@EqualsAndHashCode(exclude = {"company", "assetTypes", "prohibits","reports"})
-@ToString(exclude = {"company", "assetTypes", "prohibits","reports"})
+@EqualsAndHashCode(exclude = {"company", "asset", "prohibits","reports"})
+@ToString(exclude = {"company", "asset", "prohibits","reports"})
 @Entity
 @Table(name = "bug_bounty_programs")
 public class Program {
@@ -49,6 +49,7 @@ public class Program {
     private List<String> outOfScope = new ArrayList<>();
 
     @OneToMany(mappedBy = "bugBountyProgram",fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Report> reports = new ArrayList<>();
 
     @OneToMany(mappedBy = "bugBountyProgramForStrict", cascade = CascadeType.ALL, orphanRemoval = true)

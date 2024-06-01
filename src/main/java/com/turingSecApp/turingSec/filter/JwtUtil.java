@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Component
 public class JwtUtil {
     private final String jwtSecret = "5B25B75FB86EFF6FBF1C96AFC7A1BGYWSUWHSDawdsadwasdwaWTFQTFSYQGYTWtrtrfgrYTGHYUSGQUHUHUDQJ";
-    private final int jwtExpiration = 3600 * 1000;
+    private final int jwtExpiration = (3600 * 1000) * 24 * 3; // 3 days
 
     public String generateToken(UserDetails userDetails) {
         Date now = new Date();

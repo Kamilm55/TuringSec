@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.helper.entityHelper;
+package com.turingSecApp.turingSec.helper.entityHelper.program;
 
 import com.turingSecApp.turingSec.dao.entities.program.Asset;
 import com.turingSecApp.turingSec.dao.entities.program.Program;
@@ -11,12 +11,11 @@ import com.turingSecApp.turingSec.dao.repository.program.asset.CPARepository;
 import com.turingSecApp.turingSec.dao.repository.program.asset.HPARepository;
 import com.turingSecApp.turingSec.dao.repository.program.asset.LPARepository;
 import com.turingSecApp.turingSec.dao.repository.program.asset.MPARepository;
-import com.turingSecApp.turingSec.exception.custom.PermissionDeniedException;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
+import com.turingSecApp.turingSec.helper.entityHelper.program.IProgramEntityHelper;
 import com.turingSecApp.turingSec.payload.program.ProgramPayload;
 import com.turingSecApp.turingSec.payload.program.StrictPayload;
 import com.turingSecApp.turingSec.payload.program.asset.AssetPayload;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +39,7 @@ public class ProgramEntityHelper implements IProgramEntityHelper {
         List<Program> programList = programsRepository.findAll();
         if (!programList.isEmpty()) {
             Program existingProgram = programList.get(0);
-            Program programFromDB = programsRepository.findById(existingProgram.getId()).orElseThrow(() -> new ResourceNotFoundException("Program Asset not found with id:" + existingProgram.getId()));
+            Program programFromDB = programsRepository.findById(existingProgram.getId()).orElseThrow(() -> new ResourceNotFoundException("Program not found with id:" + existingProgram.getId()));
             company.removeProgram(programFromDB.getId());
             programsRepository.delete(programFromDB);
         }
@@ -48,7 +47,6 @@ public class ProgramEntityHelper implements IProgramEntityHelper {
 
     @Override
     public Program createProgramEntity(ProgramPayload programPayload, CompanyEntity company) {
-
         Program program = new Program();
         program.setFromDate(programPayload.getFromDate());
         program.setToDate(programPayload.getToDate());
@@ -62,8 +60,8 @@ public class ProgramEntityHelper implements IProgramEntityHelper {
         return program;
     }
 
-    private List<StrictEntity> convertToStrictEntities(List<StrictPayload> prohibitsDTOs, Program program) {
-        return prohibitsDTOs.stream().map(prohibitDTO -> {
+    private List<StrictEntity> convertToStrictEntities(List<StrictPayload> prohibitsPayload, Program program) {
+        return prohibitsPayload.stream().map(prohibitDTO -> {
             StrictEntity strictEntity = new StrictEntity();
             strictEntity.setProhibitAdded(prohibitDTO.getProhibitAdded());
             strictEntity.setBugBountyProgramForStrict(program);
@@ -72,17 +70,6 @@ public class ProgramEntityHelper implements IProgramEntityHelper {
     }
 
     @Override
-    @Transactional
-    public void deleteBugBountyProgram(Long id, CompanyEntity company) {
-        Program program = programsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Bug Bounty Program not found"));
-        if (program.getCompany().getId().equals(company.getId())) {
-            company.removeProgram(program.getId());
-            programsRepository.delete(program);
-        } else {
-            throw new PermissionDeniedException();
-        }
-    }
-
     public Set<Asset> convertAssetPayloadsToAssets(Set<AssetPayload> assetPayloads) {
         Set<Asset> assets = new HashSet<>();
         for (AssetPayload assetPayload : assetPayloads) {
@@ -98,18 +85,9 @@ public class ProgramEntityHelper implements IProgramEntityHelper {
     public <T extends BaseProgramAsset> T setAssetsToBaseProgramAsset(T programAsset, Set<Asset> assets, double price) {
         programAsset.setAssets(assets);
         programAsset.setPrice(price);
+
         // Assuming there's a method to save the program asset
-        return saveBaseProgramAsset(programAsset);
-    }
-
-
-    @Override
-    public <T extends BaseProgramAsset> void setBaseProgramAssetProperties(T baseProgramAsset, Set<Asset> assetSet, Double assetPrice) {
-        baseProgramAsset.setPrice(assetPrice);
-        baseProgramAsset.setAssets(assetSet);
-
-        // Set the base program asset reference in each asset
-        assetSet.forEach(asset -> asset.setBaseProgramAsset(baseProgramAsset));
+        return  saveBaseProgramAsset(programAsset);
     }
 
     @Override
@@ -153,9 +131,59 @@ public class ProgramEntityHelper implements IProgramEntityHelper {
         return programAsset;
     }
 
+    @Override
     public void addAssetsToSet(Set<Asset> assets, BaseProgramAsset baseProgramAsset) {
         if (baseProgramAsset != null && baseProgramAsset.getAssets() != null) {
             assets.addAll(baseProgramAsset.getAssets());
         }
+    }
+
+    //
+    @Override
+    public CriticalProgramAsset getCriticalProgramAsset(ProgramPayload programPayload) {
+        Set<Asset> assets = convertAssetPayloadsToAssets(programPayload.getAsset().getCriticalAsset().getAssets());
+        CriticalProgramAsset criticalProgramAsset = new CriticalProgramAsset();
+
+        // Set parent in every child
+        setBaseProgramAssetInEveryAsset(assets, criticalProgramAsset);
+
+        return setAssetsToBaseProgramAsset(criticalProgramAsset, assets, programPayload.getAsset().getCriticalAsset().getPrice());
+    }
+
+    private void setBaseProgramAssetInEveryAsset(Set<Asset> assets, BaseProgramAsset baseProgramAsset) {
+        assets.forEach(asset -> {
+            asset.setBaseProgramAsset(baseProgramAsset);
+        });
+    }
+
+    @Override
+    public HighProgramAsset getHighProgramAsset(ProgramPayload programPayload) {
+        Set<Asset> assets = convertAssetPayloadsToAssets(programPayload.getAsset().getHighAsset().getAssets());
+        HighProgramAsset highProgramAsset = new HighProgramAsset();
+
+        // Set parent in every child
+        setBaseProgramAssetInEveryAsset(assets,highProgramAsset);
+
+        return setAssetsToBaseProgramAsset(highProgramAsset, assets, programPayload.getAsset().getHighAsset().getPrice());
+    }
+
+    @Override
+    public MediumProgramAsset getMediumProgramAsset(ProgramPayload programPayload) {
+        Set<Asset> assets = convertAssetPayloadsToAssets(programPayload.getAsset().getMediumAsset().getAssets());
+        MediumProgramAsset mediumProgramAsset = new MediumProgramAsset();
+
+        // Set parent in every child
+        setBaseProgramAssetInEveryAsset(assets,mediumProgramAsset);
+        return setAssetsToBaseProgramAsset(mediumProgramAsset, assets, programPayload.getAsset().getMediumAsset().getPrice());
+    }
+
+    @Override
+    public LowProgramAsset getLowProgramAsset(ProgramPayload programPayload) {
+        Set<Asset> assets = convertAssetPayloadsToAssets(programPayload.getAsset().getLowAsset().getAssets());
+        LowProgramAsset lowProgramAsset = new LowProgramAsset();
+
+        // Set parent in every child
+        setBaseProgramAssetInEveryAsset(assets,lowProgramAsset);
+        return setAssetsToBaseProgramAsset(lowProgramAsset, assets, programPayload.getAsset().getLowAsset().getPrice());
     }
 }

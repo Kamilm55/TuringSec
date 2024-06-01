@@ -14,5 +14,4 @@ public interface IProgramsService {
     Set<Asset> getAllAssets(Long id);
     void deleteBugBountyProgram(Long id);
 
-    ProgramAsset saveProgramAssets(ProgramPayload programPayload);
 }
