@@ -12,17 +12,23 @@ import java.util.Set;
 public interface IProgramEntityHelper {
 
     void removeExistingProgram(CompanyEntity company);
+
     Program createProgramEntity(ProgramPayload programPayload, CompanyEntity company);
+
     void deleteBugBountyProgram(Long id, CompanyEntity company);
+
     <T extends BaseProgramAsset> T saveBaseProgramAsset(T baseProgramAsset);
+
     <T extends BaseProgramAsset> T setAssetsToBaseProgramAsset(T programAsset, Set<Asset> assets, double price);
 
     <T extends BaseProgramAsset> void setBaseProgramAssetProperties(T baseProgramAsset, Set<Asset> assetSet, Double assetPrice);
+
     void setProgramAssetForChildren(ProgramAsset programAsset,
                                     LowProgramAsset lowProgramAsset,
                                     MediumProgramAsset mediumProgramAsset,
                                     HighProgramAsset highProgramAsset,
                                     CriticalProgramAsset criticalProgramAsset);
+
     ProgramAsset createProgramAsset(
             LowProgramAsset lowProgramAsset,
             MediumProgramAsset mediumProgramAsset,
