@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${RAILWAY_DB_HOST}:${RAILWAY_DB_PORT}/${RAILWAY_DB_NAME}
+    driverClassName: org.postgresql.Driver
+    username: ${RAILWAY_DB_USER}
+    password: ${RAILWAY_DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: none

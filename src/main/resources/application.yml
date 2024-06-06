@@ -1,0 +1,29 @@
+server:
+  port: 5000
+  error.include-message: always
+
+spring:
+  profiles:
+    active: dev
+  servlet:
+    multipart:
+      enabled: true
+  liquibase:
+    change-log: classpath:liquibase/changelog-master.yml
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: kamilmmmdov2905@gmail.com
+    password: ocmf dzzn some axso
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+logging:
+  level:
+    org.springframework.security: DEBUG
