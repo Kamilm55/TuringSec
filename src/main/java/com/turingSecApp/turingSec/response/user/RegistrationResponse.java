@@ -1,6 +1,6 @@
 package com.turingSecApp.turingSec.response.user;
 
-import com.turingSecApp.turingSec.dao.entities.user.CompanyEntity;
+import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 
 
 public class RegistrationResponse {

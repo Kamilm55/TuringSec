@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.10.xsd">
+
+    <changeSet id="insertCompany" author="Kamil571">
+
+        <insert tableName="companies">
+            <column name="first_name" value="Kenan"/>
+            <column name="last_name" value="Memmedov"/>
+            <column name="email" value="string@gmail.com"/>
+            <column name="company_name" value="Company"/>
+            <column name="job_title" value="CEO"/>
+            <column name="message" value="I want to build company"/>
+            <column name="approved" value="true"/>
+            <column name="password" value="$2a$10$ltQrtzWK4XIhll8stxe6I.bp1T2NO/zPO0hOPVjNR21jFKyrSpOdC"/> <!-- Insert hashed password here -->
+        </insert>
+
+    </changeSet>
+
+    <!-- Create company_role table if not exists -->
+    <changeSet id="5" author="Kamil571">
+        <createTable tableName="company_role">
+            <column name="company_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseColumnNames="company_id"
+                                 baseTableName="company_role"
+                                 constraintName="fk_company_role_company"
+                                 referencedColumnNames="id"
+                                 referencedTableName="companies"/>
+        <addForeignKeyConstraint baseColumnNames="role_id"
+                                 baseTableName="company_role"
+                                 constraintName="fk_company_role_role"
+                                 referencedColumnNames="id"
+                                 referencedTableName="role"/>
+    </changeSet>
+
+    <!-- Link company to roles -->
+    <changeSet id="6" author="Kamil571">
+        <insert tableName="company_role">
+            <column name="company_id" value="1"/>
+            <column name="role_id" value="2"/>
+        </insert>
+    </changeSet>
+
+
+
+</databaseChangeLog>

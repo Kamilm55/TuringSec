@@ -1,7 +1,7 @@
 package com.turingSecApp.turingSec.controller;
 
-import com.turingSecApp.turingSec.dao.entities.program.Asset;
-import com.turingSecApp.turingSec.dao.entities.program.Program;
+import com.turingSecApp.turingSec.model.entities.program.Asset;
+import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.payload.program.ProgramPayload;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.interfaces.IProgramsService;

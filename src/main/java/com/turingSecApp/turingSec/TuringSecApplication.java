@@ -1,29 +1,23 @@
 package com.turingSecApp.turingSec;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.turingSecApp.turingSec.dao.entities.role.Role;
-import com.turingSecApp.turingSec.dao.entities.user.AdminEntity;
-import com.turingSecApp.turingSec.dao.entities.user.CompanyEntity;
-import com.turingSecApp.turingSec.dao.entities.user.HackerEntity;
-import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
-import com.turingSecApp.turingSec.dao.repository.*;
-import com.turingSecApp.turingSec.dao.repository.program.asset.AssetRepository;
-import com.turingSecApp.turingSec.dao.repository.program.asset.BaseProgramAssetRepository;
-import com.turingSecApp.turingSec.dao.repository.program.asset.ProgramAssetRepository;
-import com.turingSecApp.turingSec.dao.repository.program.ProgramsRepository;
-import com.turingSecApp.turingSec.dao.repository.report.ReportsRepository;
-import com.turingSecApp.turingSec.dao.repository.program.StrictRepository;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
+import com.turingSecApp.turingSec.model.entities.program.Program;
+import com.turingSecApp.turingSec.model.entities.role.Role;
+import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
+import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
+import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
+import com.turingSecApp.turingSec.model.entities.user.UserEntity;
+import com.turingSecApp.turingSec.model.repository.*;
+import com.turingSecApp.turingSec.model.repository.program.ProgramsRepository;
 import com.turingSecApp.turingSec.payload.program.*;
 import com.turingSecApp.turingSec.payload.program.asset.AssetPayload;
 import com.turingSecApp.turingSec.payload.program.asset.BaseProgramAssetPayload;
 import com.turingSecApp.turingSec.payload.program.asset.ProgramAssetPayload;
-import com.turingSecApp.turingSec.payload.user.RegisterPayload;
-import com.turingSecApp.turingSec.service.ReportService;
-import com.turingSecApp.turingSec.service.EmailNotificationService;
 import com.turingSecApp.turingSec.service.ProgramsService;
 import com.turingSecApp.turingSec.service.interfaces.IHackerService;
 import com.turingSecApp.turingSec.service.interfaces.IUserService;
+import com.turingSecApp.turingSec.util.MockData;
+import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -32,7 +26,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.ws.rs.NotFoundException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -50,439 +43,177 @@ public class TuringSecApplication implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
     private final ProgramsRepository programsRepository;
     private final ProgramsService programsService;
-    private final ReportsRepository reportsRepository;
-    private final StrictRepository strictRepository;
-    private final EmailNotificationService EmailNotificationService;
-    private final ReportService reportService;
-    private final BaseProgramAssetRepository baseProgramAssetRepository;
-    private final AssetRepository assetRepository;
-    private final ProgramAssetRepository programAssetRepository;
+    private final UtilService utilService;
     public static void main(String[] args) {
         SpringApplication.run(TuringSecApplication.class, args);
     }
 
     @Override
     @Transactional
-    public void run(String... args) throws Exception {
-        insertMockData();
-
-//        programsRepository.delete(programsRepository.findById(1L).get());
-//
-//        BugBountyProgramEntity bountyProgramById = programsService.getBugBountyProgramById(1L);
-//
-//        System.out.println(bountyProgramById.getId());
-//        System.out.println(bountyProgramById.getCompany());
-//        System.out.println(bountyProgramById.getReports());
-//        System.out.println(reportsRepository.findByBugBountyProgram(bountyProgramById));
-//        programsRepository.delete(bountyProgramById);
-
-//        programsService.getBugBountyProgramById(1L);
-//        programsService.deleteBugBountyProgramForTest(1L);
-    }
-
-    private void insertMockData() throws JsonProcessingException {
-        insertUser();
-        insertSecondUser();
-        insertAdmins();
-        insertCompany();
+    public void run(String... args){
+        insertMockData(); // for h2 db -> in development environment
 
 
-
-        // Create a new BugBountyProgramWithAssetTypePayload instance
-        ProgramPayload programPayload = new ProgramPayload();
-
-        // Set data into the payload
-        programPayload.setFromDate(LocalDate.of(2024, 4, 15));
-        programPayload.setToDate(LocalDate.of(2024, 5, 15));
-        programPayload.setPolicy("Responsible Disclosure Policy");
-        programPayload.setNotes("Bug Bounty program for ExampleCompany's web assets.");
-
-
-        // Create and set prohibits payloads
-        StrictPayload strictPayload = new StrictPayload();
-        strictPayload.setProhibitAdded("Prohibits the use of automated scanners without prior permission.");
-        programPayload.setProhibits(Arrays.asList(strictPayload));
+        UserEntity hacker1 = userRepository.findByEmail("kamilmmmdov2905@gmail.com");
+        if(hacker1!=null) {
+            System.out.println("hacker roles: " + hacker1.getRoles().toString());
+        }
+        System.out.println(hacker1.getHacker());
 
         CompanyEntity company = companyRepository.findByEmail("string@gmail.com");
+        if(company!=null){
+            System.out.println("company roles: "+company.getRoles().toString());
+        }
 
-        ProgramAssetPayload programAssetPayload = new ProgramAssetPayload();
-        BaseProgramAssetPayload lowProgramAsset = new BaseProgramAssetPayload();
-        lowProgramAsset.setPrice(45.0);
-
-        Set<AssetPayload> assets = new HashSet<>();
-        AssetPayload asset = new AssetPayload();
-        asset.setType("domain");
-        Set<String> assetNames = new HashSet<>(Set.of("x.com", "y.com"));
-        asset.setNames(assetNames);
-        assets.add(asset);
-
-
-        lowProgramAsset.setAssets(assets);
-
-
-
-        // Create and set payloads for Medium, High, and Critical assets
-        BaseProgramAssetPayload mediumProgramAssetPayload = new BaseProgramAssetPayload();
-        mediumProgramAssetPayload.setPrice(55.0); // Set price for Medium asset
-
-        BaseProgramAssetPayload highProgramAssetPayload = new BaseProgramAssetPayload();
-        highProgramAssetPayload.setPrice(65.0); // Set price for High asset
-
-        BaseProgramAssetPayload criticalProgramAssetPayload = new BaseProgramAssetPayload();
-        criticalProgramAssetPayload.setPrice(75.0); // Set price for Critical asset
-
-    // Populate asset sets for Medium, High, and Critical assets
-        Set<AssetPayload> highAssets = new HashSet<>();
-        Set<AssetPayload> criticalAssets = new HashSet<>();
-
-        // Populate asset sets
-        AssetPayload mediumAsset = new AssetPayload();
-        mediumAsset.setType("domain");
-        mediumAsset.setNames(new HashSet<>(Arrays.asList("z.com", "w.com"))); // Example asset names for Medium asset
-
-        AssetPayload mediumAsset2 = new AssetPayload();
-        mediumAsset2.setType("mobile");
-        mediumAsset2.setNames(new HashSet<>(Arrays.asList("mob1", "mob2"))); // Example asset names for Medium asset
-
-        Set<AssetPayload> mediumAssets = new HashSet<>(Set.of(mediumAsset,mediumAsset2)); // add 2 assets to set of assets for test
-
-
-        System.out.println("MEDIUM ASSETS");
-        System.out.println(mediumAssets );
-
-        AssetPayload highAsset = new AssetPayload();
-        highAsset.setType("domain");
-        highAsset.setNames(new HashSet<>(Arrays.asList("p.com", "q.com"))); // Example asset names for High asset
-        highAssets.add(highAsset);
-
-        AssetPayload criticalAsset = new AssetPayload();
-        criticalAsset.setType("domain");
-        criticalAsset.setNames(new HashSet<>(Arrays.asList("m.com", "n.com"))); // Example asset names for Critical asset
-        criticalAssets.add(criticalAsset);
-
-// Set asset sets to their respective payloads
-        mediumProgramAssetPayload.setAssets(mediumAssets);
-        highProgramAssetPayload.setAssets(highAssets);
-        criticalProgramAssetPayload.setAssets(criticalAssets);
-
-// Set payloads to the main program asset payload
-        programAssetPayload.setLowAsset(lowProgramAsset);
-        programAssetPayload.setMediumAsset(mediumProgramAssetPayload);
-        programAssetPayload.setHighAsset(highProgramAssetPayload);
-        programAssetPayload.setCriticalAsset(criticalProgramAssetPayload);
-
-
-        programPayload.setAsset(programAssetPayload);
-//        System.out.println(programAsset);
-        System.out.println(programPayload);
-
-
-       // programsService.createBugBountyProgramForTest(programPayload,company);
-
-
-        // saving from child into parents
-
-
-        programsService.createBugBountyProgramForTest(programPayload,company);
-        saveMockProgramAssets( programPayload);
-        // saving from child into parents
-
-
-//        ObjectMapper mapper = new ObjectMapper();
-//        String jsonString = mapper.writeValueAsString(programAsset);
-//
-//        System.out.println(jsonString);
-//        program.setAssets();
-
-
-        //
-//        insertBugBountyProgram();
-//        insertReports();
-//
-//        insertAdditionalData();
-
-
+        Optional<AdminEntity> admin1 = adminRepository.findByUsername("admin1_username");
+        admin1.ifPresent(adminEntity -> System.out.println("admin roles: " + adminEntity.getRoles().toString()));
     }
 
-    public void saveMockProgramAssets(ProgramPayload programPayload) {
+    private void insertMockData() {
+        setHackerRoles();
+        insertHackerForDefaultUsers();
 
-//        ProgramAsset programAsset = programsService.saveProgramAssets(programPayload);
-
-
-
-//        System.out.println(programAsset);
+//        setAdminRoles(); // todo: it is not working , change role structure
+        insertProgram();
     }
 
-
-
-    private void insertUser() {
-        // Insert 1 user
-        UserEntity user1 = UserEntity.builder()
-                .first_name("Kamil")
-                .last_name("Memmedov")
-                .country("Azerbaijan")
-                .username("Username")
-                .email("kamilmdov2905@gmail.com")
-                .password(passwordEncoder.encode("userPass"))
-                .activationToken("7203c486-0069-45d4-8857-15a27ad24bee")
-                .activated(true)
-                .build();
-        Set<Role> roles = new HashSet<>();
-        roles.add(roleRepository.findByName("HACKER"));
-        user1.setRoles(roles);
+    private void setHackerRoles() {
+        UserEntity user1 = userRepository.findByUsername("Username").orElseThrow(()->new UserNotFoundException("Admin not found with username:Username"));
+        Set<Role> hackerRoles = utilService.getHackerRoles();
+        user1.setRoles(hackerRoles);
         userRepository.save(user1);
 
-        UserEntity fetchedUser = userRepository.findByUsername(user1.getUsername())
-                .orElseThrow(() -> new UserNotFoundException("User with username " + user1.getUsername() + " not found"));
+        UserEntity user2 = userRepository.findByUsername("Hacker_2").orElseThrow(()->new UserNotFoundException("Admin not found with username:Hacker_2"));
+        user2.setRoles(hackerRoles);
 
-        HackerEntity hackerEntity = new HackerEntity();
-        hackerEntity.setUser(fetchedUser);
-        hackerEntity.setFirst_name(fetchedUser.getFirst_name());
-        hackerEntity.setLast_name(fetchedUser.getLast_name());
-        hackerEntity.setCountry(fetchedUser.getCountry());
-        hackerRepository.save(hackerEntity);
-
-        fetchedUser.setHacker(hackerEntity);
-        userRepository.save(fetchedUser);
+        userRepository.save(user2);
     }
 
-    private void insertSecondUser() {
-        // Insert 2nd user
-        RegisterPayload registerPayload = RegisterPayload.builder()
-                .firstName("Hackerrrr")
-                .lastName("Lastname")
-                .country("Azerbaijan")
-                .username("Hacker_2")
-                .email("kamilmmmdov2905@gmail.com")
-                .password("userPass") // encode inside service
-                .build();
-        userService.insertActiveHacker(registerPayload);
+    private void insertHackerForDefaultUsers() {
+        UserEntity user1 = userRepository.findByUsername("Username").orElseThrow(()->new UserNotFoundException("Admin not found with username:Username"));
+        UserEntity user2 = userRepository.findByUsername("Hacker_2").orElseThrow(()->new UserNotFoundException("Admin not found with username:Hacker_2"));
+
+        if (user1.getHacker() == null){
+                createHackerSetToUserAndSave(user1);
+                createHackerSetToUserAndSave(user2);
+        }
     }
 
-    private void insertAdmins() {
-        // Insert 2 admins
-        AdminEntity admin1 = AdminEntity.builder()
-                .first_name("Kamil")
-                .last_name("Memmedov")
-                .username("admin1_username")
-                .password(passwordEncoder.encode("adminPass"))
-                .email("kamilmmmdov2905@gmail.com")
-                .build();
+    private void createHackerSetToUserAndSave(UserEntity user2) {
+        HackerEntity hackerEntity2 = new HackerEntity();
+        hackerEntity2.setUser(user2);
+        hackerEntity2.setFirst_name(user2.getFirst_name());
+        hackerEntity2.setLast_name(user2.getLast_name());
+        hackerEntity2.setCountry(user2.getCountry());
+        hackerRepository.save(hackerEntity2);
 
-        AdminEntity admin2 = AdminEntity.builder()
-                .first_name("Admin2")
-                .last_name("Admin2Last")
-                .username("admin2_username")
-                .password(passwordEncoder.encode("adminPass "))
-                .email("elnarzulfuqarli2001@gmail.com")
-                .build();
+        user2.setHacker(hackerEntity2);
+        userRepository.save(user2);
+    }
+
+    private void setAdminRoles() {
+        Set<Role> adminRoles = utilService.getAdminRoles();
+
+        AdminEntity admin1 = adminRepository.findByUsername("admin1_username").orElseThrow(()->new UserNotFoundException("Admin not found with username:admin1_username"));
+        admin1.setRoles(adminRoles);
+
+
+        AdminEntity admin2 = adminRepository.findByUsername("admin2_username").orElseThrow(()->new UserNotFoundException("Admin not found with username:admin2_username"));
+        admin2.setRoles(adminRoles);
 
         adminRepository.save(admin1);
         adminRepository.save(admin2);
+
     }
 
-    private void insertCompany() {
-        // Insert 1 company
-        Role companyRole = roleRepository.findByName("COMPANY");
-        if (companyRole == null) {
-            throw new NotFoundException("Company role not found.");
+    private void insertProgram()  {
+        // Check if exists? if exists don't insert it violates non-unique condition
+        if (!MockData.mockDataNames.contains("Program1")) {
+            // Create a new BugBountyProgramWithAssetTypePayload instance
+            ProgramPayload programPayload = new ProgramPayload();
+
+            // Set data into the payload
+            programPayload.setFromDate(LocalDate.of(2024, 4, 15));
+            programPayload.setToDate(LocalDate.of(2024, 5, 15));
+            programPayload.setPolicy("Responsible Disclosure Policy");
+            programPayload.setNotes("Bug Bounty program for ExampleCompany's web assets.");
+
+
+            // Create and set prohibits payloads
+            StrictPayload strictPayload = new StrictPayload();
+            strictPayload.setProhibitAdded("Prohibits the use of automated scanners without prior permission.");
+            programPayload.setProhibits(Arrays.asList(strictPayload));
+
+            CompanyEntity company = companyRepository.findByEmail("string@gmail.com");
+
+            ProgramAssetPayload programAssetPayload = new ProgramAssetPayload();
+            BaseProgramAssetPayload lowProgramAsset = new BaseProgramAssetPayload();
+            lowProgramAsset.setPrice(45.0);
+
+            Set<AssetPayload> assets = new HashSet<>();
+            AssetPayload asset = new AssetPayload();
+            asset.setType("domain");
+            Set<String> assetNames = new HashSet<>(Set.of("x.com", "y.com"));
+            asset.setNames(assetNames);
+            assets.add(asset);
+
+
+            lowProgramAsset.setAssets(assets);
+
+
+            // Create and set payloads for Medium, High, and Critical assets
+            BaseProgramAssetPayload mediumProgramAssetPayload = new BaseProgramAssetPayload();
+            mediumProgramAssetPayload.setPrice(55.0); // Set price for Medium asset
+
+            BaseProgramAssetPayload highProgramAssetPayload = new BaseProgramAssetPayload();
+            highProgramAssetPayload.setPrice(65.0); // Set price for High asset
+
+            BaseProgramAssetPayload criticalProgramAssetPayload = new BaseProgramAssetPayload();
+            criticalProgramAssetPayload.setPrice(75.0); // Set price for Critical asset
+
+            // Populate asset sets for Medium, High, and Critical assets
+            Set<AssetPayload> highAssets = new HashSet<>();
+            Set<AssetPayload> criticalAssets = new HashSet<>();
+
+            // Populate asset sets
+            AssetPayload mediumAsset = new AssetPayload();
+            mediumAsset.setType("domain");
+            mediumAsset.setNames(new HashSet<>(Arrays.asList("z.com", "w.com"))); // Example asset names for Medium asset
+
+            AssetPayload mediumAsset2 = new AssetPayload();
+            mediumAsset2.setType("mobile");
+            mediumAsset2.setNames(new HashSet<>(Arrays.asList("mob1", "mob2"))); // Example asset names for Medium asset
+
+            Set<AssetPayload> mediumAssets = new HashSet<>(Set.of(mediumAsset,mediumAsset2)); // add 2 assets to set of assets for test
+
+            AssetPayload highAsset = new AssetPayload();
+            highAsset.setType("domain");
+            highAsset.setNames(new HashSet<>(Arrays.asList("p.com", "q.com"))); // Example asset names for High asset
+            highAssets.add(highAsset);
+
+            AssetPayload criticalAsset = new AssetPayload();
+            criticalAsset.setType("domain");
+            criticalAsset.setNames(new HashSet<>(Arrays.asList("m.com", "n.com"))); // Example asset names for Critical asset
+            criticalAssets.add(criticalAsset);
+
+            // Set asset sets to their respective payloads
+            mediumProgramAssetPayload.setAssets(mediumAssets);
+            highProgramAssetPayload.setAssets(highAssets);
+            criticalProgramAssetPayload.setAssets(criticalAssets);
+
+            // Set payloads to the main program asset payload
+            programAssetPayload.setLowAsset(lowProgramAsset);
+            programAssetPayload.setMediumAsset(mediumProgramAssetPayload);
+            programAssetPayload.setHighAsset(highProgramAssetPayload);
+            programAssetPayload.setCriticalAsset(criticalProgramAssetPayload);
+
+            programPayload.setAsset(programAssetPayload);
+
+            programsService.createBugBountyProgramForTest(programPayload,company);
         }
 
-        CompanyEntity company1 = CompanyEntity.builder()
-                .first_name("Kenan")
-                .last_name("Memmedov")
-                .email("string@gmail.com")
-                .company_name("Company")
-                .job_title("CEO")
-                .message("I want to build company")
-                .approved(true)
-                .password(passwordEncoder.encode("string"))
-                .build();
 
-        company1.setRoles(Collections.singleton(companyRole));
-        companyRepository.save(company1);
     }
-
-//    private void insertBugBountyProgram() {
-//
-//        CompanyEntity company = companyRepository.findByEmail("string@gmail.com");
-//        // Create a new BugBountyProgramWithAssetTypePayload instance
-//        ProgramPayload payload = new ProgramPayload();
-//
-//        // Set data into the payload
-//        payload.setFromDate(LocalDate.of(2024, 4, 15));
-//        payload.setToDate(LocalDate.of(2024, 5, 15));
-//        payload.setPolicy("Responsible Disclosure Policy");
-//        payload.setNotes("Bug Bounty program for ExampleCompany's web assets.");
-////        payload.setCompanyId(1L); // Assuming company ID is 1
-//
-//        // Create and set asset type payloads
-//        ProgramAsset programAsset = new ProgramAsset();
-////        programAsset.setProgram();
-////        assetTypePayload.setLevel("High");
-////        assetTypePayload.setNames(Set.of("\"x.com\"","y.com"));
-////        assetTypePayload.setType("Web Application");
-////        assetTypePayload.setPrice(500.0); // Assuming price is 500.0
-////        payload.setAssets(assetTypePayload);
-//
-//        // Create and set prohibits payloads
-//        StrictPayload strictPayload = new StrictPayload();
-//        strictPayload.setProhibitAdded("Prohibits the use of automated scanners without prior permission.");
-//        payload.setProhibits(Arrays.asList(strictPayload));
-//        programsService.createBugBountyProgramForTest(payload,company);
-//
-//
-//    }
-
-//    private void insertReports() {
-//        // Insert 2 reports
-//        BugBountyReportPayload reportPayload = BugBountyReportPayload.builder()
-//                .reportAssetPayload(new ReportAssetPayload("Domain", "Asset 2"))
-//                .weakness(new ReportWeakness("Memory Corruption" , "SQL Injection"))
-//                .methodName("POST")
-//                .proofOfConcept(new ProofOfConcept("Remote Code Execution in Application X","https://example.com/vulnerabilities/appx/rce","https://example.com/vulnerabilities/appx/rce"))
-//                .discoveryDetails(new DiscoveryDetails("15.0"))
-//                .lastActivity(Date.from(LocalDateTime.parse("2024-05-01T09:46:19.700").toInstant(ZoneOffset.UTC)))
-//                .rewardsStatus("Pending")
-//                .reportTemplate("Average Bounty")
-//                .ownPercentage(20.0)
-//                .collaboratorPayload(
-//                        List.of(
-//                                CollaboratorPayload.builder()
-//                                        .hackerUsername("Username")
-//                                        .collaborationPercentage(30.0)
-//                                        .build(),
-//                                CollaboratorPayload.builder()
-//                                        .hackerUsername("Hacker_2")
-//                                        .collaborationPercentage(50.0)
-//                                        .build()
-//                        )
-//                )
-//                .build();
-//
-//        BugBountyReportPayload reportPayload2 = BugBountyReportPayload.builder()
-//                .reportAssetPayload(new ReportAssetPayload("Domain", "Asset 3"))
-//                .weakness(new ReportWeakness("Memory Corruption" , "SQL Injection"))
-//                .methodName("GET")
-//                .proofOfConcept(new ProofOfConcept("Remote Code Execution in Application X","https://example.com/vulnerabilities/appx/rce","https://example.com/vulnerabilities/appx/rce"))
-//                .discoveryDetails(new DiscoveryDetails("45.0"))
-//                .lastActivity(Date.from(LocalDateTime.parse("2024-04-30T15:20:00").toInstant(ZoneOffset.UTC)))
-//                .rewardsStatus("Pending")
-//                .reportTemplate("Average Bounty")
-//                .ownPercentage(30.0)
-//                .collaboratorPayload(
-//                        List.of(
-//                                CollaboratorPayload.builder()
-//                                        .hackerUsername("Username")
-//                                        .collaborationPercentage(70.0)
-//                                        .build()
-//                        )
-//                )
-//                .build();
-//
-//        bugBountyReportService.submitBugBountyReportForTest(reportPayload, 1L,1L);
-//        bugBountyReportService.submitBugBountyReportForTest(reportPayload2, 1L,2L);
-//    }
-
-    //
-//    private void insertAdditionalData() {
-//        insertAdditionalCompanies();
-//        insertAdditionalBugBountyPrograms();
-//        insertAdditionalBugBountyReports();
-//    }
-//
-//    private void insertAdditionalCompanies() {
-//        // Insert 5 additional companies
-//        Role companyRole = roleRepository.findByName("COMPANY");
-//        if (companyRole == null) {
-//            throw new NotFoundException("Company role not found.");
-//        }
-//
-//        for (int i = 0; i < 5; i++) {
-//            CompanyEntity company = CompanyEntity.builder()
-//                    .first_name("Company " + (i + 1))
-//                    .last_name("CEO " + (i + 1))
-//                    .email("company" + (i + 1) + "@example.com")
-//                    .company_name("Company " + (i + 1))
-//                    .job_title("CEO")
-//                    .message("Message " + (i + 1))
-//                    .approved(true)
-//                    .password(passwordEncoder.encode("password"))
-//                    .build();
-//
-//            company.setRoles(Collections.singleton(companyRole));
-//            companyRepository.save(company);
-//        }
-//    }
-//
-//    private void insertAdditionalBugBountyPrograms() {
-//        // Retrieve all companies
-//        List<CompanyEntity> companies = companyRepository.findAll();
-//
-//        for (int i = 1; i < 6; i++) {
-//            // Get the company for this iteration
-//            CompanyEntity company = companies.get(i);
-//
-//            // Create a new BugBountyProgramWithAssetTypePayload instance
-//            ProgramPayload payload = new ProgramPayload();
-//
-//            // Set data into the payload
-//            payload.setFromDate(LocalDate.of(2024, 5, i + 1));
-//            payload.setPolicy("Policy for Program " + (i + 1));
-//            payload.setNotes("Notes for Program " + (i + 1));
-//
-//            // Create and set asset type payloads
-//            AssetTypePayload assetTypePayload = new AssetTypePayload();
-//            assetTypePayload.setLevel("Medium");
-//            assetTypePayload.setAssetType("Asset " + (i + 1));
-//            assetTypePayload.setPrice((i * 10 + 80.0)); // Set price
-//            payload.setAssetTypes(Collections.singletonList(assetTypePayload));
-//
-//            // Create and set prohibits payloads
-//            StrictPayload strictPayload = new StrictPayload();
-//            strictPayload.setProhibitAdded("Prohibits for Program " + (i + 1));
-//            payload.setProhibits(Collections.singletonList(strictPayload));
-//
-//            // Call the service method to create the bug bounty program
-//            programsService.createBugBountyProgramForTest(payload, company);
-//        }
-//    }
-//
-//
-//    private void insertAdditionalBugBountyReports() {
-//        // Insert 5 additional Bug Bounty reports and associate each with a program
-//        List<Program> programs = programsRepository.findAll();
-//
-//        for (int i = 0; i < 5; i++) {
-//            Program program = programs.get(i);
-//
-//            BugBountyReportPayload reportPayload = BugBountyReportPayload.builder()
-//                    .reportAssetPayload(new ReportAssetPayload("Domain", "Asset " + i ))
-//                    .weakness(new ReportWeakness("Memory Corruption" , "SQL Injection"))
-//                    .methodName("POST")
-//                    .proofOfConcept(new ProofOfConcept("Remote Code Execution in Application X" + (i + 1),"https://example.com/vulnerabilities/appx/rce" + (i + 1),"https://example.com/vulnerabilities/appx/rce" + (i + 1)))
-//                    .discoveryDetails(new DiscoveryDetails("time spend"))
-//                    .lastActivity(Date.from(LocalDateTime.now().toInstant(ZoneOffset.UTC)))
-//                    .rewardsStatus("Pending")
-//                    .reportTemplate("Average Bounty")
-//                    .ownPercentage(50.0)
-//                    .collaboratorPayload(
-//                            List.of(
-//                                    CollaboratorPayload.builder()
-//                                            .hackerUsername("Username")
-//                                            .collaborationPercentage(30.0)
-//                                            .build(),
-//                                    CollaboratorPayload.builder()
-//                                            .hackerUsername("Hacker_2")
-//                                            .collaborationPercentage(20.0)
-//                                            .build()
-//                            )
-//                    )
-//                    .build();
-//
-//            bugBountyReportService.submitBugBountyReportForTest(reportPayload, program.getId(),2L);
-//        }
-//    }
 
 
 }

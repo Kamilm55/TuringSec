@@ -1,21 +1,19 @@
 package com.turingSecApp.turingSec.service.user;
 
 
-import com.turingSecApp.turingSec.dao.entities.program.Program;
-import com.turingSecApp.turingSec.dao.entities.user.CompanyEntity;
-import com.turingSecApp.turingSec.dao.entities.user.HackerEntity;
-import com.turingSecApp.turingSec.dao.entities.role.Role;
-import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
-import com.turingSecApp.turingSec.dao.repository.*;
-import com.turingSecApp.turingSec.dao.repository.program.ProgramsRepository;
+import com.turingSecApp.turingSec.model.entities.program.Program;
+import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
+import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
+import com.turingSecApp.turingSec.model.entities.role.Role;
+import com.turingSecApp.turingSec.model.entities.user.UserEntity;
+import com.turingSecApp.turingSec.model.repository.*;
+import com.turingSecApp.turingSec.model.repository.program.ProgramsRepository;
 import com.turingSecApp.turingSec.exception.custom.BadCredentialsException;
 import com.turingSecApp.turingSec.exception.custom.EmailAlreadyExistsException;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.payload.user.*;
-import com.turingSecApp.turingSec.response.program.BugBountyProgramDTO;
-import com.turingSecApp.turingSec.response.program.BugBountyProgramWithAssetTypeDTO;
 import com.turingSecApp.turingSec.response.user.AuthResponse;
 import com.turingSecApp.turingSec.response.user.UserDTO;
 import com.turingSecApp.turingSec.response.user.UserHackerDTO;
@@ -23,7 +21,6 @@ import com.turingSecApp.turingSec.service.EmailNotificationService;
 import com.turingSecApp.turingSec.service.ProgramsService;
 import com.turingSecApp.turingSec.service.interfaces.IUserService;
 import com.turingSecApp.turingSec.util.UtilService;
-import com.turingSecApp.turingSec.util.mapper.ProgramMapper;
 import com.turingSecApp.turingSec.util.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -66,7 +63,7 @@ public class UserService implements IUserService {
         // Create and save the hacker entity
         HackerEntity hackerEntity = createAndSaveHackerEntity(user);
 
-        // Send activation email
+        // Send activation email //todo: change to async event (kafka)
         sendActivationEmail(user);
 
         // Generate token for the registered user

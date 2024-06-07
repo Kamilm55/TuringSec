@@ -1,13 +1,13 @@
 package com.turingSecApp.turingSec.util;
 
-import com.turingSecApp.turingSec.dao.entities.program.Program;
-import com.turingSecApp.turingSec.dao.entities.role.Role;
-import com.turingSecApp.turingSec.dao.entities.user.CompanyEntity;
-import com.turingSecApp.turingSec.dao.entities.user.HackerEntity;
-import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
-import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
-import com.turingSecApp.turingSec.dao.repository.RoleRepository;
-import com.turingSecApp.turingSec.dao.repository.UserRepository;
+import com.turingSecApp.turingSec.model.entities.program.Program;
+import com.turingSecApp.turingSec.model.entities.role.Role;
+import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
+import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
+import com.turingSecApp.turingSec.model.entities.user.UserEntity;
+import com.turingSecApp.turingSec.model.repository.CompanyRepository;
+import com.turingSecApp.turingSec.model.repository.RoleRepository;
+import com.turingSecApp.turingSec.model.repository.UserRepository;
 import com.turingSecApp.turingSec.exception.custom.*;
 import com.turingSecApp.turingSec.response.program.BugBountyProgramWithAssetTypeDTO;
 import com.turingSecApp.turingSec.response.user.AuthResponse;
@@ -61,6 +61,11 @@ public class UtilService {
     public Set<Role> getHackerRoles() {
         Set<Role> roles = new HashSet<>();
         roles.add(roleRepository.findByName("HACKER"));
+        return roles;
+    }
+    public Set<Role> getAdminRoles() {
+        Set<Role> roles = new HashSet<>();
+        roles.add(roleRepository.findByName("ADMIN"));
         return roles;
     }
 

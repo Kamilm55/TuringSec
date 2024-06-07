@@ -1,8 +1,8 @@
 package com.turingSecApp.turingSec.controller;
 
-import com.turingSecApp.turingSec.dao.entities.report.ReportCVSS;
-import com.turingSecApp.turingSec.dao.entities.report.Report;
-import com.turingSecApp.turingSec.dao.entities.report.ReportManual;
+import com.turingSecApp.turingSec.model.entities.report.ReportCVSS;
+import com.turingSecApp.turingSec.model.entities.report.Report;
+import com.turingSecApp.turingSec.model.entities.report.ReportManual;
 import com.turingSecApp.turingSec.payload.report.ReportCVSSPayload;
 import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
 import com.turingSecApp.turingSec.response.report.ReportsByUserDTO;

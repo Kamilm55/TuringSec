@@ -1,7 +1,7 @@
 package com.turingSecApp.turingSec.file_upload.service;
 
-import com.turingSecApp.turingSec.dao.entities.user.HackerEntity;
-import com.turingSecApp.turingSec.dao.repository.HackerRepository;
+import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
+import com.turingSecApp.turingSec.model.repository.HackerRepository;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.file_upload.entity.ImageForHacker;
 import com.turingSecApp.turingSec.file_upload.exception.FileNotFoundException;

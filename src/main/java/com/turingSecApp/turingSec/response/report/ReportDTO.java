@@ -1,10 +1,10 @@
 package com.turingSecApp.turingSec.response.report;
 
-import com.turingSecApp.turingSec.dao.entities.report.*;
-import com.turingSecApp.turingSec.dao.entities.report.embedded.DiscoveryDetails;
-import com.turingSecApp.turingSec.dao.entities.report.embedded.ProofOfConcept;
-import com.turingSecApp.turingSec.dao.entities.report.embedded.ReportAsset;
-import com.turingSecApp.turingSec.dao.entities.report.embedded.ReportWeakness;
+import com.turingSecApp.turingSec.model.entities.report.*;
+import com.turingSecApp.turingSec.model.entities.report.embedded.DiscoveryDetails;
+import com.turingSecApp.turingSec.model.entities.report.embedded.ProofOfConcept;
+import com.turingSecApp.turingSec.model.entities.report.embedded.ReportAsset;
+import com.turingSecApp.turingSec.model.entities.report.embedded.ReportWeakness;
 import lombok.*;
 
 import java.util.Date;

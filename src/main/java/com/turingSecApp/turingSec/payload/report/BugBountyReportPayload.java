@@ -1,8 +1,8 @@
 package com.turingSecApp.turingSec.payload.report;
 
-import com.turingSecApp.turingSec.dao.entities.report.embedded.DiscoveryDetails;
-import com.turingSecApp.turingSec.dao.entities.report.embedded.ProofOfConcept;
-import com.turingSecApp.turingSec.dao.entities.report.embedded.ReportWeakness;
+import com.turingSecApp.turingSec.model.entities.report.embedded.DiscoveryDetails;
+import com.turingSecApp.turingSec.model.entities.report.embedded.ProofOfConcept;
+import com.turingSecApp.turingSec.model.entities.report.embedded.ReportWeakness;
 import com.turingSecApp.turingSec.payload.report.child.CollaboratorPayload;
 import com.turingSecApp.turingSec.payload.report.child.ReportAssetPayload;
 import jakarta.validation.Valid;

@@ -1,8 +1,7 @@
 package com.turingSecApp.turingSec.service.interfaces;
 
-import com.turingSecApp.turingSec.dao.entities.program.Asset;
-import com.turingSecApp.turingSec.dao.entities.program.Program;
-import com.turingSecApp.turingSec.dao.entities.program.asset.ProgramAsset;
+import com.turingSecApp.turingSec.model.entities.program.Asset;
+import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.payload.program.ProgramPayload;
 
 import java.util.List;

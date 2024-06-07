@@ -1,20 +1,21 @@
 package com.turingSecApp.turingSec.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.turingSecApp.turingSec.dao.entities.program.Asset;
-import com.turingSecApp.turingSec.dao.entities.program.Program;
-import com.turingSecApp.turingSec.dao.entities.program.asset.ProgramAsset;
-import com.turingSecApp.turingSec.dao.entities.program.asset.child.*;
-import com.turingSecApp.turingSec.dao.entities.user.CompanyEntity;
-import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
-import com.turingSecApp.turingSec.dao.repository.program.ProgramsRepository;
-import com.turingSecApp.turingSec.dao.repository.program.asset.AssetRepository;
-import com.turingSecApp.turingSec.dao.repository.program.asset.ProgramAssetRepository;
+import com.turingSecApp.turingSec.model.entities.program.Asset;
+import com.turingSecApp.turingSec.model.entities.program.Program;
+import com.turingSecApp.turingSec.model.entities.program.asset.ProgramAsset;
+import com.turingSecApp.turingSec.model.entities.program.asset.child.*;
+import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
+import com.turingSecApp.turingSec.model.repository.CompanyRepository;
+import com.turingSecApp.turingSec.model.repository.program.ProgramsRepository;
+import com.turingSecApp.turingSec.model.repository.program.asset.AssetRepository;
+import com.turingSecApp.turingSec.model.repository.program.asset.ProgramAssetRepository;
 import com.turingSecApp.turingSec.exception.custom.PermissionDeniedException;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.helper.entityHelper.program.IProgramEntityHelper;
 import com.turingSecApp.turingSec.payload.program.ProgramPayload;
 import com.turingSecApp.turingSec.service.interfaces.IProgramsService;
+import com.turingSecApp.turingSec.util.MockData;
 import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static com.turingSecApp.turingSec.util.MockData.addToMockDataNameToSet;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +38,7 @@ public class ProgramsService implements IProgramsService {
     private final IProgramEntityHelper programEntityHelper;
 
     private final CompanyRepository companyRepository;
+
 
     @Override
     public List<Program> getCompanyAllBugBountyPrograms() {
@@ -54,11 +58,12 @@ public class ProgramsService implements IProgramsService {
     }
 
     @Transactional // For commandlineRunner (mock data)
-    public void createBugBountyProgramForTest(ProgramPayload programPayload, CompanyEntity company) throws JsonProcessingException {
+    public void createBugBountyProgramForTest(ProgramPayload programPayload, CompanyEntity company){
 //        CompanyEntity company = getAuthenticatedUser();
 
         Program program = convertToBugBountyProgramEntityAndSave(programPayload, company);
 
+        addToMockDataNameToSet("Program1");
         System.out.println("createdOrUpdatedProgram " + program);
     }
 

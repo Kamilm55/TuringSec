@@ -1,7 +1,6 @@
 package com.turingSecApp.turingSec.response.user;
 
-import com.turingSecApp.turingSec.dao.entities.role.Role;
-import com.turingSecApp.turingSec.response.user.HackerResponse;
+import com.turingSecApp.turingSec.model.entities.role.Role;
 
 import java.util.Set;
 

@@ -1,7 +1,7 @@
 package com.turingSecApp.turingSec.response.company;
 
-import com.turingSecApp.turingSec.dao.entities.program.Program;
-import com.turingSecApp.turingSec.dao.entities.role.UserRoles;
+import com.turingSecApp.turingSec.model.entities.program.Program;
+import com.turingSecApp.turingSec.model.entities.role.UserRoles;
 import lombok.Data;
 
 import java.util.Set;

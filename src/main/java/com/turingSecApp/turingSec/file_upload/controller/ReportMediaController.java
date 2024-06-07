@@ -1,9 +1,7 @@
 package com.turingSecApp.turingSec.file_upload.controller;
 
-import com.turingSecApp.turingSec.dao.entities.report.Media;
-import com.turingSecApp.turingSec.file_upload.entity.ImageForHacker;
+import com.turingSecApp.turingSec.model.entities.report.Media;
 import com.turingSecApp.turingSec.file_upload.response.FileResponse;
-import com.turingSecApp.turingSec.file_upload.service.ImageForHackerService;
 import com.turingSecApp.turingSec.file_upload.service.ReportMediaService;
 import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;

@@ -1,11 +1,11 @@
 package com.turingSecApp.turingSec.service;
 
-import com.turingSecApp.turingSec.dao.entities.user.AdminEntity;
-import com.turingSecApp.turingSec.dao.entities.user.CompanyEntity;
-import com.turingSecApp.turingSec.dao.entities.role.Role;
-import com.turingSecApp.turingSec.dao.repository.AdminRepository;
-import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
-import com.turingSecApp.turingSec.dao.repository.RoleRepository;
+import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
+import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
+import com.turingSecApp.turingSec.model.entities.role.Role;
+import com.turingSecApp.turingSec.model.repository.AdminRepository;
+import com.turingSecApp.turingSec.model.repository.CompanyRepository;
+import com.turingSecApp.turingSec.model.repository.RoleRepository;
 import com.turingSecApp.turingSec.exception.custom.EmailAlreadyExistsException;
 import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.payload.company.CompanyLoginPayload;

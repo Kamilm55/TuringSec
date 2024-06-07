@@ -1,7 +1,7 @@
 package com.turingSecApp.turingSec.util.mapper;
 
-import com.turingSecApp.turingSec.dao.entities.program.Program;
-import com.turingSecApp.turingSec.dao.entities.user.CompanyEntity;
+import com.turingSecApp.turingSec.model.entities.program.Program;
+import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.response.company.CompanyDTO;
 import com.turingSecApp.turingSec.response.company.CompanyResponse;
 import org.mapstruct.Mapper;

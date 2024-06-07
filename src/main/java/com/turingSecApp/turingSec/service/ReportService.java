@@ -1,16 +1,16 @@
 package com.turingSecApp.turingSec.service;
 
-import com.turingSecApp.turingSec.dao.entities.program.Program;
-import com.turingSecApp.turingSec.dao.entities.user.CompanyEntity;
-import com.turingSecApp.turingSec.dao.entities.report.ReportCVSS;
-import com.turingSecApp.turingSec.dao.entities.report.Report;
-import com.turingSecApp.turingSec.dao.entities.report.ReportManual;
-import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
-import com.turingSecApp.turingSec.dao.repository.*;
-import com.turingSecApp.turingSec.dao.repository.program.ProgramsRepository;
-import com.turingSecApp.turingSec.dao.repository.report.ReportCVSSRepository;
-import com.turingSecApp.turingSec.dao.repository.report.ReportManualRepository;
-import com.turingSecApp.turingSec.dao.repository.report.ReportsRepository;
+import com.turingSecApp.turingSec.model.entities.program.Program;
+import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
+import com.turingSecApp.turingSec.model.entities.report.ReportCVSS;
+import com.turingSecApp.turingSec.model.entities.report.Report;
+import com.turingSecApp.turingSec.model.entities.report.ReportManual;
+import com.turingSecApp.turingSec.model.entities.user.UserEntity;
+import com.turingSecApp.turingSec.model.repository.*;
+import com.turingSecApp.turingSec.model.repository.program.ProgramsRepository;
+import com.turingSecApp.turingSec.model.repository.report.ReportCVSSRepository;
+import com.turingSecApp.turingSec.model.repository.report.ReportManualRepository;
+import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
 import com.turingSecApp.turingSec.exception.custom.PermissionDeniedException;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;

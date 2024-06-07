@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.10.xsd">
+
+    <changeSet id="insertDefaultAdmins" author="Kamil571">
+        <insert tableName="admins">
+            <column name="first_name" value="Kamil"/>
+            <column name="last_name" value="Memmedov"/>
+            <column name="username" value="admin1_username"/>
+            <column name="password" value="$2a$10$44o18UYHg91i9I1guehX.OqMS59io3p1YZa1a6z86vFvVL.90AQSq"/> <!-- Insert hashed password here -->
+            <column name="email" value="kamilmmmdov2905@gmail.com"/>
+
+        </insert>
+        <insert tableName="admins">
+            <column name="first_name" value="Admin2"/>
+            <column name="last_name" value="Admin2Last"/>
+            <column name="username" value="admin2_username"/>
+            <column name="password" value="$2a$10$8bpNYaiGcluBWWY/EHHc1uXf5Dwetyk8hvLYpqzH7YNhbJuxlsCde"/> <!-- Insert hashed password here -->
+            <column name="email" value="elnarzulfuqarli2001@gmail.com"/>
+        </insert>
+
+    </changeSet>
+
+
+</databaseChangeLog>

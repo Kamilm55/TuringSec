@@ -1,7 +1,7 @@
 package com.turingSecApp.turingSec.file_upload.repository;
 
-import com.turingSecApp.turingSec.dao.entities.report.Media;
-import com.turingSecApp.turingSec.dao.entities.report.Report;
+import com.turingSecApp.turingSec.model.entities.report.Media;
+import com.turingSecApp.turingSec.model.entities.report.Report;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

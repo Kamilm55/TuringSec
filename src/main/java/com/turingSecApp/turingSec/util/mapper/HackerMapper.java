@@ -1,6 +1,6 @@
 package com.turingSecApp.turingSec.util.mapper;
 
-import com.turingSecApp.turingSec.dao.entities.user.HackerEntity;
+import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
 import com.turingSecApp.turingSec.response.user.HackerDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

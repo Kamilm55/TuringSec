@@ -1,6 +1,6 @@
 package com.turingSecApp.turingSec.util.mapper;
 
-import com.turingSecApp.turingSec.dao.entities.report.Report;
+import com.turingSecApp.turingSec.model.entities.report.Report;
 import com.turingSecApp.turingSec.response.report.ReportDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

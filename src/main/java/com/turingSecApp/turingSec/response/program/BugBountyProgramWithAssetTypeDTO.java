@@ -1,6 +1,6 @@
 package com.turingSecApp.turingSec.response.program;
 
-import com.turingSecApp.turingSec.dao.entities.program.asset.ProgramAsset;
+import com.turingSecApp.turingSec.model.entities.program.asset.ProgramAsset;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

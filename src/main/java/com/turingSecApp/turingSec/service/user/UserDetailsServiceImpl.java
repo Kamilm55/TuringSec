@@ -1,13 +1,13 @@
 package com.turingSecApp.turingSec.service.user;
 
-import com.turingSecApp.turingSec.dao.entities.user.AdminEntity;
-import com.turingSecApp.turingSec.dao.entities.user.CompanyEntity;
-import com.turingSecApp.turingSec.dao.entities.role.Role;
-import com.turingSecApp.turingSec.dao.entities.user.UserEntity;
-import com.turingSecApp.turingSec.dao.repository.AdminRepository;
-import com.turingSecApp.turingSec.dao.repository.CompanyRepository;
-import com.turingSecApp.turingSec.dao.repository.RoleRepository;
-import com.turingSecApp.turingSec.dao.repository.UserRepository;
+import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
+import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
+import com.turingSecApp.turingSec.model.entities.role.Role;
+import com.turingSecApp.turingSec.model.entities.user.UserEntity;
+import com.turingSecApp.turingSec.model.repository.AdminRepository;
+import com.turingSecApp.turingSec.model.repository.CompanyRepository;
+import com.turingSecApp.turingSec.model.repository.RoleRepository;
+import com.turingSecApp.turingSec.model.repository.UserRepository;
 import com.turingSecApp.turingSec.exception.custom.CompanyNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

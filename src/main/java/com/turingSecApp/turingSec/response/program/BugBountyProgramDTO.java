@@ -1,6 +1,6 @@
 package com.turingSecApp.turingSec.response.program;
 
-import com.turingSecApp.turingSec.dao.entities.program.StrictEntity;
+import com.turingSecApp.turingSec.model.entities.program.StrictEntity;
 import lombok.*;
 
 import java.time.LocalDate;

@@ -1,17 +1,16 @@
 package com.turingSecApp.turingSec.helper.entityHelper.report;
 
-import com.turingSecApp.turingSec.dao.entities.report.CollaboratorEntity;
-import com.turingSecApp.turingSec.dao.entities.report.ReportCVSS;
-import com.turingSecApp.turingSec.dao.entities.report.ReportManual;
-import com.turingSecApp.turingSec.dao.entities.report.embedded.ReportAsset;
-import com.turingSecApp.turingSec.dao.entities.report.Report;
-import com.turingSecApp.turingSec.dao.repository.*;
-import com.turingSecApp.turingSec.dao.repository.program.ProgramsRepository;
-import com.turingSecApp.turingSec.dao.repository.report.ReportCVSSRepository;
-import com.turingSecApp.turingSec.dao.repository.report.ReportManualRepository;
-import com.turingSecApp.turingSec.dao.repository.report.ReportsRepository;
+import com.turingSecApp.turingSec.model.entities.report.CollaboratorEntity;
+import com.turingSecApp.turingSec.model.entities.report.ReportCVSS;
+import com.turingSecApp.turingSec.model.entities.report.ReportManual;
+import com.turingSecApp.turingSec.model.entities.report.embedded.ReportAsset;
+import com.turingSecApp.turingSec.model.entities.report.Report;
+import com.turingSecApp.turingSec.model.repository.*;
+import com.turingSecApp.turingSec.model.repository.program.ProgramsRepository;
+import com.turingSecApp.turingSec.model.repository.report.ReportCVSSRepository;
+import com.turingSecApp.turingSec.model.repository.report.ReportManualRepository;
+import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
-import com.turingSecApp.turingSec.helper.entityHelper.report.IReportEntityHelper;
 import com.turingSecApp.turingSec.payload.report.BugBountyReportPayload;
 import com.turingSecApp.turingSec.payload.report.ReportCVSSPayload;
 import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
