@@ -57,8 +57,8 @@ public class TuringSecApplication implements CommandLineRunner {
         UserEntity hacker1 = userRepository.findByEmail("kamilmmmdov2905@gmail.com");
         if(hacker1!=null) {
             System.out.println("hacker roles: " + hacker1.getRoles().toString());
+             System.out.println(hacker1.getHacker());
         }
-        System.out.println(hacker1.getHacker());
 
         CompanyEntity company = companyRepository.findByEmail("string@gmail.com");
         if(company!=null){

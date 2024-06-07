@@ -10,11 +10,13 @@ spring:
       enabled: true
   liquibase:
     change-log: classpath:liquibase/changelog-master.yml
+    enabled: false
   jpa:
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
+        ddl-auto: update
         format_sql: true
   mail:
     host: smtp.gmail.com
