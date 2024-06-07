@@ -16,7 +16,6 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
-        ddl-auto: update
         format_sql: true
   mail:
     host: smtp.gmail.com

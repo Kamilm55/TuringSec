@@ -4,6 +4,3 @@ spring:
     driverClassName: org.postgresql.Driver
     username: ${RAILWAY_DB_USER}
     password: ${RAILWAY_DB_PASSWORD}
-  jpa:
-    hibernate:
-      ddl-auto: none

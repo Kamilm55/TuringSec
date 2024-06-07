@@ -78,19 +78,19 @@ public class TuringSecApplication implements CommandLineRunner {
     }
 
     private void setHackerRoles() {
-        UserEntity user1 = userRepository.findByUsername("Username").orElseThrow(()->new UserNotFoundException("Admin not found with username:Username"));
+        UserEntity user1 = userRepository.findByUsername("Username").orElseThrow(()->new UserNotFoundException("Hacker not found with username:Username"));
         Set<Role> hackerRoles = utilService.getHackerRoles();
         user1.setRoles(hackerRoles);
         userRepository.save(user1);
 
-        UserEntity user2 = userRepository.findByUsername("Hacker_2").orElseThrow(()->new UserNotFoundException("Admin not found with username:Hacker_2"));
+        UserEntity user2 = userRepository.findByUsername("Hacker_2").orElseThrow(()->new UserNotFoundException("Hacker not found with username:Hacker_2"));
         user2.setRoles(hackerRoles);
 
         userRepository.save(user2);
     }
 
     private void insertHackerForDefaultUsers() {
-        UserEntity user1 = userRepository.findByUsername("Username").orElseThrow(()->new UserNotFoundException("Admin not found with username:Username"));
+        UserEntity user1 = userRepository.findByUsername("Username").orElseThrow(()->new UserNotFoundException("Hacker not found with username:Username"));
         UserEntity user2 = userRepository.findByUsername("Hacker_2").orElseThrow(()->new UserNotFoundException("Admin not found with username:Hacker_2"));
 
         if (user1.getHacker() == null){
