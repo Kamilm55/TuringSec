@@ -4,30 +4,62 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.10.xsd">
 
-<changeSet id="insertDefaultUsers" author="Kamil571">
-    <insert tableName="users">
-        <column name="first_name" value="Kamil"/>
-        <column name="last_name" value="Memmedov"/>
-        <column name="country" value="Azerbaijan"/>
-        <column name="username" value="Username"/>
-        <column name="password" value="$2a$10$QB/wKB3ciupj7VQk4xN42.Yr.2sfZwztkEdgsja8HkUrNz60QAvPa"/> <!-- Insert hashed password here -->
-        <column name="email" value="kamilmdov2905@gmail.com"/>
-        <column name="activation_token" value="7203c486-0069-45d4-8857-15a27ad24bee"/>
-        <column name="activated" value="true"/>
-    </insert>
-    <insert tableName="users">
-        <column name="first_name" value="Hackerrrr"/>
-        <column name="last_name" value="Lastname"/>
-        <column name="country" value="Azerbaijan"/>
-        <column name="username" value="Hacker_2"/>
-        <column name="password" value="$2a$10$h5wIdrm1oJ4lEjP0KDJCP.4QRfya.A8.nU7GRmuzbk8omSAx3LI6."/> <!-- Insert hashed password here -->
-        <column name="email" value="kamilmmmdov2905@gmail.com"/>
-        <column name="activation_token" value="7203c456-0069-45d4-8857-15a27ad24bsdad"/> <!-- No activation token for the second user -->
-        <column name="activated" value="true"/>
-    </insert>
+    <changeSet id="insertDefaultUsers" author="Kamil571">
+        <insert tableName="users">
+            <column name="id" value="1"/>
+            <column name="first_name" value="Kamil"/>
+            <column name="last_name" value="Memmedov"/>
+            <column name="country" value="Azerbaijan"/>
+            <column name="username" value="Username"/>
+            <column name="password" value="$2a$10$QB/wKB3ciupj7VQk4xN42.Yr.2sfZwztkEdgsja8HkUrNz60QAvPa"/>
+            <column name="email" value="kamilmdov2905@gmail.com"/>
+            <column name="activation_token" value="7203c486-0069-45d4-8857-15a27ad24bee"/>
+            <column name="activated" value="true"/>
+        </insert>
+        <insert tableName="users">
+            <column name="id" value="2"/>
+            <column name="first_name" value="Hackerrrr"/>
+            <column name="last_name" value="Lastname"/>
+            <column name="country" value="Azerbaijan"/>
+            <column name="username" value="Hacker_2"/>
+            <column name="password" value="$2a$10$h5wIdrm1oJ4lEjP0KDJCP.4QRfya.A8.nU7GRmuzbk8omSAx3LI6."/>
+            <column name="email" value="kamilmmmdov2905@gmail.com"/>
+            <column name="activation_token" value="7203c456-0069-45d4-8857-15a27ad24bsdad"/>
+            <column name="activated" value="true"/>
+        </insert>
+    </changeSet>
 
-
-</changeSet>
-
+    <changeSet id="insertDefaultHackers" author="Kamil571">
+        <insert tableName="hackers">
+            <column name="id" value="1"/>
+            <column name="first_name" value="Kamil"/>
+            <column name="last_name" value="Memmedov"/>
+            <column name="country" value="Azerbaijan"/>
+            <column name="website" value=""/>
+            <column name="has_background_pic" value="false"/>
+            <column name="has_profile_pic" value="false"/>
+            <column name="bio" value=""/>
+            <column name="linkedin" value=""/>
+            <column name="twitter" value=""/>
+            <column name="github" value=""/>
+            <column name="city" value=""/>
+            <column name="user_id" value="1"/>
+        </insert>
+        <insert tableName="hackers">
+            <column name="id" value="2"/>
+            <column name="first_name" value="Hackerrrr"/>
+            <column name="last_name" value="Lastname"/>
+            <column name="country" value="Azerbaijan"/>
+            <column name="website" value=""/>
+            <column name="has_background_pic" value="false"/>
+            <column name="has_profile_pic" value="false"/>
+            <column name="bio" value=""/>
+            <column name="linkedin" value=""/>
+            <column name="twitter" value=""/>
+            <column name="github" value=""/>
+            <column name="city" value=""/>
+            <column name="user_id" value="2"/>
+        </insert>
+    </changeSet>
 
 </databaseChangeLog>

@@ -1,7 +1,6 @@
 package com.turingSecApp.turingSec;
 
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
-import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.role.Role;
 import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
@@ -13,10 +12,10 @@ import com.turingSecApp.turingSec.payload.program.*;
 import com.turingSecApp.turingSec.payload.program.asset.AssetPayload;
 import com.turingSecApp.turingSec.payload.program.asset.BaseProgramAssetPayload;
 import com.turingSecApp.turingSec.payload.program.asset.ProgramAssetPayload;
-import com.turingSecApp.turingSec.service.ProgramsService;
+import com.turingSecApp.turingSec.service.ProgramService;
 import com.turingSecApp.turingSec.service.interfaces.IHackerService;
+import com.turingSecApp.turingSec.service.interfaces.IMockDataService;
 import com.turingSecApp.turingSec.service.interfaces.IUserService;
-import com.turingSecApp.turingSec.util.MockData;
 import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -42,8 +41,9 @@ public class TuringSecApplication implements CommandLineRunner {
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
     private final ProgramsRepository programsRepository;
-    private final ProgramsService programsService;
+    private final ProgramService programService;
     private final UtilService utilService;
+    private  final IMockDataService mockDataService;
     public static void main(String[] args) {
         SpringApplication.run(TuringSecApplication.class, args);
     }
@@ -51,13 +51,17 @@ public class TuringSecApplication implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args){
-        insertMockData(); // for h2 db -> in development environment
+        mockDataService.insertMockData();
+//
+//        insertMockData(); // for h2 db -> in development environment
+
+        //todo: insert all mock data without liquibase
 
 
         UserEntity hacker1 = userRepository.findByEmail("kamilmmmdov2905@gmail.com");
         if(hacker1!=null) {
             System.out.println("hacker roles: " + hacker1.getRoles().toString());
-             System.out.println(hacker1.getHacker());
+             System.out.println("hacker entity for user" + hacker1.getHacker());
         }
 
         CompanyEntity company = companyRepository.findByEmail("string@gmail.com");
@@ -70,65 +74,25 @@ public class TuringSecApplication implements CommandLineRunner {
     }
 
     private void insertMockData() {
-        setHackerRoles();
-        insertHackerForDefaultUsers();
+
+//        insertRoles();
+//        insertUsers(); // from github
+//        insertAdmins();
+//        insertCompany();
+//        insertProgram();
+
+//        setHackerRoles();
+//        insertHackerForDefaultUsers();
 
 //        setAdminRoles(); // todo: it is not working , change role structure
-        insertProgram();
+//        insertProgram();
     }
 
-    private void setHackerRoles() {
-        UserEntity user1 = userRepository.findByUsername("Username").orElseThrow(()->new UserNotFoundException("Hacker not found with username:Username"));
-        Set<Role> hackerRoles = utilService.getHackerRoles();
-        user1.setRoles(hackerRoles);
-        userRepository.save(user1);
 
-        UserEntity user2 = userRepository.findByUsername("Hacker_2").orElseThrow(()->new UserNotFoundException("Hacker not found with username:Hacker_2"));
-        user2.setRoles(hackerRoles);
-
-        userRepository.save(user2);
-    }
-
-    private void insertHackerForDefaultUsers() {
-        UserEntity user1 = userRepository.findByUsername("Username").orElseThrow(()->new UserNotFoundException("Hacker not found with username:Username"));
-        UserEntity user2 = userRepository.findByUsername("Hacker_2").orElseThrow(()->new UserNotFoundException("Admin not found with username:Hacker_2"));
-
-        if (user1.getHacker() == null){
-                createHackerSetToUserAndSave(user1);
-                createHackerSetToUserAndSave(user2);
-        }
-    }
-
-    private void createHackerSetToUserAndSave(UserEntity user2) {
-        HackerEntity hackerEntity2 = new HackerEntity();
-        hackerEntity2.setUser(user2);
-        hackerEntity2.setFirst_name(user2.getFirst_name());
-        hackerEntity2.setLast_name(user2.getLast_name());
-        hackerEntity2.setCountry(user2.getCountry());
-        hackerRepository.save(hackerEntity2);
-
-        user2.setHacker(hackerEntity2);
-        userRepository.save(user2);
-    }
-
-    private void setAdminRoles() {
-        Set<Role> adminRoles = utilService.getAdminRoles();
-
-        AdminEntity admin1 = adminRepository.findByUsername("admin1_username").orElseThrow(()->new UserNotFoundException("Admin not found with username:admin1_username"));
-        admin1.setRoles(adminRoles);
-
-
-        AdminEntity admin2 = adminRepository.findByUsername("admin2_username").orElseThrow(()->new UserNotFoundException("Admin not found with username:admin2_username"));
-        admin2.setRoles(adminRoles);
-
-        adminRepository.save(admin1);
-        adminRepository.save(admin2);
-
-    }
 
     private void insertProgram()  {
-        // Check if exists? if exists don't insert it violates non-unique condition
-        if (!MockData.mockDataNames.contains("Program1")) {
+
+
             // Create a new BugBountyProgramWithAssetTypePayload instance
             ProgramPayload programPayload = new ProgramPayload();
 
@@ -209,8 +173,8 @@ public class TuringSecApplication implements CommandLineRunner {
 
             programPayload.setAsset(programAssetPayload);
 
-            programsService.createBugBountyProgramForTest(programPayload,company);
-        }
+            programService.createBugBountyProgramForTest(programPayload,company);
+
 
 
     }

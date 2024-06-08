@@ -1,6 +1,5 @@
 package com.turingSecApp.turingSec.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.turingSecApp.turingSec.model.entities.program.Asset;
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.program.asset.ProgramAsset;
@@ -15,7 +14,6 @@ import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.helper.entityHelper.program.IProgramEntityHelper;
 import com.turingSecApp.turingSec.payload.program.ProgramPayload;
 import com.turingSecApp.turingSec.service.interfaces.IProgramsService;
-import com.turingSecApp.turingSec.util.MockData;
 import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,11 +23,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.turingSecApp.turingSec.util.MockData.addToMockDataNameToSet;
-
 @Service
 @RequiredArgsConstructor
-public class ProgramsService implements IProgramsService {
+public class ProgramService implements IProgramsService {
 
     private final ProgramsRepository programsRepository;
     private final UtilService utilService;
@@ -63,7 +59,6 @@ public class ProgramsService implements IProgramsService {
 
         Program program = convertToBugBountyProgramEntityAndSave(programPayload, company);
 
-        addToMockDataNameToSet("Program1");
         System.out.println("createdOrUpdatedProgram " + program);
     }
 

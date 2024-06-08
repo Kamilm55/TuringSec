@@ -4,19 +4,19 @@ server:
 
 spring:
   profiles:
-    active: dev
+    active: prod
   servlet:
     multipart:
       enabled: true
-  liquibase:
-    change-log: classpath:liquibase/changelog-master.yml
-    enabled: false
   jpa:
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
         format_sql: true
+  liquibase:
+    change-log: classpath:liquibase/changelog-master.yml
+    enabled: false
   mail:
     host: smtp.gmail.com
     port: 587
@@ -25,6 +25,7 @@ spring:
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
+
 logging:
   level:
     org.springframework.security: DEBUG

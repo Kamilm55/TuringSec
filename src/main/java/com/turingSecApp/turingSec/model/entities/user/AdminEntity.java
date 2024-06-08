@@ -5,6 +5,8 @@ import com.turingSecApp.turingSec.model.entities.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -31,6 +33,6 @@ public class AdminEntity {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     @JsonIgnore
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>(); // add Admin role
 
 }

@@ -7,6 +7,7 @@ import com.turingSecApp.turingSec.model.entities.role.UserRoles;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -39,7 +40,7 @@ public class CompanyEntity {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     @JsonIgnore
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonIgnore
@@ -47,7 +48,7 @@ public class CompanyEntity {
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     @JsonIgnore
-    private Set<UserRoles> userRoles;
+    private Set<UserRoles> userRoles = new HashSet<>();;
 
     public void removeProgram(Long programId) {
         if (bugBountyPrograms != null) {

@@ -18,7 +18,7 @@ import com.turingSecApp.turingSec.response.user.AuthResponse;
 import com.turingSecApp.turingSec.response.user.UserDTO;
 import com.turingSecApp.turingSec.response.user.UserHackerDTO;
 import com.turingSecApp.turingSec.service.EmailNotificationService;
-import com.turingSecApp.turingSec.service.ProgramsService;
+import com.turingSecApp.turingSec.service.ProgramService;
 import com.turingSecApp.turingSec.service.interfaces.IUserService;
 import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.UserMapper;
@@ -44,7 +44,7 @@ public class UserService implements IUserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtTokenProvider;
     private final UserDetailsService userDetailsService;
-    private final ProgramsService programsService;
+    private final ProgramService programService;
     private final UserRepository userRepository;
     private final UtilService utilService;
 
@@ -94,6 +94,10 @@ public class UserService implements IUserService {
                 .password(passwordEncoder.encode(registerPayload.getPassword()))
                 .activated(activated)// false for register method
                 .build();
+
+        if(activated){ // for inserting active hacker
+            user.setActivationToken(generateActivationToken());
+        }
 
         // Set user roles
         Set<Role> roles = utilService.getHackerRoles();
@@ -382,12 +386,12 @@ public class UserService implements IUserService {
 
     @Override
     public List<Program> getAllBugBountyPrograms() {
-        return programsService.getAllBugBountyProgramsAsEntity();
+        return programService.getAllBugBountyProgramsAsEntity();
     }
 
     @Override
     public Program getBugBountyProgramById(Long id) {
-      return programsService.getBugBountyProgramById(id);
+      return programService.getBugBountyProgramById(id);
     }
 
     @Override
