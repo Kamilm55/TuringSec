@@ -1,3 +1,7 @@
+server:
+  port: 3000
+  address: 0.0.0.0
+
 spring:
   datasource:
     url: jdbc:postgresql://${RAILWAY_DB_HOST}:${RAILWAY_DB_PORT}/${RAILWAY_DB_NAME}
@@ -5,5 +9,7 @@ spring:
     username: ${RAILWAY_DB_USER}
     password: ${RAILWAY_DB_PASSWORD}
 
-#for test local postgres: jdbc:postgresql://localhost:5433/postgres
 
+# For testing with a local PostgreSQL database
+# Uncomment and use the following line:
+# url: jdbc:postgresql://localhost:5433/postgres
