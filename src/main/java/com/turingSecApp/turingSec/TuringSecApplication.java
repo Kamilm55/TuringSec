@@ -52,10 +52,6 @@ public class TuringSecApplication implements CommandLineRunner {
     @Transactional
     public void run(String... args){
         mockDataService.insertMockData();
-//
-//        insertMockData(); // for h2 db -> in development environment
-
-        //todo: insert all mock data without liquibase
 
 
         UserEntity hacker1 = userRepository.findByEmail("kamilmmmdov2905@gmail.com");
@@ -71,112 +67,6 @@ public class TuringSecApplication implements CommandLineRunner {
 
         Optional<AdminEntity> admin1 = adminRepository.findByUsername("admin1_username");
         admin1.ifPresent(adminEntity -> System.out.println("admin roles: " + adminEntity.getRoles().toString()));
-    }
-
-    private void insertMockData() {
-
-//        insertRoles();
-//        insertUsers(); // from github
-//        insertAdmins();
-//        insertCompany();
-//        insertProgram();
-
-//        setHackerRoles();
-//        insertHackerForDefaultUsers();
-
-//        setAdminRoles(); // todo: it is not working , change role structure
-//        insertProgram();
-    }
-
-
-
-    private void insertProgram()  {
-
-
-            // Create a new BugBountyProgramWithAssetTypePayload instance
-            ProgramPayload programPayload = new ProgramPayload();
-
-            // Set data into the payload
-            programPayload.setFromDate(LocalDate.of(2024, 4, 15));
-            programPayload.setToDate(LocalDate.of(2024, 5, 15));
-            programPayload.setPolicy("Responsible Disclosure Policy");
-            programPayload.setNotes("Bug Bounty program for ExampleCompany's web assets.");
-
-
-            // Create and set prohibits payloads
-            StrictPayload strictPayload = new StrictPayload();
-            strictPayload.setProhibitAdded("Prohibits the use of automated scanners without prior permission.");
-            programPayload.setProhibits(Arrays.asList(strictPayload));
-
-            CompanyEntity company = companyRepository.findByEmail("string@gmail.com");
-
-            ProgramAssetPayload programAssetPayload = new ProgramAssetPayload();
-            BaseProgramAssetPayload lowProgramAsset = new BaseProgramAssetPayload();
-            lowProgramAsset.setPrice(45.0);
-
-            Set<AssetPayload> assets = new HashSet<>();
-            AssetPayload asset = new AssetPayload();
-            asset.setType("domain");
-            Set<String> assetNames = new HashSet<>(Set.of("x.com", "y.com"));
-            asset.setNames(assetNames);
-            assets.add(asset);
-
-
-            lowProgramAsset.setAssets(assets);
-
-
-            // Create and set payloads for Medium, High, and Critical assets
-            BaseProgramAssetPayload mediumProgramAssetPayload = new BaseProgramAssetPayload();
-            mediumProgramAssetPayload.setPrice(55.0); // Set price for Medium asset
-
-            BaseProgramAssetPayload highProgramAssetPayload = new BaseProgramAssetPayload();
-            highProgramAssetPayload.setPrice(65.0); // Set price for High asset
-
-            BaseProgramAssetPayload criticalProgramAssetPayload = new BaseProgramAssetPayload();
-            criticalProgramAssetPayload.setPrice(75.0); // Set price for Critical asset
-
-            // Populate asset sets for Medium, High, and Critical assets
-            Set<AssetPayload> highAssets = new HashSet<>();
-            Set<AssetPayload> criticalAssets = new HashSet<>();
-
-            // Populate asset sets
-            AssetPayload mediumAsset = new AssetPayload();
-            mediumAsset.setType("domain");
-            mediumAsset.setNames(new HashSet<>(Arrays.asList("z.com", "w.com"))); // Example asset names for Medium asset
-
-            AssetPayload mediumAsset2 = new AssetPayload();
-            mediumAsset2.setType("mobile");
-            mediumAsset2.setNames(new HashSet<>(Arrays.asList("mob1", "mob2"))); // Example asset names for Medium asset
-
-            Set<AssetPayload> mediumAssets = new HashSet<>(Set.of(mediumAsset,mediumAsset2)); // add 2 assets to set of assets for test
-
-            AssetPayload highAsset = new AssetPayload();
-            highAsset.setType("domain");
-            highAsset.setNames(new HashSet<>(Arrays.asList("p.com", "q.com"))); // Example asset names for High asset
-            highAssets.add(highAsset);
-
-            AssetPayload criticalAsset = new AssetPayload();
-            criticalAsset.setType("domain");
-            criticalAsset.setNames(new HashSet<>(Arrays.asList("m.com", "n.com"))); // Example asset names for Critical asset
-            criticalAssets.add(criticalAsset);
-
-            // Set asset sets to their respective payloads
-            mediumProgramAssetPayload.setAssets(mediumAssets);
-            highProgramAssetPayload.setAssets(highAssets);
-            criticalProgramAssetPayload.setAssets(criticalAssets);
-
-            // Set payloads to the main program asset payload
-            programAssetPayload.setLowAsset(lowProgramAsset);
-            programAssetPayload.setMediumAsset(mediumProgramAssetPayload);
-            programAssetPayload.setHighAsset(highProgramAssetPayload);
-            programAssetPayload.setCriticalAsset(criticalProgramAssetPayload);
-
-            programPayload.setAsset(programAssetPayload);
-
-            programService.createBugBountyProgramForTest(programPayload,company);
-
-
-
     }
 
 

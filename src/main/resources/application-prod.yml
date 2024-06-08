@@ -1,16 +1,9 @@
 spring:
   datasource:
-    url: jdbc:postgresql://monorail.proxy.rlwy.net:37193/railway
+    url: jdbc:postgresql://${RAILWAY_DB_HOST}:${RAILWAY_DB_PORT}/${RAILWAY_DB_NAME}
     driverClassName: org.postgresql.Driver
-    username: postgres
-    password: jPcVKazZwuHlZfOWaSjRmCfSfqFQfcaz
-
+    username: ${RAILWAY_DB_USER}
+    password: ${RAILWAY_DB_PASSWORD}
 
 #for test local postgres: jdbc:postgresql://localhost:5433/postgres
 
-#spring:
-#  datasource:
-#    url: jdbc:postgresql://${RAILWAY_DB_HOST}:${RAILWAY_DB_PORT}/${RAILWAY_DB_NAME}
-#    driverClassName: org.postgresql.Driver
-#    username: ${RAILWAY_DB_USER}
-#    password: ${RAILWAY_DB_PASSWORD}
