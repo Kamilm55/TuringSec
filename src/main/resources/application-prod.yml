@@ -4,10 +4,10 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5433/postgres
+    url: jdbc:postgresql://${RAILWAY_DB_HOST}:${RAILWAY_DB_PORT}/${RAILWAY_DB_NAME}
     driverClassName: org.postgresql.Driver
-    username: postgres
-    password: postgres
+    username: ${RAILWAY_DB_USER}
+    password: ${RAILWAY_DB_PASSWORD}
 
 
 # For testing with a local PostgreSQL database
