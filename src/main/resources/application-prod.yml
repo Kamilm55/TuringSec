@@ -1,6 +1,8 @@
-#server:
-#  port: 3000
-#  address: 0.0.0.0
+server:
+  port: 3000
+  address: 0.0.0.0
+
+# https://www.youtube.com/watch?v=fllt_qIlEhI => Step-by-Step Guide: Deploying Spring Boot Apps | Railway.app
 
 spring:
   datasource:
