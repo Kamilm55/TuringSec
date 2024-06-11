@@ -62,6 +62,9 @@ public class SecurityConfig {
                     // h2 console
                     request.requestMatchers("/h2-console/**").permitAll(); // permits access to all URLs starting with /h2-console/ without authentication.
 
+                    // test
+                    request.requestMatchers("/api/test").permitAll();
+
                     // Bug Bounty Program Controller
                     request
                             .requestMatchers("/api/bug-bounty-programs").hasRole("COMPANY")

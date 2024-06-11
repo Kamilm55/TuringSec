@@ -9,7 +9,6 @@ spring:
     username: ${RAILWAY_DB_USER}
     password: ${RAILWAY_DB_PASSWORD}
 
-
 # For testing with a local PostgreSQL database , first you should open docker
 # Uncomment and use the following line:
 # url: jdbc:postgresql://localhost:5433/postgres
