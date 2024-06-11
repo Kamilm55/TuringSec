@@ -1,6 +1,6 @@
-server:
-  port: 8080
-  address: 0.0.0.0
+#server:
+#  port: 8080
+#  address: 0.0.0.0
 
 spring:
   datasource:
@@ -10,6 +10,6 @@ spring:
     password: ${RAILWAY_DB_PASSWORD}
 
 
-# For testing with a local PostgreSQL database
+# For testing with a local PostgreSQL database , first you should open docker
 # Uncomment and use the following line:
 # url: jdbc:postgresql://localhost:5433/postgres
