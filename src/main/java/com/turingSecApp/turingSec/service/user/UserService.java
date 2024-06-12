@@ -20,6 +20,7 @@ import com.turingSecApp.turingSec.response.user.UserHackerDTO;
 import com.turingSecApp.turingSec.service.EmailNotificationService;
 import com.turingSecApp.turingSec.service.ProgramService;
 import com.turingSecApp.turingSec.service.interfaces.IUserService;
+import com.turingSecApp.turingSec.util.GlobalConstants;
 import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.turingSecApp.turingSec.util.GlobalConstants.ROOT_LINK;
 
 @Service
 @RequiredArgsConstructor
@@ -47,6 +47,7 @@ public class UserService implements IUserService {
     private final ProgramService programService;
     private final UserRepository userRepository;
     private final UtilService utilService;
+    private final GlobalConstants globalConstants;
 
     private final HackerRepository hackerRepository;
     private final CompanyRepository companyRepository;
@@ -349,7 +350,7 @@ public class UserService implements IUserService {
         userRepository.save(user);
 
         // Send activation email
-        String activationLink = ROOT_LINK + "/api/auth/activate?token=" + activationToken;
+        String activationLink = globalConstants.ROOT_LINK + "/api/auth/activate?token=" + activationToken;
         String subject = "Activate Your Account";
         String content = "Dear " + user.getFirst_name() + ",\n\n"
                 + "Thank you for registering with our application. Please click the link below to activate your account:\n\n"

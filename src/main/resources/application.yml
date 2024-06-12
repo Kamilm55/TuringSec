@@ -1,10 +1,9 @@
 server:
-#  port: 5000 for only development env (local)
   error.include-message: always
 
 spring:
   profiles:
-    active: dev
+    active: dev # prod || dev
   servlet:
     multipart:
       enabled: true

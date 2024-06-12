@@ -24,6 +24,7 @@ import com.turingSecApp.turingSec.response.report.ReportsByUserWithCompDTO;
 import com.turingSecApp.turingSec.response.user.UserDTO;
 import com.turingSecApp.turingSec.service.interfaces.IBugBountyReportService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
+import com.turingSecApp.turingSec.util.GlobalConstants;
 import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +39,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.turingSecApp.turingSec.util.GlobalConstants.ROOT_LINK;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +50,7 @@ public class ReportService implements IBugBountyReportService {
     private final UtilService utilService;
     private final IReportEntityHelper reportEntityHelper;
     private final ReportMediaService reportMediaService;
+    private final GlobalConstants globalConstants;
 
     private final ProgramsRepository programsRepository;
     private final UserRepository userRepository;
@@ -337,8 +338,7 @@ public class ReportService implements IBugBountyReportService {
 
 
     private String getUserImgUrl(UserDTO userDTO) {
-    // https://turingsec-production-de02.up.railway.app
-        return ROOT_LINK + "/api/background-image-for-hacker/download/" + userDTO.getHackerId();
+        return globalConstants.ROOT_LINK + "/api/background-image-for-hacker/download/" + userDTO.getHackerId();
     }
 
     private String getUsernameFromToken() {

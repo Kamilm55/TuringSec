@@ -7,6 +7,7 @@ import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.file_upload.exception.FileNotFoundException;
 import com.turingSecApp.turingSec.file_upload.repository.MediaRepository;
 import com.turingSecApp.turingSec.file_upload.response.FileResponse;
+import com.turingSecApp.turingSec.util.GlobalConstants;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -16,14 +17,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.turingSecApp.turingSec.util.GlobalConstants.ROOT_LINK;
-
 @Service
 @RequiredArgsConstructor
 public class ReportMediaService implements IFileService,IMultiFileService{
     private final MediaRepository mediaRepository;
     private final ReportsRepository reportsRepository;
     private final ModelMapper modelMapper;
+    private final GlobalConstants globalConstants;
 
     @Override
     public List<FileResponse> saveFiles(List<MultipartFile> fileList, Long reportId) throws IOException {
@@ -53,7 +53,7 @@ public class ReportMediaService implements IFileService,IMultiFileService{
         FileResponse fileResponse = mapToFileResponse(mediaRepository.save(updatedFile));
 
         // Add attachment link
-        String media_url = ROOT_LINK + "/api/report-media/download/";
+        String media_url = globalConstants.ROOT_LINK + "/api/report-media/download/";
         report.addAttachment(media_url + fileResponse.getId());
 
         reportsRepository.save(report);

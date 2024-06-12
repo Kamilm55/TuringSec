@@ -1,6 +1,8 @@
 server:
   port: ${PORT}
-#  address: 0.0.0.0
+
+app:
+  root_url: ${RAILWAY_APP_URL}
 
 spring:
   datasource:
@@ -8,6 +10,7 @@ spring:
     driverClassName: org.postgresql.Driver
     username: ${RAILWAY_DB_USER}
     password: ${RAILWAY_DB_PASSWORD}
+
 
 # For testing with a local PostgreSQL database , first you should open docker
 # Uncomment and use the following line:
