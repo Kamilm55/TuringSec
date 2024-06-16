@@ -44,6 +44,7 @@ public class ReportController {
 //    https://github.com/swagger-api/swagger-core/issues/3050
 //ResponseEntity<Void> doSomething(MyMultipartRequest request) {...}
 
+    // Handle big videos -> https://stackoverflow.com/questions/2689989/how-to-handle-maxuploadsizeexceededexception
     @PostMapping(value = "/manualReport",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public BaseResponse<ReportManual> submitManualReport(
             @RequestPart(value = "files",required = false) @Parameter(description = "File to upload") @Schema(type = "string", format = "binary") List<MultipartFile> files,
