@@ -2,6 +2,7 @@ package com.turingSecApp.turingSec.file_upload.service;
 
 import com.turingSecApp.turingSec.model.entities.report.Media;
 import com.turingSecApp.turingSec.model.entities.report.Report;
+import com.turingSecApp.turingSec.model.entities.report.embedded.AttachmentDetails;
 import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.file_upload.exception.FileNotFoundException;
@@ -53,8 +54,10 @@ public class ReportMediaService implements IFileService,IMultiFileService{
         FileResponse fileResponse = mapToFileResponse(mediaRepository.save(updatedFile));
 
         // Add attachment link
-        String media_url = globalConstants.ROOT_LINK + "/api/report-media/download/";
-        report.addAttachment(media_url + fileResponse.getId());
+        String media_url = globalConstants.ROOT_LINK + "/api/report-media/download/" + fileResponse.getId();
+        String content_type = fileResponse.getContentType();
+        AttachmentDetails attachmentDetails = new AttachmentDetails(media_url,content_type);
+        report.addAttachment(attachmentDetails);
 
         reportsRepository.save(report);
 

@@ -62,7 +62,7 @@ public class ReportService implements IBugBountyReportService {
        return bugBountyReportRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Report not found with id:" + id));
     }
     @Override
-    public /*ReportManualDTO*/ReportManual submitManualReport(List<MultipartFile> files, UserDetails userDetails, ReportManualPayload reportPayload, Long bugBountyProgramId) throws IOException {
+    public ReportManual submitManualReport(List<MultipartFile> files, UserDetails userDetails, ReportManualPayload reportPayload, Long bugBountyProgramId) throws IOException {
         // Check the authenticated hacker
         UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
 

@@ -60,7 +60,9 @@ public class ReportController {
             throw new RuntimeException(e);
         }
 
-        return BaseResponse.success(submittedBugBountyReport,"Bug bounty report submitted successfully");
+        return BaseResponse.success(
+                submittedBugBountyReport,
+                "Bug bounty report submitted successfully");
     }
 
 //    @PutMapping("/manualReport/{id}")

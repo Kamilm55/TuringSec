@@ -2,10 +2,7 @@ package com.turingSecApp.turingSec.model.entities.report;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.turingSecApp.turingSec.model.entities.program.Program;
-import com.turingSecApp.turingSec.model.entities.report.embedded.DiscoveryDetails;
-import com.turingSecApp.turingSec.model.entities.report.embedded.ProofOfConcept;
-import com.turingSecApp.turingSec.model.entities.report.embedded.ReportAsset;
-import com.turingSecApp.turingSec.model.entities.report.embedded.ReportWeakness;
+import com.turingSecApp.turingSec.model.entities.report.embedded.*;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -45,7 +42,7 @@ public class Report {
     private List<Media> media = new ArrayList<>();
 
     @ElementCollection
-    private List<String> attachments = new ArrayList<>();
+    private List<AttachmentDetails> attachments = new ArrayList<>();
 
     private String methodName;
     private Date lastActivity;
@@ -73,7 +70,7 @@ public class Report {
         collaborators.add(collaborator);
         collaborator.setBugBountyReport(this);
     }
-    public void addAttachment(String media_link) {
-        attachments.add(media_link);
+    public void addAttachment(AttachmentDetails attachmentDetails) {
+        attachments.add(attachmentDetails);
     }
 }
