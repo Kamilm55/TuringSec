@@ -21,16 +21,19 @@ public class UserUpdateRequest {
     @NotBlank(message = "Country is required")
     private String country;
 
-    @Pattern(regexp = "^(https?:\\/\\/)?(www\\.)?linkedin\\.com\\/\\w*$|^$",
-            message = "Linkedin should be in format linkedin.com/<username> or empty")
+    @Pattern(
+            regexp = "^(https?:\\/\\/)?(www\\.)?linkedin\\.com\\/in\\/[^\\/]+(\\/)?$|^$",
+            message = "Linkedin should be in the format linkedin.com/in/<username> or empty"
+    )
     private String linkedin;
+
 
     @Pattern(regexp = "^(https?:\\/\\/)?(www\\.)?github\\.com\\/\\w*$|^$",
             message = "GitHub should be in format github.com/<username> or empty")
     private String github;
 
-    @Pattern(regexp = "^(https?:\\/\\/)?(www\\.)?twitter\\.com\\/\\w*$|^$",
-            message = "Twitter should be in format twitter.com/<username> or empty")
+    @Pattern(regexp = "^(https?:\\/\\/)?(www\\.)?x\\.com\\/\\w*$|^$",
+            message = "Twitter should be in format x.com/<username> or empty")
     private String twitter;
     @NotBlank(message = "City is required")
     private String city;
