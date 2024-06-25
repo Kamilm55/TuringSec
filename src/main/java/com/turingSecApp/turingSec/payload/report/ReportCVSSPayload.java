@@ -1,6 +1,7 @@
 package com.turingSecApp.turingSec.payload.report;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -29,4 +30,7 @@ public class ReportCVSSPayload extends BugBountyReportPayload{
 
     @NotBlank(message = "Availability is required")
     private String availability;
+
+    @NotNull(message = "Cvss score is required")
+    private Double score;
 }

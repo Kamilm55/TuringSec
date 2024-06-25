@@ -19,6 +19,8 @@ public class ReportCVSS extends Report {
     private String integrity;
     private String availability;
 
+    private Double score;
+
     // Constructors, getters, and setters
 }
 

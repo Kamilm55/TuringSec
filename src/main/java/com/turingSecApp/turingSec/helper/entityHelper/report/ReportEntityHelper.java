@@ -82,6 +82,7 @@ public class ReportEntityHelper implements IReportEntityHelper {
         reportCVSS.setConfidentiality(reportPayload.getConfidentiality());
         reportCVSS.setIntegrity(reportPayload.getIntegrity());
         reportCVSS.setAvailability(reportPayload.getAvailability());
+        reportCVSS.setScore(reportPayload.getScore());
     }
     @Override
     public void setCommonReportProperties(Report report, BugBountyReportPayload reportPayload) {
