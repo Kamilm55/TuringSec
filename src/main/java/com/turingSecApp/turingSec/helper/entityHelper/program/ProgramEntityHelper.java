@@ -73,6 +73,7 @@ public class ProgramEntityHelper implements IProgramEntityHelper {
         Set<Asset> assets = new HashSet<>();
         for (AssetPayload assetPayload : assetPayloads) {
             Asset asset = new Asset();
+            asset.setPrice(assetPayload.getPrice());
             asset.setType(assetPayload.getType());
             asset.setNames(new HashSet<>(assetPayload.getNames()));
             assets.add(asset);
@@ -81,9 +82,8 @@ public class ProgramEntityHelper implements IProgramEntityHelper {
     }
 
     @Override
-    public <T extends BaseProgramAsset> T setAssetsToBaseProgramAsset(T programAsset, Set<Asset> assets, double price) {
+    public <T extends BaseProgramAsset> T setAssetsToBaseProgramAsset(T programAsset, Set<Asset> assets) {
         programAsset.setAssets(assets);
-        programAsset.setPrice(price);
 
         // Assuming there's a method to save the program asset
         return  saveBaseProgramAsset(programAsset);
@@ -146,7 +146,7 @@ public class ProgramEntityHelper implements IProgramEntityHelper {
         // Set parent in every child
         setBaseProgramAssetInEveryAsset(assets, criticalProgramAsset);
 
-        return setAssetsToBaseProgramAsset(criticalProgramAsset, assets, programPayload.getAsset().getCriticalAsset().getPrice());
+        return setAssetsToBaseProgramAsset(criticalProgramAsset, assets);
     }
 
     private void setBaseProgramAssetInEveryAsset(Set<Asset> assets, BaseProgramAsset baseProgramAsset) {
@@ -163,7 +163,7 @@ public class ProgramEntityHelper implements IProgramEntityHelper {
         // Set parent in every child
         setBaseProgramAssetInEveryAsset(assets,highProgramAsset);
 
-        return setAssetsToBaseProgramAsset(highProgramAsset, assets, programPayload.getAsset().getHighAsset().getPrice());
+        return setAssetsToBaseProgramAsset(highProgramAsset, assets);
     }
 
     @Override
@@ -173,7 +173,7 @@ public class ProgramEntityHelper implements IProgramEntityHelper {
 
         // Set parent in every child
         setBaseProgramAssetInEveryAsset(assets,mediumProgramAsset);
-        return setAssetsToBaseProgramAsset(mediumProgramAsset, assets, programPayload.getAsset().getMediumAsset().getPrice());
+        return setAssetsToBaseProgramAsset(mediumProgramAsset, assets);
     }
 
     @Override
@@ -183,6 +183,6 @@ public class ProgramEntityHelper implements IProgramEntityHelper {
 
         // Set parent in every child
         setBaseProgramAssetInEveryAsset(assets,lowProgramAsset);
-        return setAssetsToBaseProgramAsset(lowProgramAsset, assets, programPayload.getAsset().getLowAsset().getPrice());
+        return setAssetsToBaseProgramAsset(lowProgramAsset, assets);
     }
 }

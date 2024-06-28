@@ -24,6 +24,7 @@ public class Asset {
     private Long id;
 
     private String type;
+    private Double price;
 
     @ElementCollection
     private Set<String> names = new HashSet<>();

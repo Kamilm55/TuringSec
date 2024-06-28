@@ -17,10 +17,5 @@ import java.util.Set;
 @Data
 @Builder
 public class BaseProgramAssetPayload {
-
-    @NotNull(message = "Price is required")
-    @DecimalMin(value = "0.0", message = "Price must be number(double) and greater than 0 or equal to 0")
-    private Double price;
-
     private Set<@Valid AssetPayload> assets = new HashSet<>();
 }

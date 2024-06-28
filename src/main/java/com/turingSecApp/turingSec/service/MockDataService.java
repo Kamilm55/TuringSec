@@ -180,11 +180,12 @@ public class MockDataService implements IMockDataService {
 
         ProgramAssetPayload programAssetPayload = new ProgramAssetPayload();
         BaseProgramAssetPayload lowProgramAsset = new BaseProgramAssetPayload();
-        lowProgramAsset.setPrice(45.0);
+
 
         Set<AssetPayload> assets = new HashSet<>();
         AssetPayload asset = new AssetPayload();
         asset.setType("domain");
+        asset.setPrice(33.0);
         Set<String> assetNames = new HashSet<>(Set.of("x.com", "y.com"));
         asset.setNames(assetNames);
         assets.add(asset);
@@ -195,13 +196,10 @@ public class MockDataService implements IMockDataService {
 
         // Create and set payloads for Medium, High, and Critical assets
         BaseProgramAssetPayload mediumProgramAssetPayload = new BaseProgramAssetPayload();
-        mediumProgramAssetPayload.setPrice(55.0); // Set price for Medium asset
 
         BaseProgramAssetPayload highProgramAssetPayload = new BaseProgramAssetPayload();
-        highProgramAssetPayload.setPrice(65.0); // Set price for High asset
 
         BaseProgramAssetPayload criticalProgramAssetPayload = new BaseProgramAssetPayload();
-        criticalProgramAssetPayload.setPrice(75.0); // Set price for Critical asset
 
         // Populate asset sets for Medium, High, and Critical assets
         Set<AssetPayload> highAssets = new HashSet<>();
@@ -210,21 +208,25 @@ public class MockDataService implements IMockDataService {
         // Populate asset sets
         AssetPayload mediumAsset = new AssetPayload();
         mediumAsset.setType("domain");
+        mediumAsset.setPrice(68.0);
         mediumAsset.setNames(new HashSet<>(Arrays.asList("z.com", "w.com"))); // Example asset names for Medium asset
 
         AssetPayload mediumAsset2 = new AssetPayload();
         mediumAsset2.setType("mobile");
+        mediumAsset2.setPrice(85.5);
         mediumAsset2.setNames(new HashSet<>(Arrays.asList("mob1", "mob2"))); // Example asset names for Medium asset
 
         Set<AssetPayload> mediumAssets = new HashSet<>(Set.of(mediumAsset,mediumAsset2)); // add 2 assets to set of assets for test
 
         AssetPayload highAsset = new AssetPayload();
         highAsset.setType("domain");
+        highAsset.setPrice(149.8);
         highAsset.setNames(new HashSet<>(Arrays.asList("p.com", "q.com"))); // Example asset names for High asset
         highAssets.add(highAsset);
 
         AssetPayload criticalAsset = new AssetPayload();
         criticalAsset.setType("domain");
+        criticalAsset.setPrice(560.0);
         criticalAsset.setNames(new HashSet<>(Arrays.asList("m.com", "n.com"))); // Example asset names for Critical asset
         criticalAssets.add(criticalAsset);
 

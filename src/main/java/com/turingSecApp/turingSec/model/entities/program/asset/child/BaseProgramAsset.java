@@ -25,7 +25,7 @@ public class BaseProgramAsset {
     @SequenceGenerator(name = "base_program_asset_seq", sequenceName = "base_program_asset_seq", allocationSize = 1)
     private Long id;
 
-    private Double price;
+    //private Double price;
 
     @OneToMany(mappedBy = "baseProgramAsset",cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private  Set<Asset>  assets = new HashSet<>();

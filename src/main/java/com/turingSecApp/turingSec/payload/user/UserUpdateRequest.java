@@ -33,7 +33,7 @@ public class UserUpdateRequest {
     private String github;
 
     @Pattern(regexp = "^(https?:\\/\\/)?(www\\.)?x\\.com\\/\\w*$|^$",
-            message = "Twitter should be in format x.com/<username> or empty")
+            message = "Twitter should be in format x3.com/<username> or empty")
     private String twitter;
     @NotBlank(message = "City is required")
     private String city;

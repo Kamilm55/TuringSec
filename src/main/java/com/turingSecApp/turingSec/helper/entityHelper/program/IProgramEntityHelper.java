@@ -18,7 +18,7 @@ public interface IProgramEntityHelper {
 
     <T extends BaseProgramAsset> T saveBaseProgramAsset(T baseProgramAsset);
 
-    <T extends BaseProgramAsset> T setAssetsToBaseProgramAsset(T programAsset, Set<Asset> assets, double price);
+    <T extends BaseProgramAsset> T setAssetsToBaseProgramAsset(T programAsset, Set<Asset> assets);
 
     void setProgramAssetForChildren(ProgramAsset programAsset,
                                     LowProgramAsset lowProgramAsset,
