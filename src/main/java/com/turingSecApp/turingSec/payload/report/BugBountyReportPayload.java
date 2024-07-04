@@ -45,7 +45,6 @@ public class BugBountyReportPayload {
     private @Valid DiscoveryDetails discoveryDetails;
 
 
-
     // methodName is optional
     private String methodName;
 

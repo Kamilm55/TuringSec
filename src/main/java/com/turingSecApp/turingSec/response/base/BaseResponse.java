@@ -6,6 +6,9 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import java.net.URI;
 
 @Data
 @NoArgsConstructor
@@ -19,6 +22,7 @@ public class BaseResponse<T>{
     HttpStatus status;
     Meta meta;
     T data;
+
 
     @Data
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -57,6 +61,35 @@ public class BaseResponse<T>{
         }
     }
 
+   public static <T>ResponseEntity<BaseResponse<T>> noContent(){
+        BaseResponse<T> response = new BaseResponse<>().<T>builder()
+                .status(HttpStatus.NO_CONTENT)
+                .meta(Meta.of(SuccessResponseMessages.NO_CONTENT))
+                .data(null)
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+    }
+
+    public static <T> ResponseEntity<BaseResponse<T>> created(T data, URI location) {
+        BaseResponse<T> response = BaseResponse.<T>builder()
+                .status(HttpStatus.CREATED)
+                .meta(Meta.of(SuccessResponseMessages.CREATED))
+                .data(data)
+                .build();
+
+        return ResponseEntity.created(location).body(response);
+    }
+
+    public static <T> ResponseEntity<BaseResponse<T>> created(T data, URI location, String additionalMsg) {
+        BaseResponse<T> response = BaseResponse.<T>builder()
+                .status(HttpStatus.CREATED)
+                .meta(Meta.of("CREATED", additionalMsg))
+                .data(data)
+                .build();
+
+        return ResponseEntity.created(location).body(response);
+    }
 
     public static <T> BaseResponse<T> success(T data){
         return new BaseResponse<>().<T>builder()
@@ -69,7 +102,7 @@ public class BaseResponse<T>{
         return new BaseResponse<>().<T>builder()
                 .status(HttpStatus.OK)
                 .meta(Meta.of(
-                        "success",
+                        "SUCCESS",
                         additionalMsg
                 ))
                 .data(data)

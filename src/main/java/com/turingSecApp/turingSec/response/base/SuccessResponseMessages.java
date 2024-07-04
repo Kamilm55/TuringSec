@@ -11,7 +11,9 @@ import org.springframework.http.HttpStatus;
 @FieldDefaults(level = AccessLevel.PRIVATE , makeFinal = true)
 public enum SuccessResponseMessages implements ResponseMessages {
 
-    SUCCESS("success","Successful operation" ,HttpStatus.OK);
+    SUCCESS("SUCCESS","Successful operation" ,HttpStatus.OK),
+    CREATED("CREATED","Product created successfully" , HttpStatus.CREATED),
+    NO_CONTENT("NO_CONTENT", "", HttpStatus.NO_CONTENT);
 
     String key;
     String message;

@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DiscoveryDetails {
-    @NotBlank
+    // Optional
     private String timeSpend;
 }
