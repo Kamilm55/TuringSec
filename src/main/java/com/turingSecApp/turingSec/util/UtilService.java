@@ -18,6 +18,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,7 +30,6 @@ public class UtilService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
 
-    // Company service
     // Method to retrieve authenticated user(Hacker)
     public UserEntity getAuthenticatedHacker() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

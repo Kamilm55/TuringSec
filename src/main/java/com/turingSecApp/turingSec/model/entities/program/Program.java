@@ -7,10 +7,12 @@ import com.turingSecApp.turingSec.model.entities.report.Report;
 import jakarta.persistence.Entity;
 import lombok.*;
 import jakarta.persistence.*;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +25,7 @@ import java.util.List;
 @ToString(exclude = {"company", "asset", "prohibits","reports"})
 @Entity
 @Table(name = "bug_bounty_programs")
+@Slf4j
 public class Program {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,8 +34,11 @@ public class Program {
     @Column(nullable = false)
     private LocalDate fromDate;
 
-    @Column
+    @Column(nullable = false)
     private LocalDate toDate;
+
+    @Transient
+    private Long lastDays;
 
     @Column
     private String notes;
@@ -70,4 +76,24 @@ public class Program {
 
         }
     }
+
+    // Other approach --> @PostLoad in JPA -> In this example, the calculateLastDays() method will be called automatically after the entity is loaded from the database, setting the lastDays field.
+    public Long getLastDays() {
+        if (fromDate != null && toDate != null) {
+            return ChronoUnit.DAYS.between(fromDate, toDate);
+        }
+        log.error("FromDate,toDate are null");
+        return null;
+    }
+
+//    @PostLoad
+//    public void calculateLastDays() {
+//        if (fromDate != null && toDate != null) {
+//            lastDays = ChronoUnit.DAYS.between(fromDate, toDate);
+//        } else {
+//            lastDays = null;
+//        }
+//    }
+
+
 }

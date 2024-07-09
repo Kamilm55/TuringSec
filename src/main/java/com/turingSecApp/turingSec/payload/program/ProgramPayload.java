@@ -19,9 +19,9 @@ public class ProgramPayload {
 
     @NotNull(message = "From date is required")
     private LocalDate fromDate;
-
     @NotNull(message = "To date is required")
     private LocalDate toDate;
+
     @NotBlank(message = "Policy is required")
     private String policy;
     private String notes;

@@ -1,10 +1,12 @@
 package com.turingSecApp.turingSec.helper.entityHelper.report;
 
+import com.turingSecApp.turingSec.exception.custom.CollaboratorException;
 import com.turingSecApp.turingSec.model.entities.report.CollaboratorEntity;
 import com.turingSecApp.turingSec.model.entities.report.ReportCVSS;
 import com.turingSecApp.turingSec.model.entities.report.ReportManual;
 import com.turingSecApp.turingSec.model.entities.report.embedded.ReportAsset;
 import com.turingSecApp.turingSec.model.entities.report.Report;
+import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.*;
 import com.turingSecApp.turingSec.model.repository.program.ProgramsRepository;
 import com.turingSecApp.turingSec.model.repository.report.ReportCVSSRepository;
@@ -15,17 +17,21 @@ import com.turingSecApp.turingSec.payload.report.BugBountyReportPayload;
 import com.turingSecApp.turingSec.payload.report.ReportCVSSPayload;
 import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
 import com.turingSecApp.turingSec.payload.report.child.CollaboratorPayload;
+import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReportEntityHelper implements IReportEntityHelper {
     private final ReportsRepository reportsRepository;
     private final ReportManualRepository reportManualRepository;
     private final ReportCVSSRepository reportCVSSRepository;
+    private final UtilService utilService;
 
     private final CollaboratorRepository collaboratorRepository;
     private final ReportsRepository bugBountyReportRepository;
@@ -124,7 +130,17 @@ public class ReportEntityHelper implements IReportEntityHelper {
     public void saveCollaborators(List<CollaboratorPayload> collaboratorDTOs, Report report) {
         for (var collaboratorDTO : collaboratorDTOs) {
             CollaboratorEntity collaboratorEntity = new CollaboratorEntity();
-            userRepository.findByUsername(collaboratorDTO.getHackerUsername()).orElseThrow(() -> new UserNotFoundException("User with username '" + collaboratorDTO.getHackerUsername() + "' not found for collaborating"));
+            // Filter users who collaborate
+            userRepository.findByUsername(collaboratorDTO.getHackerUsername())
+                    .orElseThrow(() -> new CollaboratorException("User with username '" + collaboratorDTO.getHackerUsername() + "' not found for collaborating"));
+
+            // Current user cannot collaborate
+            UserEntity currentHacker = utilService.getAuthenticatedHacker();
+            if (currentHacker.getUsername().equals(collaboratorDTO.getHackerUsername())){
+                log.error("Collaborator cannot be current user, username of current user:%s, username of collaborator:%s ".formatted(currentHacker.getUsername(),collaboratorDTO.getHackerUsername()));
+                throw new CollaboratorException("Collaborator cannot be current user");
+            }
+
             collaboratorEntity.setCollaborationPercentage(collaboratorDTO.getCollaborationPercentage());
             collaboratorEntity.setHackerUsername(collaboratorDTO.getHackerUsername());
             collaboratorEntity.setBugBountyReport(report);

@@ -80,6 +80,13 @@ public class GlobalExceptionHandler {
                 HttpStatus.CONFLICT
         );
     }
+    @ExceptionHandler(CollaboratorException.class)
+    public ResponseEntity<ExceptionResponseMessages> handleCollaboratorException(CollaboratorException ex) {
+        return new ResponseEntity<>(
+                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.CONFLICT) ,
+                HttpStatus.CONFLICT
+        );
+    }
 
 
     @ExceptionHandler(UserNotFoundException.class)

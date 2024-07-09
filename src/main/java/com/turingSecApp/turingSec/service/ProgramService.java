@@ -19,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -61,7 +63,7 @@ public class ProgramService implements IProgramsService {
 
         System.out.println("createdOrUpdatedProgram " + program);
     }
-
+    @Transactional
     public Program convertToBugBountyProgramEntityAndSave(ProgramPayload programPayload, CompanyEntity company) {
         // Remove existing program if exists
         programEntityHelper.removeExistingProgram(company);
@@ -71,8 +73,11 @@ public class ProgramService implements IProgramsService {
 
         // Set asset and save program
         setProgramAsset(programPayload, program);
+
         return program;
     }
+
+
 
     private void setProgramAsset(ProgramPayload programPayload, Program program) {
         ProgramAsset savedProgramAsset = saveProgramAssets(programPayload);
