@@ -13,14 +13,14 @@ import com.turingSecApp.turingSec.exception.custom.PermissionDeniedException;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.helper.entityHelper.program.IProgramEntityHelper;
 import com.turingSecApp.turingSec.payload.program.ProgramPayload;
+import com.turingSecApp.turingSec.response.program.ProgramDTO;
 import com.turingSecApp.turingSec.service.interfaces.IProgramsService;
 import com.turingSecApp.turingSec.util.UtilService;
+import com.turingSecApp.turingSec.util.mapper.ProgramMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,17 +39,19 @@ public class ProgramService implements IProgramsService {
 
 
     @Override
-    public List<Program> getCompanyAllBugBountyPrograms() {
+    public List<ProgramDTO> getCompanyAllBugBountyPrograms() {
         // Retrieve the company associated with the authenticated user
         CompanyEntity company = utilService.getAuthenticatedCompany();
 
         // Get programs belonging to the company
-        return programsRepository.findByCompany(company);
+        List<Program> programList = programsRepository.findByCompany(company);
+
+        return ProgramMapper.INSTANCE.toProgramListDTO(programList);
     }
 
     @Override
     @Transactional
-    public /*BugBountyProgramDTO*/Program createBugBountyProgram(ProgramPayload programPayload) {
+    public ProgramDTO createBugBountyProgram(ProgramPayload programPayload) {
         CompanyEntity company = utilService.getAuthenticatedCompany();
 
         return convertToBugBountyProgramEntityAndSave(programPayload, company);
@@ -59,12 +61,12 @@ public class ProgramService implements IProgramsService {
     public void createBugBountyProgramForTest(ProgramPayload programPayload, CompanyEntity company){
 //        CompanyEntity company = getAuthenticatedUser();
 
-        Program program = convertToBugBountyProgramEntityAndSave(programPayload, company);
+        ProgramDTO program = convertToBugBountyProgramEntityAndSave(programPayload, company);
 
         System.out.println("createdOrUpdatedProgram " + program);
     }
     @Transactional
-    public Program convertToBugBountyProgramEntityAndSave(ProgramPayload programPayload, CompanyEntity company) {
+    public ProgramDTO convertToBugBountyProgramEntityAndSave(ProgramPayload programPayload, CompanyEntity company) {
         // Remove existing program if exists
         programEntityHelper.removeExistingProgram(company);
 
@@ -74,9 +76,9 @@ public class ProgramService implements IProgramsService {
         // Set asset and save program
         setProgramAsset(programPayload, program);
 
-        return program;
+        // Map to dto
+        return ProgramMapper.INSTANCE.toProgramDTO(program);
     }
-
 
 
     private void setProgramAsset(ProgramPayload programPayload, Program program) {
@@ -97,7 +99,7 @@ public class ProgramService implements IProgramsService {
     }
     @Override
     public Set<Asset> getAllAssets(Long id) {
-        Program program = getBugBountyProgramById(id);
+        Program program = findProgramById(id);
         Set<ProgramAsset> programAssets = programAssetRepository.findProgramAssetByProgram(program);
 
         Set<Asset> assets = new HashSet<>();
@@ -124,7 +126,7 @@ public class ProgramService implements IProgramsService {
         CompanyEntity company = utilService.getAuthenticatedCompany();
 
         // Retrieve the bug bounty program by ID
-        Program program = getBugBountyProgramById(id);
+        Program program = findProgramById(id);
 
         // Check if the authenticated company is the owner of the program
         if (program.getCompany().getId().equals(company.getId())) {
@@ -175,11 +177,19 @@ public class ProgramService implements IProgramsService {
 
 
     // Related to UserService
-    public List<Program> getAllBugBountyProgramsAsEntity() {
-        return programsRepository.findAll();
+    public List<ProgramDTO> getAllBugBountyProgramsAsEntity() {
+        List<Program> programList = programsRepository.findAll();
+
+        return ProgramMapper.INSTANCE.toProgramListDTO(programList);
     }
 
-    public Program getBugBountyProgramById(Long id) {
+    public ProgramDTO getBugBountyProgramById(Long id) {
+        Program program = findProgramById(id);
+
+        return ProgramMapper.INSTANCE.toProgramDTO(program);
+    }
+
+    private Program findProgramById(Long id) {
         return programsRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Bug Bounty Program not found with id:" + id));
     }
 }

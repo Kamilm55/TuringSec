@@ -4,11 +4,14 @@ import com.turingSecApp.turingSec.model.entities.program.Asset;
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.payload.program.ProgramPayload;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
+import com.turingSecApp.turingSec.response.program.ProgramDTO;
 import com.turingSecApp.turingSec.service.interfaces.IProgramsService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Set;
 
@@ -19,16 +22,17 @@ import java.util.Set;
 public class ProgramController {
     private final IProgramsService bugBountyProgramService;
     @GetMapping
-    public BaseResponse<List<Program>> getCompanyAllBugBountyPrograms() {
+    public BaseResponse<List<ProgramDTO>> getCompanyAllBugBountyPrograms() {
         // Get programs belonging to the company
         return BaseResponse.success(bugBountyProgramService.getCompanyAllBugBountyPrograms());
     }
 
     @PostMapping
-    public BaseResponse</*BugBountyProgramDTO*/Program> createBugBountyProgram(@RequestBody @Valid ProgramPayload programPayload) {
-//          refactorThis: CREATED RESPONSE MESSAGE 201
-//           ResponseEntity.created(URI.create("/api/bug-bounty-programs/" + createdOrUpdateProgram.getId())).body(createdOrUpdateProgram);
-        return BaseResponse.success(bugBountyProgramService.createBugBountyProgram(programPayload));
+    public ResponseEntity<BaseResponse<ProgramDTO>> createBugBountyProgram(@RequestBody @Valid ProgramPayload programPayload) {
+        ProgramDTO programDTO = bugBountyProgramService.createBugBountyProgram(programPayload);
+        URI uri = URI.create("/api/bug-bounty-programs/" + programDTO.getId());
+
+        return BaseResponse.created(programDTO,uri);
     }
     @GetMapping("/{id}/assets") // for report dropdown
     public BaseResponse<Set<Asset>> getAllAssets(@PathVariable Long id) {
@@ -36,10 +40,9 @@ public class ProgramController {
     }
 
     @DeleteMapping("/{id}")
-    public BaseResponse<Void> deleteBugBountyProgram(@PathVariable Long id) {
-       bugBountyProgramService.deleteBugBountyProgram(id);
-//        refactorThis: NOCONTENT RESPONSE MESSAGE 204
-        return  BaseResponse.success(null,"Program deleted successfully");
+    public ResponseEntity<BaseResponse<Void>> deleteBugBountyProgram(@PathVariable Long id) {
+        bugBountyProgramService.deleteBugBountyProgram(id);
+        return  BaseResponse.noContent();
     }
 
 }

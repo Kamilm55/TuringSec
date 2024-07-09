@@ -14,6 +14,7 @@ import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.payload.user.*;
+import com.turingSecApp.turingSec.response.program.ProgramDTO;
 import com.turingSecApp.turingSec.response.user.AuthResponse;
 import com.turingSecApp.turingSec.response.user.UserDTO;
 import com.turingSecApp.turingSec.response.user.UserHackerDTO;
@@ -386,12 +387,12 @@ public class UserService implements IUserService {
     /////////////////////////////////Programs\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
     @Override
-    public List<Program> getAllBugBountyPrograms() {
+    public List<ProgramDTO> getAllBugBountyPrograms() {
         return programService.getAllBugBountyProgramsAsEntity();
     }
 
     @Override
-    public Program getBugBountyProgramById(Long id) {
+    public ProgramDTO getBugBountyProgramById(Long id) {
       return programService.getBugBountyProgramById(id);
     }
 

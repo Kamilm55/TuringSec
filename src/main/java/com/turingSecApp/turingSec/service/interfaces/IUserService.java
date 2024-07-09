@@ -3,6 +3,7 @@ package com.turingSecApp.turingSec.service.interfaces;
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.payload.user.*;
+import com.turingSecApp.turingSec.response.program.ProgramDTO;
 import com.turingSecApp.turingSec.response.user.AuthResponse;
 import com.turingSecApp.turingSec.response.user.UserDTO;
 import com.turingSecApp.turingSec.response.user.UserHackerDTO;
@@ -23,8 +24,8 @@ public interface IUserService {
     void deleteUser();
 
     // Programs for users
-    List<Program> getAllBugBountyPrograms();
-    Program getBugBountyProgramById(Long id);
+    List<ProgramDTO> getAllBugBountyPrograms();
+    ProgramDTO getBugBountyProgramById(Long id);
     UserEntity findUserByUsername(String username);
 
     String generateNewToken(UserHackerDTO updateProfile);
