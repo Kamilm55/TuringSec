@@ -24,7 +24,6 @@ public interface ProgramMapper {
     @AfterMapping
     default void setElementCollections(Program programEntity, @MappingTarget ProgramDTO programDTO) {
         System.out.println(programEntity.getInScope());
-        System.out.println("works");
 
         programDTO.setInScope(programEntity.getInScope());
         programDTO.setOutOfScope(programEntity.getOutOfScope());

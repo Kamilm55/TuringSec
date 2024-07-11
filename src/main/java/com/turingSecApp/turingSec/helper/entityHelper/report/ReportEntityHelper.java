@@ -101,7 +101,7 @@ public class ReportEntityHelper implements IReportEntityHelper {
 //        report.setSeverity(reportPayload.getSeverity());
         report.setLastActivity(reportPayload.getLastActivity());
         report.setRewardsStatus(reportPayload.getRewardsStatus());
-        report.setOwnPercentage(reportPayload.getOwnPercentage());
+        //report.setOwnPercentage(reportPayload.getOwnPercentage());
         report.setReportTemplate(reportPayload.getReportTemplate());
         report.setMethodName(reportPayload.getMethodName());
     }
@@ -134,12 +134,12 @@ public class ReportEntityHelper implements IReportEntityHelper {
             userRepository.findByUsername(collaboratorDTO.getHackerUsername())
                     .orElseThrow(() -> new CollaboratorException("User with username '" + collaboratorDTO.getHackerUsername() + "' not found for collaborating"));
 
-            // Current user cannot collaborate
-            UserEntity currentHacker = utilService.getAuthenticatedHacker();
-            if (currentHacker.getUsername().equals(collaboratorDTO.getHackerUsername())){
-                log.error("Collaborator cannot be current user, username of current user:%s, username of collaborator:%s ".formatted(currentHacker.getUsername(),collaboratorDTO.getHackerUsername()));
-                throw new CollaboratorException("Collaborator cannot be current user");
-            }
+            // Current user cannot collaborate -> business logic changed
+//            UserEntity currentHacker = utilService.getAuthenticatedHacker();
+//            if (currentHacker.getUsername().equals(collaboratorDTO.getHackerUsername())){
+//                log.error("Collaborator cannot be current user, username of current user:%s, username of collaborator:%s ".formatted(currentHacker.getUsername(),collaboratorDTO.getHackerUsername()));
+//                throw new CollaboratorException("Collaborator cannot be current user");
+//            }
 
             collaboratorEntity.setCollaborationPercentage(collaboratorDTO.getCollaborationPercentage());
             collaboratorEntity.setHackerUsername(collaboratorDTO.getHackerUsername());

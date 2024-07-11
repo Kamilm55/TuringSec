@@ -60,7 +60,7 @@ public class Report {
     @JsonIgnore
     private Program bugBountyProgram;
 
-    private Double ownPercentage = 100.0; // Default own percentage is 100%
+ //   private Double ownPercentage = 100.0; // Default own percentage is 100%
 
     @OneToMany(mappedBy = "bugBountyReport", cascade = CascadeType.ALL/*,orphanRemoval = true*/)
     private List<CollaboratorEntity> collaborators = new ArrayList<>();

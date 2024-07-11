@@ -29,8 +29,8 @@ public class BugBountyReportPayload {
     @NotBlank(message = "Report template is required")
     private String reportTemplate;
 
-    @NotNull(message = "Own percentage of work is required")
-    private Double ownPercentage = 100.0; // Default own percentage is 100%
+//    @NotNull(message = "Own percentage of work is required")
+//    private Double ownPercentage = 100.0; // Default own percentage is 100%
     private List<CollaboratorPayload> collaboratorPayload = new ArrayList<>();
 
     @NotNull(message = "Asset is required")
