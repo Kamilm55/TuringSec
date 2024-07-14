@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.service;
+package com.turingSecApp.turingSec.service.report;
 
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
@@ -7,7 +7,7 @@ import com.turingSecApp.turingSec.model.entities.report.Report;
 import com.turingSecApp.turingSec.model.entities.report.ReportManual;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.*;
-import com.turingSecApp.turingSec.model.repository.program.ProgramsRepository;
+import com.turingSecApp.turingSec.model.repository.program.ProgramRepository;
 import com.turingSecApp.turingSec.model.repository.report.ReportCVSSRepository;
 import com.turingSecApp.turingSec.model.repository.report.ReportManualRepository;
 import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
@@ -52,7 +52,7 @@ public class ReportService implements IBugBountyReportService {
     private final ReportMediaService reportMediaService;
     private final GlobalConstants globalConstants;
 
-    private final ProgramsRepository programsRepository;
+    private final ProgramRepository programRepository;
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
     private final CollaboratorRepository collaboratorRepository;
@@ -67,7 +67,7 @@ public class ReportService implements IBugBountyReportService {
         UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
 
         // Fetch the BugBountyProgramEntity from the repository
-        Program program = programsRepository.findById(bugBountyProgramId)
+        Program program = programRepository.findById(bugBountyProgramId)
                 .orElseThrow(() -> new ResourceNotFoundException("Program not found with id:" + bugBountyProgramId));
 
         // Create a new report entity -> for basic type fields or embeddable
@@ -138,7 +138,7 @@ public class ReportService implements IBugBountyReportService {
         UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
 
         // Fetch the BugBountyProgramEntity from the repository
-        Program program = programsRepository.findById(bugBountyProgramId)
+        Program program = programRepository.findById(bugBountyProgramId)
                 .orElseThrow(() -> new ResourceNotFoundException("Program not found with id:" + bugBountyProgramId));
 
         // Create a new report entity -> for basic type fields or embeddable
@@ -212,7 +212,7 @@ public class ReportService implements IBugBountyReportService {
         checkReportOwnership(report);
 
         // Find related program then remove from list<ReportEntity>, then you can delete
-        Program program = programsRepository.findByReportsContains(report).orElseThrow(() -> new ResourceNotFoundException("Report not found with report:" + report));
+        Program program = programRepository.findByReportsContains(report).orElseThrow(() -> new ResourceNotFoundException("Report not found with report:" + report));
         program.removeReport(report.getId());
 
         Report updatedReport = reportEntityHelper.deleteReportChildEntities(report);
@@ -354,7 +354,7 @@ public class ReportService implements IBugBountyReportService {
     public void submitBugBountyReportForTest(BugBountyReportPayload reportPayload, Long bugBountyProgramId ,Long userId) {
 
         // Fetch the BugBountyProgramEntity from the repository
-        Program program = programsRepository.findById(bugBountyProgramId)
+        Program program = programRepository.findById(bugBountyProgramId)
                 .orElseThrow(() -> new ResourceNotFoundException("Program not found with id:" + bugBountyProgramId));
 
         // Create a new report entity

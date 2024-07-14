@@ -6,13 +6,11 @@ import com.turingSecApp.turingSec.model.entities.report.ReportCVSS;
 import com.turingSecApp.turingSec.model.entities.report.ReportManual;
 import com.turingSecApp.turingSec.model.entities.report.embedded.ReportAsset;
 import com.turingSecApp.turingSec.model.entities.report.Report;
-import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.*;
-import com.turingSecApp.turingSec.model.repository.program.ProgramsRepository;
+import com.turingSecApp.turingSec.model.repository.program.ProgramRepository;
 import com.turingSecApp.turingSec.model.repository.report.ReportCVSSRepository;
 import com.turingSecApp.turingSec.model.repository.report.ReportManualRepository;
 import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
-import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.payload.report.BugBountyReportPayload;
 import com.turingSecApp.turingSec.payload.report.ReportCVSSPayload;
 import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
@@ -36,7 +34,7 @@ public class ReportEntityHelper implements IReportEntityHelper {
     private final CollaboratorRepository collaboratorRepository;
     private final ReportsRepository bugBountyReportRepository;
     private final UserRepository userRepository;
-    private final ProgramsRepository programsRepository;
+    private final ProgramRepository programRepository;
 
     //todo: delete auto , not manually
     public Report deleteReportChildEntities(Report report) {

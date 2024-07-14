@@ -57,7 +57,7 @@ public class Program {
     private List<Report> reports = new ArrayList<>();
 
     @OneToMany(mappedBy = "bugBountyProgramForStrict", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StrictEntity> prohibits = new ArrayList<>();
+    private List<Prohibit> prohibits = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "company_id")

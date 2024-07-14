@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ProgramsRepository extends JpaRepository<Program,Long> {
+public interface ProgramRepository extends JpaRepository<Program,Long> {
     List<Program> findByCompany(CompanyEntity company);
     Optional<Program> findByReportsContains(Report reports);
 

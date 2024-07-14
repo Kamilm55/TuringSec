@@ -1,14 +1,8 @@
 package com.turingSecApp.turingSec.response.program;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.turingSecApp.turingSec.model.entities.program.StrictEntity;
+import com.turingSecApp.turingSec.model.entities.program.Prohibit;
 import com.turingSecApp.turingSec.model.entities.program.asset.ProgramAsset;
-import com.turingSecApp.turingSec.model.entities.report.Report;
-import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
-import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -37,7 +31,7 @@ public class ProgramDTO {
     private List<String> inScope = new ArrayList<>();
 
     private List<String> outOfScope = new ArrayList<>();
-    private List<StrictEntity> prohibits = new ArrayList<>();
+    private List<Prohibit> prohibits = new ArrayList<>();
 
     private ProgramAsset asset;
 }

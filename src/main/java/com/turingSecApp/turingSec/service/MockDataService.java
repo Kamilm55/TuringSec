@@ -1,20 +1,20 @@
 package com.turingSecApp.turingSec.service;
 
 import com.turingSecApp.turingSec.exception.custom.CompanyNotFoundException;
-import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.model.entities.MockData;
 import com.turingSecApp.turingSec.model.entities.role.Role;
 import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.repository.*;
 import com.turingSecApp.turingSec.payload.program.ProgramPayload;
-import com.turingSecApp.turingSec.payload.program.StrictPayload;
+import com.turingSecApp.turingSec.payload.program.ProhibitPayload;
 import com.turingSecApp.turingSec.payload.program.asset.AssetPayload;
 import com.turingSecApp.turingSec.payload.program.asset.BaseProgramAssetPayload;
 import com.turingSecApp.turingSec.payload.program.asset.ProgramAssetPayload;
 import com.turingSecApp.turingSec.payload.user.RegisterPayload;
 import com.turingSecApp.turingSec.service.interfaces.IMockDataService;
 import com.turingSecApp.turingSec.service.interfaces.IUserService;
+import com.turingSecApp.turingSec.service.program.ProgramService;
 import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -172,9 +172,9 @@ public class MockDataService implements IMockDataService {
 
 
         // Create and set prohibits payloads
-        StrictPayload strictPayload = new StrictPayload();
-        strictPayload.setProhibitAdded("Prohibits the use of automated scanners without prior permission.");
-        programPayload.setProhibits(Arrays.asList(strictPayload));
+        ProhibitPayload prohibitPayload = new ProhibitPayload();
+        prohibitPayload.setProhibitAdded("Prohibits the use of automated scanners without prior permission.");
+        programPayload.setProhibits(Arrays.asList(prohibitPayload));
 
         CompanyEntity company = companyRepository.findByEmail("string@gmail.com");
 

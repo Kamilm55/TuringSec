@@ -9,6 +9,7 @@ import com.turingSecApp.turingSec.model.repository.CompanyRepository;
 import com.turingSecApp.turingSec.model.repository.RoleRepository;
 import com.turingSecApp.turingSec.model.repository.UserRepository;
 import com.turingSecApp.turingSec.exception.custom.*;
+import com.turingSecApp.turingSec.model.repository.program.ProgramRepository;
 import com.turingSecApp.turingSec.response.program.BugBountyProgramWithAssetTypeDTO;
 import com.turingSecApp.turingSec.response.user.AuthResponse;
 import com.turingSecApp.turingSec.util.mapper.UserMapper;
@@ -18,8 +19,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -27,6 +26,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UtilService {
     private final CompanyRepository companyRepository;
+    private final ProgramRepository programRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
 
@@ -134,6 +134,7 @@ public class UtilService {
         }
         return hackerEntity.getId();
     }
-
-
+    public Program findProgramById(Long id) {
+        return programRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Bug Bounty Program not found with id:" + id));
+    }
 }

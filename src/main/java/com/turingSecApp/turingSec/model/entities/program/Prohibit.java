@@ -12,7 +12,7 @@ import lombok.*;
 @ToString(exclude = "bugBountyProgramForStrict")
 @Entity
 @Table(name = "strict_prohibits")
-public class StrictEntity {
+public class Prohibit {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

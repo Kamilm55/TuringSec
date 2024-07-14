@@ -1,18 +1,11 @@
 package com.turingSecApp.turingSec;
 
-import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
-import com.turingSecApp.turingSec.model.entities.role.Role;
 import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
-import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.*;
-import com.turingSecApp.turingSec.model.repository.program.ProgramsRepository;
-import com.turingSecApp.turingSec.payload.program.*;
-import com.turingSecApp.turingSec.payload.program.asset.AssetPayload;
-import com.turingSecApp.turingSec.payload.program.asset.BaseProgramAssetPayload;
-import com.turingSecApp.turingSec.payload.program.asset.ProgramAssetPayload;
-import com.turingSecApp.turingSec.service.ProgramService;
+import com.turingSecApp.turingSec.model.repository.program.ProgramRepository;
+import com.turingSecApp.turingSec.service.program.ProgramService;
 import com.turingSecApp.turingSec.service.interfaces.IHackerService;
 import com.turingSecApp.turingSec.service.interfaces.IMockDataService;
 import com.turingSecApp.turingSec.service.interfaces.IUserService;
@@ -25,7 +18,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.*;
 
 @SpringBootApplication
@@ -40,7 +32,7 @@ public class TuringSecApplication implements CommandLineRunner {
     private final UserRepository userRepository;
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
-    private final ProgramsRepository programsRepository;
+    private final ProgramRepository programRepository;
     private final ProgramService programService;
     private final UtilService utilService;
     private  final IMockDataService mockDataService;

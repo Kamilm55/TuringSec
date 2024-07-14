@@ -25,7 +25,7 @@ public class ProgramPayload {
     @NotBlank(message = "Policy is required")
     private String policy;
     private String notes;
-    private List<@Valid StrictPayload> prohibits = new ArrayList<>();
+    private List<@Valid ProhibitPayload> prohibits = new ArrayList<>();
 
     private List<String> inScope = new ArrayList<>();
 

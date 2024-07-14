@@ -1,24 +1,21 @@
 package com.turingSecApp.turingSec.helper.entityHelper.program;
 
-import com.turingSecApp.turingSec.model.entities.program.Asset;
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.program.asset.ProgramAsset;
-import com.turingSecApp.turingSec.model.entities.program.asset.child.*;
+import com.turingSecApp.turingSec.model.entities.program.asset.child.CriticalProgramAsset;
+import com.turingSecApp.turingSec.model.entities.program.asset.child.HighProgramAsset;
+import com.turingSecApp.turingSec.model.entities.program.asset.child.LowProgramAsset;
+import com.turingSecApp.turingSec.model.entities.program.asset.child.MediumProgramAsset;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.payload.program.ProgramPayload;
-import com.turingSecApp.turingSec.payload.program.asset.AssetPayload;
-
-import java.util.Set;
 
 public interface IProgramEntityHelper {
 
     void removeExistingProgram(CompanyEntity company);
-
     Program createProgramEntity(ProgramPayload programPayload, CompanyEntity company);
+    void setProhibits(ProgramPayload programPayload, Program program);
+    void setProgramAsset(ProgramPayload programPayload, Program program);
 
-    <T extends BaseProgramAsset> T saveBaseProgramAsset(T baseProgramAsset);
-
-    <T extends BaseProgramAsset> T setAssetsToBaseProgramAsset(T programAsset, Set<Asset> assets);
 
     void setProgramAssetForChildren(ProgramAsset programAsset,
                                     LowProgramAsset lowProgramAsset,
@@ -32,12 +29,4 @@ public interface IProgramEntityHelper {
             HighProgramAsset highProgramAsset,
             CriticalProgramAsset criticalProgramAsset);
 
-    void addAssetsToSet(Set<Asset> assets, BaseProgramAsset baseProgramAsset);
-
-    Set<Asset> convertAssetPayloadsToAssets(Set<AssetPayload> assets);
-    //
-    LowProgramAsset getLowProgramAsset(ProgramPayload programPayload);
-    MediumProgramAsset getMediumProgramAsset(ProgramPayload programPayload);
-    HighProgramAsset getHighProgramAsset(ProgramPayload programPayload);
-    CriticalProgramAsset getCriticalProgramAsset(ProgramPayload programPayload);
 }

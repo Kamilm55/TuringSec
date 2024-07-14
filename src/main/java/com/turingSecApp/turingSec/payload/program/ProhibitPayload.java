@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class StrictPayload {
+public class ProhibitPayload {
 
     @NotBlank(message = "Prohibit Added is required")
     private String prohibitAdded;
