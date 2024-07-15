@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -70,6 +71,13 @@ public class UtilService {
         return roles;
     }
 
+    public String generateActivationToken() {
+        // You can implement your own token generation logic here
+        // This could involve creating a unique token, saving it in the database,
+        // and associating it with the user for verification during activation.
+        // For simplicity, you can use a library like java.util.UUID.randomUUID().
+        return UUID.randomUUID().toString();
+    }
     // Method to build authentication response
     public AuthResponse buildAuthResponse(String token, UserEntity user, HackerEntity hacker) {
         return AuthResponse.builder()
@@ -136,5 +144,9 @@ public class UtilService {
     }
     public Program findProgramById(Long id) {
         return programRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Bug Bounty Program not found with id:" + id));
+    }
+
+    public UserEntity findUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User not found with this id: " + userId));
     }
 }

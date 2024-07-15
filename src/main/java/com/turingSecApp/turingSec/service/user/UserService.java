@@ -40,91 +40,27 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserService implements IUserService {
-    private final EmailNotificationService EmailNotificationService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtTokenProvider;
     private final UserDetailsService userDetailsService;
     private final ProgramService programService;
     private final UserRepository userRepository;
     private final UtilService utilService;
-    private final GlobalConstants globalConstants;
 
     private final HackerRepository hackerRepository;
     private final CompanyRepository companyRepository;
+
+
+    private final UserManagementService userManagementService;
     @Override
     public AuthResponse registerHacker(RegisterPayload registerPayload) {
-        // Ensure the user doesn't exist
-        checkUserDoesNotExist(registerPayload);
-
-        // Create and save the user entity
-        UserEntity user = createUserEntity(registerPayload , false);
-
-        // Create and save the hacker entity
-        HackerEntity hackerEntity = createAndSaveHackerEntity(user);
-
-        // Send activation email //todo: change to async event (kafka)
-        sendActivationEmail(user);
-
-        // Generate token for the registered user
-        String token = generateTokenForUser(user);
-
-        // Retrieve the user and hacker details from the database
-        UserEntity userById = findUserById(user.getId());
-        HackerEntity hackerFromDB = findHackerByUser(userById);
-
-        // Build and return the authentication response
-        return utilService.buildAuthResponse(token, userById, hackerFromDB);
+        return userManagementService.registerHacker(registerPayload);
     }
 
-    // Method to check if user already exists with the provided username or email
-    private void checkUserDoesNotExist(RegisterPayload registerPayload) {
-        utilService.isUserExistWithUsername(registerPayload.getUsername());
-        utilService.isUserExistWithEmail(registerPayload.getEmail());
-    }
-
-    // Method to create and save the user entity
-    private UserEntity createUserEntity(RegisterPayload registerPayload , boolean activated) {
-        UserEntity user = UserEntity.builder()
-                .first_name(registerPayload.getFirstName())
-                .last_name(registerPayload.getLastName())
-                .country(registerPayload.getCountry())
-                .username(registerPayload.getUsername())
-                .email(registerPayload.getEmail())
-                .password(passwordEncoder.encode(registerPayload.getPassword()))
-                .activated(activated)// false for register method
-                .build();
-
-        if(activated){ // for inserting active hacker
-            user.setActivationToken(generateActivationToken());
-        }
-
-        // Set user roles
-        Set<Role> roles = utilService.getHackerRoles();
-        user.setRoles(roles);
-
-        // Save the user
-        return userRepository.save(user);
-    }
-
-
-    // Method to create and save the hacker entity
-    private HackerEntity createAndSaveHackerEntity(UserEntity user) {
-        //Note: To fetch user explicitly to avoid save process instead it updates because there is user entity with actual id not null
-        UserEntity fetchedUser = userRepository.findByUsername(user.getUsername()).orElseThrow(()-> new UserNotFoundException("User with username " + user.getUsername() + " not found"));
-
-
-        HackerEntity hackerEntity = new HackerEntity();
-        hackerEntity.setUser(fetchedUser);
-        hackerEntity.setFirst_name(fetchedUser.getFirst_name());
-        hackerEntity.setLast_name(fetchedUser.getLast_name());
-        hackerEntity.setCountry(fetchedUser.getCountry());
-        hackerRepository.save(hackerEntity);
-
-        // Accomplish associations between user and hacker
-        fetchedUser.setHacker(hackerEntity);
-        userRepository.save(fetchedUser);
-
-        return hackerEntity;
+    @Override
+    @Transactional // A collection with cascade="all-delete-orphan" was no longer referenced by the owning entity instance: com.turingSecApp.turingSec.dao.entities.user.UserEntity.reports
+    public void insertActiveHacker(RegisterPayload registerPayload) {
+        userManagementService.insertActiveHacker(registerPayload);
     }
 
     // Method to generate authentication token for the user
@@ -140,27 +76,6 @@ public class UserService implements IUserService {
 
     ///////////\\\\\\\\\\\
 
-    @Override
-    @Transactional // A collection with cascade="all-delete-orphan" was no longer referenced by the owning entity instance: com.turingSecApp.turingSec.dao.entities.user.UserEntity.reports
-    public void insertActiveHacker(RegisterPayload registerPayload) {
-        // Ensure the user doesn't exist
-        checkUserDoesNotExist(registerPayload);
-
-        // Create and Save the user entity
-        UserEntity user = createUserEntity(registerPayload, true);
-
-        // Create and save the hacker entity
-        HackerEntity hackerEntity = createAndSaveHackerEntity(user);
-
-        // Accomplish associations between user and hacker
-        associateUserWithHacker(user, hackerEntity);
-    }
-
-    // Method to accomplish associations between user and hacker
-    private void associateUserWithHacker(UserEntity user, HackerEntity hackerEntity) {
-        user.setHacker(hackerEntity);
-        userRepository.save(user);
-    }
 
 
     /////////////////////\\\\\\\\\\\\\\\\
@@ -179,6 +94,8 @@ public class UserService implements IUserService {
 
         return false;
     }
+
+
     @Override
     public AuthResponse loginUser(LoginRequest loginRequest) {
         // Find user by email
@@ -341,30 +258,6 @@ public class UserService implements IUserService {
     }
     /////////////
 
-    public void sendActivationEmail(UserEntity user) {
-        // Generate activation token and save it to the user entity
-        String activationToken = generateActivationToken();
-        user.setActivationToken(activationToken);
-        userRepository.save(user);
-
-        // Send activation email
-        String activationLink = globalConstants.ROOT_LINK + "/api/auth/activate?token=" + activationToken;
-        String subject = "Activate Your Account";
-        String content = "Dear " + user.getFirst_name() + ",\n\n"
-                + "Thank you for registering with our application. Please click the link below to activate your account:\n\n"
-                + activationLink + "\n\n"
-                + "Best regards,\nThe Application Team";
-
-        EmailNotificationService.sendEmail(user.getEmail(), subject, content);
-    }
-
-    private String generateActivationToken() {
-        // You can implement your own token generation logic here
-        // This could involve creating a unique token, saving it in the database,
-        // and associating it with the user for verification during activation.
-        // For simplicity, you can use a library like java.util.UUID.randomUUID().
-        return UUID.randomUUID().toString();
-    }
 
     @Override
     @Transactional// This annotation ensures that the method is executed within a transactional context, allowing database operations like deletion to be performed reliably.
@@ -379,7 +272,7 @@ public class UserService implements IUserService {
         userRepository.delete(user);
 
         // Clear the authorization header
-//        request.removeAttribute("Authorization"); //Not Working , do this (clear auth header) in client side
+//        request.removeAttribute("Authorization"); // Do this (clear auth header) in client side
     }
     /////////////////////////////////Programs\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
