@@ -51,8 +51,6 @@ public class UserService implements IUserService {
 
     private final HackerRepository hackerRepository;
     private final CompanyRepository companyRepository;
-    private final RoleRepository roleRepository;
-    private final ProgramRepository programRepository;
     @Override
     public AuthResponse registerHacker(RegisterPayload registerPayload) {
         // Ensure the user doesn't exist
