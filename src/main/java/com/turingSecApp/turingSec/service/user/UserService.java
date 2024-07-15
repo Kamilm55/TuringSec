@@ -53,30 +53,19 @@ public class UserService implements IUserService {
     private final CompanyRepository companyRepository;
     private final RoleRepository roleRepository;
     private final ProgramRepository programRepository;
+
+    private final UserManagementService userManagementService;
     @Override
     public AuthResponse registerHacker(RegisterPayload registerPayload) {
-        // Ensure the user doesn't exist
-        checkUserDoesNotExist(registerPayload);
-
-        // Create and save the user entity
-        UserEntity user = createUserEntity(registerPayload , false);
-
-        // Create and save the hacker entity
-        HackerEntity hackerEntity = createAndSaveHackerEntity(user);
-
-        // Send activation email //todo: change to async event (kafka)
-        sendActivationEmail(user);
-
-        // Generate token for the registered user
-        String token = generateTokenForUser(user);
-
-        // Retrieve the user and hacker details from the database
-        UserEntity userById = findUserById(user.getId());
-        HackerEntity hackerFromDB = findHackerByUser(userById);
-
-        // Build and return the authentication response
-        return utilService.buildAuthResponse(token, userById, hackerFromDB);
+        return userManagementService.registerHacker(registerPayload);
     }
+
+    @Override
+    @Transactional // A collection with cascade="all-delete-orphan" was no longer referenced by the owning entity instance: com.turingSecApp.turingSec.dao.entities.user.UserEntity.reports
+    public void insertActiveHacker(RegisterPayload registerPayload) {
+        userManagementService.insertActiveHacker(registerPayload);
+    }
+
 
     // Method to check if user already exists with the provided username or email
     private void checkUserDoesNotExist(RegisterPayload registerPayload) {
@@ -142,21 +131,7 @@ public class UserService implements IUserService {
 
     ///////////\\\\\\\\\\\
 
-    @Override
-    @Transactional // A collection with cascade="all-delete-orphan" was no longer referenced by the owning entity instance: com.turingSecApp.turingSec.dao.entities.user.UserEntity.reports
-    public void insertActiveHacker(RegisterPayload registerPayload) {
-        // Ensure the user doesn't exist
-        checkUserDoesNotExist(registerPayload);
 
-        // Create and Save the user entity
-        UserEntity user = createUserEntity(registerPayload, true);
-
-        // Create and save the hacker entity
-        HackerEntity hackerEntity = createAndSaveHackerEntity(user);
-
-        // Accomplish associations between user and hacker
-        associateUserWithHacker(user, hackerEntity);
-    }
 
     // Method to accomplish associations between user and hacker
     private void associateUserWithHacker(UserEntity user, HackerEntity hackerEntity) {
@@ -181,6 +156,8 @@ public class UserService implements IUserService {
 
         return false;
     }
+
+
     @Override
     public AuthResponse loginUser(LoginRequest loginRequest) {
         // Find user by email

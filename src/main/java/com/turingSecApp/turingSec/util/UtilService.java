@@ -137,4 +137,8 @@ public class UtilService {
     public Program findProgramById(Long id) {
         return programRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Bug Bounty Program not found with id:" + id));
     }
+
+    public UserEntity findUserById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User not found with this id: " + userId));
+    }
 }
