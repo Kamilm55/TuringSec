@@ -125,7 +125,6 @@ public class CompanyService implements ICompanyService {
     @Override
     public CompanyResponse getCompaniesById(Long id) {
         CompanyEntity company = userService.getCompaniesById(id);
-
         return CompanyMapper.INSTANCE.convertToResponse(company);
     }
 
@@ -159,6 +158,7 @@ public class CompanyService implements ICompanyService {
             EmailNotificationService.sendEmail(admin.getEmail(), subject, content);
         }
     }
+
 
 
 }
