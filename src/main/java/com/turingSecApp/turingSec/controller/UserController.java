@@ -81,7 +81,6 @@ public class UserController {
     @GetMapping("/current-user")
     public BaseResponse<UserDTO> getCurrentUser() {
         return BaseResponse.success(userService.getCurrentUser());
-
     }
 
     @GetMapping("/allUsers")

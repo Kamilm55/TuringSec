@@ -40,18 +40,9 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserService implements IUserService {
-    private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtTokenProvider;
-    private final UserDetailsService userDetailsService;
-    private final ProgramService programService;
-    private final UserRepository userRepository;
-    private final UtilService utilService;
-
-    private final HackerRepository hackerRepository;
     private final CompanyRepository companyRepository;
-
-
     private final UserManagementService userManagementService;
+    private final UserRetrievalService userRetrievalService;
     @Override
     public AuthResponse registerHacker(RegisterPayload registerPayload) {
         return userManagementService.registerHacker(registerPayload);
@@ -62,245 +53,74 @@ public class UserService implements IUserService {
     public void insertActiveHacker(RegisterPayload registerPayload) {
         userManagementService.insertActiveHacker(registerPayload);
     }
-
-    // Method to generate authentication token for the user
-    private String generateTokenForUser(UserEntity user) {
-        UserDetails userDetails = new CustomUserDetails(user);
-        return jwtTokenProvider.generateToken(userDetails);
-    }
-
-    // Method to retrieve hacker details by associated user
-    private HackerEntity findHackerByUser(UserEntity user) {
-        return hackerRepository.findByUser(user);
-    }
-
-    ///////////\\\\\\\\\\\
-
-
-
-    /////////////////////\\\\\\\\\\\\\\\\
-
     @Override
     public boolean activateAccount(String token) {
-        // Retrieve user by activation token
-        UserEntity user = userRepository.findByActivationToken(token);
-
-        if (user != null /*&& !user.isActivated()*/) {
-            // Activate the user by updating the account status or perform other necessary actions
-            user.setActivated(true);
-            userRepository.save(user);
-            return true;
-        }
-
-        return false;
+        return userRetrievalService.activateAccount(token);
     }
-
 
     @Override
     public AuthResponse loginUser(LoginRequest loginRequest) {
-        // Find user by email
-        UserEntity userEntity = findUserByEmail(loginRequest.getUsernameOrEmail());
-
-        // If user not found by email, try finding by username
-        if (userEntity == null) {
-            userEntity = findUserByUsername(loginRequest.getUsernameOrEmail());
-        }
-
-        // Authenticate user if found
-        if (userEntity != null && passwordEncoder.matches(loginRequest.getPassword(), userEntity.getPassword())) {
-            // Check if the user is activated
-            utilService.checkUserIsActivated(userEntity);
-
-            // Generate token using the user details
-            String token = generateTokenForUser(userEntity);
-
-            // Retrieve user and hacker details from the database
-            UserEntity userById = findUserById(userEntity.getId());
-            HackerEntity hackerFromDB = findHackerByUser(userById);
-
-            // Create and return authentication response
-            return utilService.buildAuthResponse(token, userById, hackerFromDB);
-        } else {
-            // Authentication failed
-            throw new BadCredentialsException("Invalid username/email or password.");
-        }
-    }
-
-    // Method to find user by email
-    private UserEntity findUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+        return userManagementService.loginUser(loginRequest);
     }
 
     @Override
     public void changePassword(ChangePasswordRequest request) {
-        // Retrieve authenticated user
-        UserEntity user = utilService.getAuthenticatedHacker();
-
-        // Validate current password
-        validateCurrentPassword(request, user);
-
-        // Validate and update new password
-        updatePassword(request.getNewPassword(), request.getConfirmNewPassword(), user);
-    }
-
-    // Method to validate current password
-    private void validateCurrentPassword(ChangePasswordRequest request, UserEntity user) {
-        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-            throw new BadCredentialsException("Incorrect current password");
-        }
-    }
-
-    // Method to validate and update new password
-    private void updatePassword(String newPassword,String confirmedPassword, UserEntity user) {
-        // Validate new password and confirm new password
-        if (!newPassword.equals(confirmedPassword)) {
-            throw new BadCredentialsException("New password and confirm new password do not match");
-        }
-
-        // Update password
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
+        userManagementService.changePassword(request);
     }
 
 
     @Override
     public void changeEmail(ChangeEmailRequest request) {
-        // Retrieve authenticated user
-        UserEntity user = utilService.getAuthenticatedHacker();
-
-        // Validate current password
-        validateCurrentPassword(request, user);
-
-        // Check if the new email is already in use
-        checkIfEmailExists(request.getNewEmail());
-
-        // Update email
-        user.setEmail(request.getNewEmail());
-        userRepository.save(user);
+        userManagementService.changeEmail(request);
     }
-
-   // Method to validate current password
-    private void validateCurrentPassword(ChangeEmailRequest request, UserEntity user) {
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new BadCredentialsException("Incorrect current password");
-        }
-    }
-
-    // Method to check if the new email is already in use
-    private void checkIfEmailExists(String newEmail) {
-        if (userRepository.findByEmail(newEmail) != null) {
-            throw new EmailAlreadyExistsException("Email " + newEmail + " is already in use");
-        }
-    }
-
 
     @Override
     public UserHackerDTO updateProfile(UserUpdateRequest userUpdateRequest) {
-        UserEntity userEntity = utilService.getAuthenticatedHacker();
-
-        updateProfile(userEntity, userUpdateRequest);
-        userRepository.save(userEntity);
-
-        HackerEntity hackerEntity = hackerRepository.findByUser(userEntity);
-        if (hackerEntity != null) {
-            updateHackerProfile(hackerEntity, userUpdateRequest);
-            hackerRepository.save(hackerEntity);
-        }
-
-        userRepository.save(userEntity);
-
-        return UserMapper.INSTANCE.toDto(userEntity, hackerEntity);
+        return userManagementService.updateProfile(userUpdateRequest);
     }
 
-    private void updateProfile(UserEntity userEntity, UserUpdateRequest userUpdateRequest) {
-        userEntity.setUsername(userUpdateRequest.getUsername());
-        userEntity.setFirst_name(userUpdateRequest.getFirstName());
-        userEntity.setLast_name(userUpdateRequest.getLastName());
-        userEntity.setCountry(userUpdateRequest.getCountry());
-    }
-
-    private void updateHackerProfile(HackerEntity hackerEntity, UserUpdateRequest userUpdateRequest) {
-        hackerEntity.setFirst_name(userUpdateRequest.getFirstName());
-        hackerEntity.setLast_name(userUpdateRequest.getLastName());
-        hackerEntity.setCountry(userUpdateRequest.getCountry());
-        hackerEntity.setCity(userUpdateRequest.getCity());
-        hackerEntity.setWebsite(userUpdateRequest.getWebsite());
-        hackerEntity.setBio(userUpdateRequest.getBio());
-        hackerEntity.setLinkedin(userUpdateRequest.getLinkedin());
-        hackerEntity.setTwitter(userUpdateRequest.getTwitter());
-        hackerEntity.setGithub(userUpdateRequest.getGithub());
-    }
-
+    @Override
     public String generateNewToken(UserHackerDTO updatedUser) {
-        UserDetails userDetailsFromDB = userDetailsService.loadUserByUsername(updatedUser.getUsername());
-        // Assuming you have generated a new token here
-        return jwtTokenProvider.generateToken(userDetailsFromDB);
+        return userManagementService.generateNewToken(updatedUser);
     }
 
     @Override
     public UserDTO getUserById(Long userId) {
-        UserEntity user = findUserById(userId);
-        return UserMapper.INSTANCE.convert(user);
+        return userRetrievalService.getUserById(userId);
     }
 
     @Override
     public UserDTO getCurrentUser() {
-        return UserMapper.INSTANCE.convert(utilService.getAuthenticatedHacker());
+        return userRetrievalService.getCurrentUser();
     }
 
     @Override
     public List<UserHackerDTO> getAllActiveUsers() {
-      return userRepository.findAllByActivated(true)
-              .stream()
-              .map(userEntity -> UserMapper.INSTANCE.toDto(userEntity, userEntity.getHacker()))
-              .collect(Collectors.toList());
-
+        return userRetrievalService.getAllActiveUsers();
     }
-    /////////////
 
+    @Override
+    public List<ProgramDTO> getAllBugBountyPrograms() {
+        return userRetrievalService.getAllBugBountyPrograms();
+    }
 
     @Override
     @Transactional// This annotation ensures that the method is executed within a transactional context, allowing database operations like deletion to be performed reliably.
     public void deleteUser() {
-        // Get the authenticated user's username from the security context
-        UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
-
-        // Find the user by username
-        UserEntity user = findUserByUsername(authenticatedUser.getUsername());
-
-        // Delete the user
-        userRepository.delete(user);
-
-        // Clear the authorization header
-//        request.removeAttribute("Authorization"); // Do this (clear auth header) in client side
-    }
-    /////////////////////////////////Programs\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-
-    @Override
-    public List<ProgramDTO> getAllBugBountyPrograms() {
-        return programService.getAllBugBountyProgramsAsEntity();
+        userManagementService.deleteUser();
     }
 
     @Override
     public ProgramDTO getBugBountyProgramById(Long id) {
-      return programService.getBugBountyProgramById(id);
+        return userRetrievalService.getBugBountyProgramById(id);
     }
-
-    @Override
-    public UserEntity findUserByUsername(String username) {
-      return   userRepository.findByUsername(username).orElseThrow(()-> new UserNotFoundException("User not found with this username: " + username));
-    }
-
 
     public CompanyEntity getCompaniesById(Long id) {
         Optional<CompanyEntity> companyEntity = companyRepository.findById(id);
         return companyEntity.orElseThrow(() -> new ResourceNotFoundException("Company not found with id:" + id));
     }
 
-    ///////// Util methods
-    private UserEntity findUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User not found with this id: " + userId));
-    }
+
 
 }
 
