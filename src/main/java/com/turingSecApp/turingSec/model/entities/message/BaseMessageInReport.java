@@ -33,14 +33,10 @@ public class BaseMessageInReport {
     @Column(nullable = false)
     private boolean isReplied;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "reply_to_id")// This will be the foreign key column in the same table
     private BaseMessageInReport replyTo;
 
-    @OneToOne
+    @ManyToOne
     private Report report;
-
-    // user
-    // company
-
 }

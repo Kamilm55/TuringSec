@@ -8,10 +8,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
 import jakarta.persistence.*;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 
 @Entity
@@ -27,6 +29,9 @@ public class Report {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(updatable = false, nullable = false, unique = true)
+    private String room;
 
     @Embedded
     private ReportWeakness weakness;
@@ -66,6 +71,13 @@ public class Report {
     private List<CollaboratorEntity> collaborators = new ArrayList<>();
 
 
+    @PrePersist
+    public void prePersist() {
+        // Generate UUID for room or perform any other pre-persist actions
+        if (this.room == null) {
+            this.room = UUID.randomUUID().toString();
+        }
+    }
     public void addCollaborator(CollaboratorEntity collaborator) {
         collaborators.add(collaborator);
         collaborator.setBugBountyReport(this);

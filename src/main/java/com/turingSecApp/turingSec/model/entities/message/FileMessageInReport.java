@@ -12,16 +12,16 @@ import lombok.EqualsAndHashCode;
 //@DiscriminatorValue("string")
 @Table(name = "messageInReport_file")
 public class FileMessageInReport extends BaseMessageInReport {
-    @Column(nullable = false)
+//    @Column(nullable = false)
     private String fileName;
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     private String contentType;
 
-    @Column(columnDefinition = "BYTEA", nullable = false)
+//    @Column(columnDefinition = "BYTEA", nullable = false)
     private byte[] fileData;
 
-    @Column(nullable = false)
+//    @Column(nullable = false)
     private String fileLocation;
 
 }
