@@ -349,29 +349,4 @@ public class ReportService implements IBugBountyReportService {
         throw new RuntimeException("Unable to extract username from JWT token");
     }
 
-
-    // For CommandLineRunner \\ TEST //
-    public void submitBugBountyReportForTest(BugBountyReportPayload reportPayload, Long bugBountyProgramId ,Long userId) {
-
-        // Fetch the BugBountyProgramEntity from the repository
-        Program program = programRepository.findById(bugBountyProgramId)
-                .orElseThrow(() -> new ResourceNotFoundException("Program not found with id:" + bugBountyProgramId));
-
-        // Create a new report entity
-        Report report = reportEntityHelper.createReportsEntityFromPayload(reportPayload);
-
-        // Set the user for the bug bounty report
-        setAuthenticatedUserToReport(userId, report);
-
-        // Set the bug bounty program for the bug bounty report
-        report.setBugBountyProgram(program);
-
-        // Set child reference type fields
-
-        // Save the report and its collaborators
-        Report savedReport = bugBountyReportRepository.save(report);
-        reportEntityHelper.saveCollaborators(reportPayload.getCollaboratorPayload(), savedReport);
-
-
-    }
 }

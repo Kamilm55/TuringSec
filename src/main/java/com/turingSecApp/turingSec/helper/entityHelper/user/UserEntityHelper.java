@@ -122,7 +122,7 @@ public class UserEntityHelper implements IUserEntityHelper{
     }
 
     @Override
-    public void updateProfile(UserEntity userEntity, UserUpdateRequest userUpdateRequest) {
+    public void updateUserProfile(UserEntity userEntity, UserUpdateRequest userUpdateRequest) {
         userEntity.setUsername(userUpdateRequest.getUsername());
         userEntity.setFirst_name(userUpdateRequest.getFirstName());
         userEntity.setLast_name(userUpdateRequest.getLastName());

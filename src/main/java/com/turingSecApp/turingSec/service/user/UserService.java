@@ -40,7 +40,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserService implements IUserService {
-    private final CompanyRepository companyRepository;
     private final UserManagementService userManagementService;
     private final UserRetrievalService userRetrievalService;
     @Override
@@ -114,12 +113,6 @@ public class UserService implements IUserService {
     public ProgramDTO getBugBountyProgramById(Long id) {
         return userRetrievalService.getBugBountyProgramById(id);
     }
-
-    public CompanyEntity getCompaniesById(Long id) {
-        Optional<CompanyEntity> companyEntity = companyRepository.findById(id);
-        return companyEntity.orElseThrow(() -> new ResourceNotFoundException("Company not found with id:" + id));
-    }
-
 
 
 }

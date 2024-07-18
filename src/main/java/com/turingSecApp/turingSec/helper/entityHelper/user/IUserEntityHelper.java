@@ -30,7 +30,7 @@ public interface IUserEntityHelper {
 
     void checkIfEmailExists(String newEmail);
 
-    void updateProfile(UserEntity userEntity, UserUpdateRequest userUpdateRequest);
+    void updateUserProfile(UserEntity userEntity, UserUpdateRequest userUpdateRequest);
 
     void updateHackerProfile(HackerEntity hackerEntity, UserUpdateRequest userUpdateRequest);
 }

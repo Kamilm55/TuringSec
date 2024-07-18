@@ -1,5 +1,6 @@
 package com.turingSecApp.turingSec.service;
 
+import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.role.Role;
@@ -23,10 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.NotFoundException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -124,8 +122,12 @@ public class CompanyService implements ICompanyService {
 
     @Override
     public CompanyResponse getCompaniesById(Long id) {
-        CompanyEntity company = userService.getCompaniesById(id);
+        CompanyEntity company = findCompanyById(id);
         return CompanyMapper.INSTANCE.convertToResponse(company);
+    }
+    private CompanyEntity findCompanyById(Long id) {
+        Optional<CompanyEntity> companyEntity = companyRepository.findById(id);
+        return companyEntity.orElseThrow(() -> new ResourceNotFoundException("Company not found with id:" + id));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.turingSecApp.turingSec.service.user;
 
 import com.turingSecApp.turingSec.exception.custom.BadCredentialsException;
+import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.helper.entityHelper.user.IUserEntityHelper;
 import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
@@ -15,16 +16,16 @@ import com.turingSecApp.turingSec.util.GlobalConstants;
 import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserManagementService {
 
     private final UtilService utilService;
@@ -70,6 +71,8 @@ public class UserManagementService {
         // Create the user entity
         UserEntity user = userEntityHelper.createUserEntity(registerPayload,activated);
 
+        // todo: save in one place
+
         // Save the user
         userRepository.save(user);
 
@@ -99,25 +102,37 @@ public class UserManagementService {
             userEntity = userEntityHelper.findUserByUsername(loginRequest.getUsernameOrEmail());
         }
 
-        // Authenticate user if found
-        if (userEntity != null && passwordEncoder.matches(loginRequest.getPassword(), userEntity.getPassword())) {
-            // Check if the user is activated
-            utilService.checkUserIsActivated(userEntity);
+         // Authenticate user if found
+         checkUserFoundOrNot(userEntity);
 
-            // Generate token using the user details
-            String token = generateTokenForUser(userEntity);
+         // Ensure password is correct
+        checkPassword(loginRequest, userEntity);
 
-            // Retrieve user and hacker details from the database
-            UserEntity userById = userEntityHelper.findUserById(userEntity.getId());
-            HackerEntity hackerFromDB = userEntityHelper.findHackerByUser(userById);
+        //Check if the user is activated
+         utilService.checkUserIsActivated(userEntity);
 
-            // Create and return authentication response
-            return utilService.buildAuthResponse(token, userById, hackerFromDB);
-        } else {
+         // Generate token using the user details
+         String token = generateTokenForUser(userEntity);
+
+         // Retrieve user and hacker details from the database
+         UserEntity userById = userEntityHelper.findUserById(userEntity.getId());
+
+         // Create and return authentication response
+         return buildAuthResponse(userById,token);
+
+    }
+
+    private void checkPassword(LoginRequest loginRequest, UserEntity userEntity) {
+        if (!passwordEncoder.matches(loginRequest.getPassword(), userEntity.getPassword())) {
             // Authentication failed
             throw new BadCredentialsException("Invalid username/email or password.");
         }
+    }
 
+    private void checkUserFoundOrNot(UserEntity userEntity) {
+        if (userEntity == null ) {
+            throw new UserNotFoundException("User not found with email/username");
+        }
     }
 
     public void changePassword(ChangePasswordRequest request) {
@@ -143,15 +158,20 @@ public class UserManagementService {
         userEntityHelper.checkIfEmailExists(request.getNewEmail());
 
         // Update email
+        updateEmail(request, user);
+    }
+
+    private void updateEmail(ChangeEmailRequest request, UserEntity user) {
         user.setEmail(request.getNewEmail());
         userRepository.save(user);
     }
 
     public UserHackerDTO updateProfile(UserUpdateRequest userUpdateRequest) {
         UserEntity userEntity = utilService.getAuthenticatedHacker();
+        log.info(String.format("User with id: %s , username: %s updated info. User info before update: %s",userEntity.getId().toString(),userEntity.getUsername(),userEntity));
 
-        userEntityHelper.updateProfile(userEntity, userUpdateRequest);
-        userRepository.save(userEntity);
+        userEntityHelper.updateUserProfile(userEntity, userUpdateRequest);
+        userRepository.save(userEntity); // todo: save in one place
 
         HackerEntity hackerEntity = hackerRepository.findByUser(userEntity);
 
@@ -160,9 +180,12 @@ public class UserManagementService {
             hackerRepository.save(hackerEntity);
         }
 
-        userRepository.save(userEntity);
 
-        return UserMapper.INSTANCE.toDto(userEntity, hackerEntity);
+        UserEntity savedUser = userRepository.save(userEntity);
+
+        log.info(String.format("User with id: %s , username: %s updated info. New user info after update: %s",savedUser.getId().toString(),savedUser.getUsername(),savedUser));
+
+        return UserMapper.INSTANCE.toDto(savedUser, hackerEntity);
     }
 
     public String generateNewToken(UserHackerDTO updatedUser) {
@@ -219,8 +242,6 @@ public class UserManagementService {
         UserDetails userDetails = new CustomUserDetails(user);
         return jwtTokenProvider.generateToken(userDetails);
     }
-
-    ///////// Util methods
 
     // Method to check if user already exists with the provided username or email
     private void checkUserDoesNotExist(RegisterPayload registerPayload) {

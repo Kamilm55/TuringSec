@@ -19,7 +19,7 @@ public class BaseMessageInReport {
     private Long id; // id as PK and FK(reply_to_id)
 
 //    @Column(nullable = false)
-//    private String room; // todo: in report entity must be include generated  uuid room ,
+//    private String room; // todo: in report entity must be include generated  uuid room , 5 , company sekil  user sekil
 //                                  therefore messaging, socket connection is specific for report , when send msg --> getAllReports -> send to which the report room is
 
     @Column(nullable = false)
@@ -39,5 +39,8 @@ public class BaseMessageInReport {
 
     @OneToOne
     private Report report;
+
+    // user
+    // company
 
 }
