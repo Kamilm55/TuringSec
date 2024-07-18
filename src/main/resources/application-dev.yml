@@ -1,5 +1,6 @@
 server:
   port: 5000
+  host: localhost # for socketIO
 
 app:
   root_url: http://localhost:5000
