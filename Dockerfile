@@ -22,7 +22,10 @@ WORKDIR /app
 # Copy the JAR file from the build stage
 COPY --from=build /app/target/TuringSec-0.0.1.jar app.jar
 
-# Expose the port your application runs on
+# Copy the keystore file
+COPY keystore.p12 keystore.p12
+
+# Expose the port your application runs on (8080 internally, 443 externally)
 EXPOSE 5000
 
 # Specify the command to run on container startup
