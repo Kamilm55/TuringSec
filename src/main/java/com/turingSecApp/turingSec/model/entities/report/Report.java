@@ -30,7 +30,7 @@ public class Report {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(updatable = false, nullable = false, unique = true)
+    //@Column(updatable = false, nullable = false, unique = true) //todo: @PrePersist not work in prod
     private String room;
 
     @Embedded

@@ -25,7 +25,7 @@ COPY --from=build /app/target/TuringSec-0.0.1.jar app.jar
 # Copy the keystore if needed
 COPY --from=build /app/src/main/resources/keystore.p12 /app/keystore.p12
 
-# Expose the port your application runs on (8080 internally, 443 externally)
+# Expose the port your application runs on 5000 in app.dev but in app.prod -> (8080 internally, 443 externally)
 EXPOSE 5000
 
 # Specify the command to run on container startup
