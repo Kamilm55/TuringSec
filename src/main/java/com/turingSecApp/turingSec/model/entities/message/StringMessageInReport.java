@@ -6,9 +6,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Entity
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 @Data
 //@DiscriminatorValue("string")
 @Table(name = "messageInReport_string")

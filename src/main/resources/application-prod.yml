@@ -17,8 +17,6 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASSWORD}
 
-
-
 # For testing with a local PostgreSQL database , first you should open docker
 # Uncomment and use the following line:
 # url: jdbc:postgresql://localhost:5433/postgres

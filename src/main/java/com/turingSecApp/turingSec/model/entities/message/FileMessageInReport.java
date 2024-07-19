@@ -5,10 +5,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
 //@DiscriminatorValue("string")
 @Table(name = "messageInReport_file")
 public class FileMessageInReport extends BaseMessageInReport {

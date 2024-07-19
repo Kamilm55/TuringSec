@@ -1,5 +1,8 @@
 package com.turingSecApp.turingSec.model.entities.message;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.turingSecApp.turingSec.model.entities.report.Report;
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,8 +26,10 @@ public class BaseMessageInReport {
 //                                  therefore messaging, socket connection is specific for report , when send msg --> getAllReports -> send to which the report room is
 
     @Column(nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime createdAt;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime editedAt;
 
     @Column(nullable = false)
@@ -35,6 +40,7 @@ public class BaseMessageInReport {
 
     @ManyToOne
     @JoinColumn(name = "reply_to_id")// This will be the foreign key column in the same table
+    @JsonIgnore
     private BaseMessageInReport replyTo;
 
     @ManyToOne
