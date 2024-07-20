@@ -67,6 +67,7 @@ public class SocketService {
     //    * Event icinde LocalDateTime tipinde mesaji gondermek olmur, serialize ede bilmir deye DTO-da string formatinda gotururuk
     //   10. *** Mesaj eger reply-dirsa isReplied true,repliedTo - da id-si verilir, amma DTO-da reply olunan mesajin contenti yoxdu ***
     //   11. Message payload validationlar edilmelidi
+    //   12. Butun bu tasklar bitenden sonra -> editMessage, deleteMessage, deleteMessageList (every user only edit or delete own), edited or deleted messages must be tracked in logs and db, explore: "can we store logs?(not to use safe delete)"
     @Transactional // for this anno we cannot set private
     public DataListener<StringMessageInReportPayload> onStrMessageReceived() {
         return (socketIOClient, data, ackSender) -> {
