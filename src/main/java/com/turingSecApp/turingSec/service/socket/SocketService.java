@@ -1,5 +1,6 @@
 package com.turingSecApp.turingSec.service.socket;
 
+import com.corundumstudio.socketio.SocketIOClient;
 import com.corundumstudio.socketio.SocketIOServer;
 import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
@@ -46,6 +47,26 @@ public class SocketService {
         //socketIOServer.addEventListener("send_message_file", FileMessageInReport.class, onFileMessageReceived());
     }
 
+
+    // TODO: TASKS
+    //  1. Exceptionlar error event name ile atilmalidi ,  hem log hem sendEvent
+    //  2. Payloadda access token alinmalidi, ve mesaji gonderen Hacker yoxsa Company-di tapa bilerik token vasitesile , (en 1-ci unauthorized olmadigini yoxlamalyiq, eks halda exception)
+    //  3. Payloaddan entity-e kecirerken eger token ile tapdigimiz user hackerdisa -> isHacker=true , company-dirse -> isHacker=false edib save edirik
+    //  4. Reportun yalniz bir user(hacker) ve bir company id-si ola biler , isHacker true ve ya false ferq etmir
+    //      hansi hal olursa olsun her iki id DTO-da entity-de yox(report-dan goture bilerik bu iki value-nu) gorunmelidi ,
+    //      frontendler isHacker-a gore mesaji gonderenin company yoxsa hacker oldugunu mueyyenlesdirib lazim olan id-ni isledecekler
+    //  5. DTO-da company ve hacker-in img,background img gosterilmelidi
+    //  6. Token-den extract etdiyimiz user(hacker) hemin reportun useri ile eyni olmalidi , deyilse exception ("Message of Hacker must be same with report Hacker") -> (hem log hem de sendEvent ile error eventinde ex-mesaji gondermek)
+    //  7. Token-den extract etdiyimiz company hemin reportun company-si ile eyni olmalidi , deyilse exception
+    //  8. BaseMessageInReportPayload-dan private Long reportId; - bu fieldi cixartmaq lazimdi path-de biz room deye birsey aliriq(uuid) ->
+    //     bu room reportun fieldi-dir, ona gore bu room fieldi ile reportu tapa bilerik -> String room = socketIOClient.getHandshakeData().getSingleUrlParam("room"); // room as query ?room= uuid of msg's report
+    //   (*Reportu room ile , user ve company-de report ile tapa bilerik)
+    //    * Postmanda "error" event-i de listen olunmalidir, "get_message" ile yanasi
+    //    * Butun log-lardaki melumatlar dogru olmalidi, payload->entity->dto hamisi duzgun sekilde yaradilmalidi
+    //   9. Report-da get program islemir lazy fetch olduguna gore error verir
+    //    * Event icinde LocalDateTime tipinde mesaji gondermek olmur, serialize ede bilmir deye DTO-da string formatinda gotururuk
+    //   10. *** Mesaj eger reply-dirsa isReplied true,repliedTo - da id-si verilir, amma DTO-da reply olunan mesajin contenti yoxdu ***
+    //   11. Message payload validationlar edilmelidi
     @Transactional // for this anno we cannot set private
     public DataListener<StringMessageInReportPayload> onStrMessageReceived() {
         return (socketIOClient, data, ackSender) -> {
@@ -65,7 +86,7 @@ public class SocketService {
             }
 
             // Set "Report"
-            Report reportOfMessage = findReportById(data.getReportId());
+            Report reportOfMessage = findReportById(data.getReportId(),socketIOClient);
             strMessage.setReport(reportOfMessage);
 
             //
@@ -96,10 +117,6 @@ public class SocketService {
             );
 
 
-
-            //todo: validation in msg payload
-            //todo: find is hacker or company based on accessToken in message
-
             // Log important details of message
             log.info(String.format("Sent message id: %d ,Report id: %d , Role is %s , Report's user id: %d,Socket client id: %s -> msg: %s at %s",
                     savedMsg.getId(),
@@ -114,7 +131,7 @@ public class SocketService {
         };
     }
 
-    private Report findReportById(Long reportId) {
+    private Report findReportById(Long reportId, SocketIOClient socketIOClient) {
         Report report = null;
         try {
             report = reportsRepository.findById(reportId)
@@ -122,7 +139,7 @@ public class SocketService {
         } catch (ResourceNotFoundException e) {
             // Handle the exception here, possibly by logging it or sending an error response
             log.error("Resource not found: " + e.getMessage());
-
+            socketIOClient.sendEvent("error","Resource not found: " + e.getMessage());
         }
         return report;
     }

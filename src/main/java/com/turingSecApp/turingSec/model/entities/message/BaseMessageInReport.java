@@ -38,6 +38,9 @@ public class BaseMessageInReport {
     @Column(nullable = false)
     private boolean isReplied;
 
+//    @Column(nullable = false)
+    //private boolean isHacker;
+
     @ManyToOne
     @JoinColumn(name = "reply_to_id")// This will be the foreign key column in the same table
     @JsonIgnore
