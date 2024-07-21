@@ -48,8 +48,12 @@ public class JwtUtil {
 
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
+        return validateBearerToken(bearerToken);
+    }
+
+    public String validateBearerToken(String bearerToken) {
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7); // Remove "Bearer " prefix
+            return bearerToken.substring(7);
         }
         return null;
     }

@@ -13,5 +13,4 @@ public class BaseMessageInReportPayload {
     private Long replyToMessageId;
 
     private Long reportId;// bu cixacaq room ile tapa bilerik reportu
-    private boolean isHacker;// bu da cixacaq accesToken olacaq bunun yerine
 }

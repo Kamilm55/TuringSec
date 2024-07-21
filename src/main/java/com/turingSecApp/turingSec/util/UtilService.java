@@ -31,6 +31,19 @@ public class UtilService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
 
+
+    // In Socket retrieve authenticated entity
+    public UserEntity getCurrentUser(String accessToken) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            String username = authentication.getName();
+            return userRepository.findByUsername(username)
+                    .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
+        } else {
+            throw new UnauthorizedException();
+        }
+    }
+
     // Method to retrieve authenticated user(Hacker)
     public UserEntity getAuthenticatedHacker() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

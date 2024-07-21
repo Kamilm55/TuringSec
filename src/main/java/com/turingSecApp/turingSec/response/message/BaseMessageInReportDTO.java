@@ -25,6 +25,9 @@ public class BaseMessageInReportDTO {
 
     private Long reportId;
 
-    // user img
-    // isHacker?
+    private boolean isHacker;
+    private Long hackerId;
+    private Long companyId;
+
+    // user img,bck img
 }

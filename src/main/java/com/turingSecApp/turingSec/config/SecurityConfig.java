@@ -56,6 +56,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> {
                     request.requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll();
 
+                    // Socket IO
+                    request.requestMatchers("/ws/**").authenticated();
+
                     // Media controller
                     request.requestMatchers("/api/background-image-for-hacker/**", "/api/image-for-hacker/**", "/api/report-media/**").permitAll();//.authenticated();
 

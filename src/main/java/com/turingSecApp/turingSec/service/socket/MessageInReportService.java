@@ -6,16 +6,25 @@ import com.corundumstudio.socketio.listener.ConnectListener;
 import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
+import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
+import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.model.entities.message.BaseMessageInReport;
 import com.turingSecApp.turingSec.model.entities.message.StringMessageInReport;
 import com.turingSecApp.turingSec.model.entities.report.Report;
+import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
+import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
 import com.turingSecApp.turingSec.model.repository.reportMessage.BaseMessageInReportRepository;
 import com.turingSecApp.turingSec.model.repository.reportMessage.StringMessageInReportRepository;
 import com.turingSecApp.turingSec.payload.message.StringMessageInReportPayload;
 import com.turingSecApp.turingSec.response.message.StringMessageInReportDTO;
+import com.turingSecApp.turingSec.service.user.UserDetailsServiceImpl;
+import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.StringMessageInReportMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,16 +33,22 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public class SocketService {
+public class MessageInReportService {
     private final ReportsRepository reportsRepository;
+    private final JwtUtil jwtTokenProvider;
+    private final UserDetailsServiceImpl userDetailsService;
+    private final UtilService utilService;
     private final BaseMessageInReportRepository baseMessageInReportRepository;
     private final StringMessageInReportRepository stringMessageInReportRepository;
 
     private SocketIOServer socketIOServer;
 
-    public SocketService(ReportsRepository reportsRepository, BaseMessageInReportRepository baseMessageInReportRepository, StringMessageInReportRepository stringMessageInReportRepository, SocketIOServer socketIOServer) {
+    public MessageInReportService(ReportsRepository reportsRepository, JwtUtil jwtTokenProvider, UserDetailsServiceImpl userDetailsService, UtilService utilService, BaseMessageInReportRepository baseMessageInReportRepository, StringMessageInReportRepository stringMessageInReportRepository, SocketIOServer socketIOServer) {
         // Inject other class
         this.reportsRepository = reportsRepository;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.userDetailsService = userDetailsService;
+        this.utilService = utilService;
         this.baseMessageInReportRepository = baseMessageInReportRepository;
         this.stringMessageInReportRepository = stringMessageInReportRepository;
 
@@ -48,16 +63,18 @@ public class SocketService {
     }
 
 
-    // TODO: TASKS
+    //  2. Payloadda access token alinmalidi, ve mesaji gonderen Hacker yoxsa Company-di tapa bilerik token vasitesile , (en 1-ci unauthorized olmadigini yoxlamalyiq, eks halda exception) +
     //  1. Exceptionlar error event name ile atilmalidi ,  hem log hem sendEvent
-    //  2. Payloadda access token alinmalidi, ve mesaji gonderen Hacker yoxsa Company-di tapa bilerik token vasitesile , (en 1-ci unauthorized olmadigini yoxlamalyiq, eks halda exception)
     //  3. Payloaddan entity-e kecirerken eger token ile tapdigimiz user hackerdisa -> isHacker=true , company-dirse -> isHacker=false edib save edirik
-    //  4. Reportun yalniz bir user(hacker) ve bir company id-si ola biler , isHacker true ve ya false ferq etmir
-    //      hansi hal olursa olsun her iki id DTO-da entity-de yox(report-dan goture bilerik bu iki value-nu) gorunmelidi ,
-    //      frontendler isHacker-a gore mesaji gonderenin company yoxsa hacker oldugunu mueyyenlesdirib lazim olan id-ni isledecekler
-    //  5. DTO-da company ve hacker-in img,background img gosterilmelidi
+    // TODO: TASKS
     //  6. Token-den extract etdiyimiz user(hacker) hemin reportun useri ile eyni olmalidi , deyilse exception ("Message of Hacker must be same with report Hacker") -> (hem log hem de sendEvent ile error eventinde ex-mesaji gondermek)
     //  7. Token-den extract etdiyimiz company hemin reportun company-si ile eyni olmalidi , deyilse exception
+    //   autheticatedUser hemin reportun hackeri ve ya company-sidirmi? eks halda exception
+    //    dto-ya cevirerken her iki id-ni set et ,  reportdan gotur , isHackeride set et entityden
+    //  4. Reportun yalniz bir user(hacker) ve bir company id-si ola biler , isHacker true ve ya false ferq etmir
+    //      hansi hal olursa olsun her iki id DTO-da gorunmelidi entity-de yox(report-dan goture bilerik bu iki value-nu)  ,
+    //      frontendler isHacker-a gore mesaji gonderenin company yoxsa hacker oldugunu mueyyenlesdirib lazim olan id-ni isledecekler
+    //  5. DTO-da company ve hacker-in img,background img gosterilmelidi
     //  8. BaseMessageInReportPayload-dan private Long reportId; - bu fieldi cixartmaq lazimdi path-de biz room deye birsey aliriq(uuid) ->
     //     bu room reportun fieldi-dir, ona gore bu room fieldi ile reportu tapa bilerik -> String room = socketIOClient.getHandshakeData().getSingleUrlParam("room"); // room as query ?room= uuid of msg's report
     //   (*Reportu room ile , user ve company-de report ile tapa bilerik)
@@ -83,7 +100,7 @@ public class SocketService {
             strMessage.setCreatedAt(LocalDateTime.now());
             strMessage.setReplied(data.isReplied());
 
-            // Set "BaseMessage" if it is not null
+            // Set "BaseMessage" (replyTo) if it is not null
             if(data.getReplyToMessageId() != null){
                 Optional<BaseMessageInReport> repliedMessageInReport = baseMessageInReportRepository.findById(data.getReplyToMessageId());
                 strMessage.setReplyTo(repliedMessageInReport.get());
@@ -93,7 +110,33 @@ public class SocketService {
             Report reportOfMessage = findReportById(data.getReportId(),socketIOClient);
             strMessage.setReport(reportOfMessage);
 
-            //
+            //////////
+            // Set isHacker based on token, token comes in auth header there is no need in payload
+            // refactorThis
+            Object authenticatedUser;
+
+            try{
+                // if exception not occurs it is Hacker
+                authenticatedUser = utilService.getAuthenticatedHacker();// returns UserEntity
+                log.info("It is Hacker entity!");
+            }catch (UnauthorizedException e){
+                // if exception occurs it is not Hacker
+                log.warn("It is not Hacker entity!");
+                authenticatedUser = utilService.getAuthenticatedCompany();// returns CompanyEntity
+            }
+
+            log.info("User/Company info: " + authenticatedUser);
+
+            if(authenticatedUser instanceof UserEntity){
+                strMessage.setHacker(true);
+            } else if (authenticatedUser instanceof CompanyEntity) {
+                strMessage.setHacker(false);
+            }else {
+                log.error("User is neither Hacker nor Company!");
+                throw new UnauthorizedException("User is neither Hacker nor Company!");
+            }
+
+            //////////
 
             // Save str message
             StringMessageInReport savedMsg = stringMessageInReportRepository.save(strMessage);
@@ -122,10 +165,9 @@ public class SocketService {
 
 
             // Log important details of message
-            log.info(String.format("Sent message id: %d ,Report id: %d , Role is %s , Report's user id: %d,Socket client id: %s -> msg: %s at %s",
+            log.info(String.format("Sent message id: %d ,Report id: %d ,Report's user id: %d,Socket client id: %s -> msg: %s at %s",
                     savedMsg.getId(),
                     data.getReportId(),
-                    data.isHacker() ? "Hacker" : "Company", // todo: not working
                     reportOfMessage.getUser().getId(),
 //                        reportOfMessage.getBugBountyProgram().getCompany().getId(),// todo: not working
 //                        reportOfMessage.getBugBountyProgram().getId(),// todo: not working
@@ -151,12 +193,32 @@ public class SocketService {
 //        return null;
 //    }
 
-
     //
     private ConnectListener onConnected() {
         return socketIOClient -> {
-            //todo: user info must be logged detailed
-            // log.info(String.format("User with username:%s started the socket"));
+
+            // refactorThis
+            String authorizationHeader = socketIOClient.getHandshakeData().getHttpHeaders().get("Authorization");
+            log.info("Authorization Header of request: " + authorizationHeader);
+            if(authorizationHeader == null){
+                log.error("Auth header is null");
+                socketIOClient.sendEvent("error","Authorization Header of request: null, You are unauthorized person");
+            }
+
+            String token = jwtTokenProvider.validateBearerToken(authorizationHeader);
+
+
+            if (token != null && jwtTokenProvider.validateToken(token)) {
+                String username = jwtTokenProvider.getUsernameFromToken(token);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+                if (userDetails != null/* && userService.findUserByUsername(username).isActivated()*/) { // todo:fix this for only user not company
+                    System.out.println("UserDetails of current user: " + userDetails);
+                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
+            }
+
             String room = socketIOClient.getHandshakeData().getSingleUrlParam("room");
             socketIOClient.joinRoom(room);
             log.info(String.format("SocketID: %s connected!", socketIOClient.getSessionId().toString()));
