@@ -6,6 +6,7 @@ import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.CompanyRepository;
+import com.turingSecApp.turingSec.model.repository.HackerRepository;
 import com.turingSecApp.turingSec.model.repository.RoleRepository;
 import com.turingSecApp.turingSec.model.repository.UserRepository;
 import com.turingSecApp.turingSec.exception.custom.*;
@@ -30,6 +31,8 @@ public class UtilService {
     private final ProgramRepository programRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final HackerRepository hackerRepository;
+
 
     // Method to retrieve authenticated user(Hacker)
     public UserEntity getAuthenticatedHacker() {
@@ -148,5 +151,15 @@ public class UtilService {
 
     public UserEntity findUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User not found with this id: " + userId));
+    }
+
+
+    public AuthResponse buildAuthResponse(UserEntity user, String token){
+        // Retrieve the user and hacker details from the database
+        UserEntity userById = findUserById(user.getId());
+        HackerEntity hackerFromDB = hackerRepository.findByUser(userById);
+
+        // Build and return the authentication response
+        return buildAuthResponse(token, userById, hackerFromDB);
     }
 }

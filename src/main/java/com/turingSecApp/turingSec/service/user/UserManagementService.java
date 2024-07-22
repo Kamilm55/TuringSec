@@ -55,7 +55,7 @@ public class UserManagementService {
         // Generate token for the registered user
         String token = generateTokenForUser(user);
 
-        return buildAuthResponse(user, token);
+        return utilService.buildAuthResponse(user, token);
     }
 
     @Transactional
@@ -70,7 +70,6 @@ public class UserManagementService {
     private UserEntity populateUserAndSave(RegisterPayload registerPayload,boolean activated) {
         // Create the user entity
         UserEntity user = userEntityHelper.createUserEntity(registerPayload,activated);
-
         // todo: save in one place
 
         // Save the user
@@ -118,7 +117,7 @@ public class UserManagementService {
          UserEntity userById = userEntityHelper.findUserById(userEntity.getId());
 
          // Create and return authentication response
-         return buildAuthResponse(userById,token);
+         return utilService.buildAuthResponse(userById,token);
 
     }
 
@@ -228,15 +227,6 @@ public class UserManagementService {
         EmailNotificationService.sendEmail(user.getEmail(), subject, content);
     }
 
-
-    private AuthResponse buildAuthResponse(UserEntity user, String token) {
-        // Retrieve the user and hacker details from the database
-        UserEntity userById = utilService.findUserById(user.getId());
-        HackerEntity hackerFromDB = hackerRepository.findByUser(userById);
-
-        // Build and return the authentication response
-        return  utilService.buildAuthResponse(token, userById, hackerFromDB);
-    }
     // Method to generate authentication token for the user
     private String generateTokenForUser(UserEntity user) {
         UserDetails userDetails = new CustomUserDetails(user);

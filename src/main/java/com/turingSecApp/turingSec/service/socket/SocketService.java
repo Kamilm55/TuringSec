@@ -28,7 +28,6 @@ public class SocketService {
     private final ReportsRepository reportsRepository;
     private final BaseMessageInReportRepository baseMessageInReportRepository;
     private final StringMessageInReportRepository stringMessageInReportRepository;
-
     private SocketIOServer socketIOServer;
 
     public SocketService(ReportsRepository reportsRepository, BaseMessageInReportRepository baseMessageInReportRepository, StringMessageInReportRepository stringMessageInReportRepository, SocketIOServer socketIOServer) {
@@ -139,7 +138,7 @@ public class SocketService {
         Report report = null;
         try {
             report = reportsRepository.findById(reportId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Report not found with id: " + reportId));
+                    .orElseThrow(() -> new ResourceNotFoundException("Report not found with name: " + reportId));
         } catch (ResourceNotFoundException e) {
             // Handle the exception here, possibly by logging it or sending an error response
             log.error("Resource not found: " + e.getMessage());

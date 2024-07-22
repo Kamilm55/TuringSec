@@ -1,40 +1,17 @@
 package com.turingSecApp.turingSec.service.user;
 
 
-import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
-import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
-import com.turingSecApp.turingSec.model.entities.role.Role;
-import com.turingSecApp.turingSec.model.entities.user.UserEntity;
-import com.turingSecApp.turingSec.model.repository.*;
-import com.turingSecApp.turingSec.model.repository.program.ProgramRepository;
-import com.turingSecApp.turingSec.exception.custom.BadCredentialsException;
-import com.turingSecApp.turingSec.exception.custom.EmailAlreadyExistsException;
-import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
-import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
-import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.payload.user.*;
 import com.turingSecApp.turingSec.response.program.ProgramDTO;
 import com.turingSecApp.turingSec.response.user.AuthResponse;
 import com.turingSecApp.turingSec.response.user.UserDTO;
 import com.turingSecApp.turingSec.response.user.UserHackerDTO;
-import com.turingSecApp.turingSec.service.EmailNotificationService;
-import com.turingSecApp.turingSec.service.program.ProgramService;
 import com.turingSecApp.turingSec.service.interfaces.IUserService;
-import com.turingSecApp.turingSec.util.GlobalConstants;
-import com.turingSecApp.turingSec.util.UtilService;
-import com.turingSecApp.turingSec.util.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 
 @Service
