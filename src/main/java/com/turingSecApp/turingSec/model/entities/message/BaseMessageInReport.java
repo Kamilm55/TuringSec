@@ -26,10 +26,8 @@ public class BaseMessageInReport {
 //                                  therefore messaging, socket connection is specific for report , when send msg --> getAllReports -> send to which the report room is
 
     @Column(nullable = false)
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime createdAt;
 
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime editedAt;
 
     @Column(nullable = false)

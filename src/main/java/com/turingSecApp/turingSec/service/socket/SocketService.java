@@ -104,6 +104,7 @@ public class SocketService {
     //      Adminler reportId ile istenilen report altindaki, butun mesajlari gore biler list<DTO> seklinde
     //      Silinmis mesajlar, editlenmis mesajlarida bu 3 task - http-dir socket ile deyil
     //   12. getMessage ile evvelki gonderilen mesajlar gorunmelidi ama list<DTO> seklinde
+    //   reporta da createdAt elave et
     //   13. Butun bu tasklar bitenden sonra -> editMessage, deleteMessage, deleteMessageList (every user only edit or delete own), edited or deleted messages must be tracked in logs and db, explore: "can we store logs?(not to use safe delete)"
     //   10. *** Mesaj eger reply-dirsa isReplied true,repliedTo - da id-si verilir, amma DTO-da reply olunan mesajin contenti yoxdu ***
     //    * Event icinde LocalDateTime tipinde mesaji gondermek olmur, serialize ede bilmir deye DTO-da string formatinda gotururuk

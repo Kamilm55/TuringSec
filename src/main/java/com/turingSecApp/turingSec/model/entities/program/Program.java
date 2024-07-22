@@ -35,6 +35,7 @@ public class Program {
     private LocalDate fromDate;
 
     @Column(nullable = false)
+
     private LocalDate toDate;
 
     @Transient
