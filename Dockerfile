@@ -27,7 +27,7 @@ COPY --from=build /app/src/main/resources/keystore.p12 /app/keystore.p12
 
 # Expose the port your application runs on 5000 in app.dev but in app.prod -> (8080 internally, 443 externally)
 EXPOSE 5000
-EXPOSE 6000 #fix in aws
+EXPOSE 6000
 
 # Specify the command to run on container startup
 CMD ["java", "-jar", "app.jar"]
