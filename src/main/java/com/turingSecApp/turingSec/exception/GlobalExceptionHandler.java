@@ -28,6 +28,16 @@ public class GlobalExceptionHandler {
         );
 
     }
+
+    @ExceptionHandler(UserMustBeSameWithReportUserException.class)
+    public ResponseEntity<ExceptionResponseMessages> handleUserMustBeSameWithReportUserException(UserMustBeSameWithReportUserException ex) {
+
+        return new ResponseEntity<>(
+                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.CONFLICT) ,
+                HttpStatus.CONFLICT
+        );
+
+    }
     //org.springframework.mail.MailSendException
     @ExceptionHandler(org.springframework.mail.MailSendException.class)
     public ResponseEntity<ExceptionResponseMessages> handleMailSendException(org.springframework.mail.MailSendException ex) {

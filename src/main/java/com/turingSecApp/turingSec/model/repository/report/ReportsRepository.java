@@ -9,11 +9,13 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 //This repository can handle common operations related to ReportEntity, such as CRUD operations or any other queries that apply to all types of reports.
 public interface ReportsRepository extends JpaRepository<Report, Long> {
     List<Report> findByUser(UserEntity user);
+    Optional<Report> findByRoom(String room);
     List<Report> findByBugBountyProgram(Program program);
     @Query("SELECT r FROM Report r WHERE r.bugBountyProgram IN :programs")
     List<Report> findByBugBountyProgramIn(Collection<Program> programs);

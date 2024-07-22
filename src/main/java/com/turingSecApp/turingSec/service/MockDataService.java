@@ -2,10 +2,13 @@ package com.turingSecApp.turingSec.service;
 
 import com.turingSecApp.turingSec.exception.custom.CompanyNotFoundException;
 import com.turingSecApp.turingSec.model.entities.MockData;
+import com.turingSecApp.turingSec.model.entities.report.Report;
 import com.turingSecApp.turingSec.model.entities.role.Role;
 import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
+import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.*;
+import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
 import com.turingSecApp.turingSec.payload.program.ProgramPayload;
 import com.turingSecApp.turingSec.payload.program.ProhibitPayload;
 import com.turingSecApp.turingSec.payload.program.asset.AssetPayload;
@@ -20,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -41,7 +45,18 @@ public class MockDataService implements IMockDataService {
     private final AdminRepository adminRepository;
     private final RoleRepository roleRepository;
     private final CompanyRepository companyRepository;
+    private final ReportsRepository reportsRepository;
 
+    @Transactional
+    public void testProxy() {
+
+        Report report = reportsRepository.findById(1L).orElse(null);
+
+        log.info("report user: " + report.getUser());
+
+        UserEntity userOfReportMessage = report.getUser();
+        System.out.println(userOfReportMessage);
+    }
     @Override
     public void insertMockData() {
         System.out.println(mockDataRepository.findById(1L));

@@ -7,6 +7,7 @@ import com.corundumstudio.socketio.listener.DataListener;
 import com.corundumstudio.socketio.listener.DisconnectListener;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
+import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.model.entities.message.BaseMessageInReport;
 import com.turingSecApp.turingSec.model.entities.message.StringMessageInReport;
@@ -18,6 +19,9 @@ import com.turingSecApp.turingSec.model.repository.reportMessage.BaseMessageInRe
 import com.turingSecApp.turingSec.model.repository.reportMessage.StringMessageInReportRepository;
 import com.turingSecApp.turingSec.payload.message.StringMessageInReportPayload;
 import com.turingSecApp.turingSec.response.message.StringMessageInReportDTO;
+import com.turingSecApp.turingSec.service.MockDataService;
+import com.turingSecApp.turingSec.service.socket.exceptionHandling.ISocketEntityHelper;
+import com.turingSecApp.turingSec.service.socket.exceptionHandling.SocketExceptionHandler;
 import com.turingSecApp.turingSec.service.user.UserDetailsServiceImpl;
 import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.StringMessageInReportMapper;
@@ -33,9 +37,11 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public class MessageInReportService {
+public class SocketService {
     private final ReportsRepository reportsRepository;
+    private final SocketExceptionHandler socketExceptionHandler;
     private final JwtUtil jwtTokenProvider;
+    private final ISocketEntityHelper socketEntityHelper;
     private final UserDetailsServiceImpl userDetailsService;
     private final UtilService utilService;
     private final BaseMessageInReportRepository baseMessageInReportRepository;
@@ -43,10 +49,12 @@ public class MessageInReportService {
 
     private SocketIOServer socketIOServer;
 
-    public MessageInReportService(ReportsRepository reportsRepository, JwtUtil jwtTokenProvider, UserDetailsServiceImpl userDetailsService, UtilService utilService, BaseMessageInReportRepository baseMessageInReportRepository, StringMessageInReportRepository stringMessageInReportRepository, SocketIOServer socketIOServer) {
+    public SocketService(ReportsRepository reportsRepository, SocketExceptionHandler socketExceptionHandler, JwtUtil jwtTokenProvider, ISocketEntityHelper socketEntityHelper, UserDetailsServiceImpl userDetailsService, UtilService utilService, BaseMessageInReportRepository baseMessageInReportRepository, StringMessageInReportRepository stringMessageInReportRepository, SocketIOServer socketIOServer) {
         // Inject other class
         this.reportsRepository = reportsRepository;
+        this.socketExceptionHandler = socketExceptionHandler;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.socketEntityHelper = socketEntityHelper;
         this.userDetailsService = userDetailsService;
         this.utilService = utilService;
         this.baseMessageInReportRepository = baseMessageInReportRepository;
@@ -66,10 +74,12 @@ public class MessageInReportService {
     //  2. Payloadda access token alinmalidi, ve mesaji gonderen Hacker yoxsa Company-di tapa bilerik token vasitesile , (en 1-ci unauthorized olmadigini yoxlamalyiq, eks halda exception) +
     //  1. Exceptionlar error event name ile atilmalidi ,  hem log hem sendEvent
     //  3. Payloaddan entity-e kecirerken eger token ile tapdigimiz user hackerdisa -> isHacker=true , company-dirse -> isHacker=false edib save edirik
-    // TODO: TASKS
     //  6. Token-den extract etdiyimiz user(hacker) hemin reportun useri ile eyni olmalidi , deyilse exception ("Message of Hacker must be same with report Hacker") -> (hem log hem de sendEvent ile error eventinde ex-mesaji gondermek)
     //  7. Token-den extract etdiyimiz company hemin reportun company-si ile eyni olmalidi , deyilse exception
     //   autheticatedUser hemin reportun hackeri ve ya company-sidirmi? eks halda exception
+    //    hacker ve ya company reporta aid deyilse mesaj gondere bilmir ama gore bilir (otaga connect ede bilir, mesj atanda disconnect olur) , room-a girmeye icaze verme
+    // TODO: TASKS
+    //      exceptionlar sadece logda gorunur event kimi send olmur
     //    dto-ya cevirerken her iki id-ni set et ,  reportdan gotur , isHackeride set et entityden
     //  4. Reportun yalniz bir user(hacker) ve bir company id-si ola biler , isHacker true ve ya false ferq etmir
     //      hansi hal olursa olsun her iki id DTO-da gorunmelidi entity-de yox(report-dan goture bilerik bu iki value-nu)  ,
@@ -88,121 +98,152 @@ public class MessageInReportService {
     //      Adminler reportId ile istenilen report altindaki, butun mesajlari gore biler list<DTO> seklinde
     //      Silinmis mesajlar, editlenmis mesajlarida bu 3 task - http-dir socket ile deyil
     //   13. Butun bu tasklar bitenden sonra -> editMessage, deleteMessage, deleteMessageList (every user only edit or delete own), edited or deleted messages must be tracked in logs and db, explore: "can we store logs?(not to use safe delete)"
-    @Transactional // for this anno we cannot set private
+    @Transactional
     public DataListener<StringMessageInReportPayload> onStrMessageReceived() {
         return (socketIOClient, data, ackSender) -> {
+            socketExceptionHandler.executeWithExceptionHandling(() -> {
+                log.info(String.format("Data from client StringMessageInReportPayload -> (payload): %s", data));
 
-            log.info(String.format("Data from client StringMessageInReportPayload -> (payload): %s",data));
+                // Create message from payload
+                StringMessageInReport strMessage = createStringMessageInReport(data);
 
-            StringMessageInReport strMessage = new StringMessageInReport();
-            strMessage.setContent(data.getContent());
-            strMessage.setEdited(false); // Initialize false, set true when change and set updatedAt
-            strMessage.setCreatedAt(LocalDateTime.now());
-            strMessage.setReplied(data.isReplied());
+                // Room from path query (urlParam) and get Report from room
+                String room = socketIOClient.getHandshakeData().getSingleUrlParam("room");
+                Report reportOfMessage = reportsRepository.findByRoom(room).orElseThrow(() -> new ResourceNotFoundException("Report not found with room: " + room));
 
-            // Set "BaseMessage" (replyTo) if it is not null
-            if(data.getReplyToMessageId() != null){
-                Optional<BaseMessageInReport> repliedMessageInReport = baseMessageInReportRepository.findById(data.getReplyToMessageId());
-                strMessage.setReplyTo(repliedMessageInReport.get());
-            }
+                // Is it user or company if authorized
+                Object authenticatedUser = getAuthenticatedUser();
+                log.info("User/Company info: " + authenticatedUser);
 
-            // Set "Report"
-            Report reportOfMessage = findReportById(data.getReportId(),socketIOClient);
-            strMessage.setReport(reportOfMessage);
+                // Validate the hacker/company
+                validateHackerAndCompany(authenticatedUser, reportOfMessage.getId(), strMessage);
 
-            //////////
-            // Set isHacker based on token, token comes in auth header there is no need in payload
-            // refactorThis
-            Object authenticatedUser;
+                // Save str message
+                StringMessageInReport savedMsg = stringMessageInReportRepository.save(strMessage);
+                log.info(String.format("Data after save -> StringMessageInReport (entity): %s", savedMsg));
 
-            try{
-                // if exception not occurs it is Hacker
-                authenticatedUser = utilService.getAuthenticatedHacker();// returns UserEntity
-                log.info("It is Hacker entity!");
-            }catch (UnauthorizedException e){
-                // if exception occurs it is not Hacker
-                log.warn("It is not Hacker entity!");
-                authenticatedUser = utilService.getAuthenticatedCompany();// returns CompanyEntity
-            }
+                // Send message to the report's room
+                sendMessageToRoom(socketIOClient, savedMsg, room);
 
-            log.info("User/Company info: " + authenticatedUser);
+                // Log important details of message
+                logImportantDetails(savedMsg, data, socketIOClient);
 
-            if(authenticatedUser instanceof UserEntity){
-                strMessage.setHacker(true);
-            } else if (authenticatedUser instanceof CompanyEntity) {
-                strMessage.setHacker(false);
-            }else {
-                log.error("User is neither Hacker nor Company!");
-                throw new UnauthorizedException("User is neither Hacker nor Company!");
-            }
-
-            //////////
-
-            // Save str message
-            StringMessageInReport savedMsg = stringMessageInReportRepository.save(strMessage);
-            log.info(String.format("Data after save -> StringMessageInReport (entity): %s",savedMsg));
-
-
-
-            // Send message to the report's room
-            String room = socketIOClient.getHandshakeData().getSingleUrlParam("room"); // room as query ?room= uuid of msg's report
-            log.info(String.format("Room uuid: %s , report of room uuid: %s , must be equal",room, reportOfMessage.getRoom()));
-
-
-            socketIOClient.getNamespace().getRoomOperations(room).getClients().forEach(
-                    x -> {
-                        if (!x.getSessionId().equals(socketIOClient.getSessionId())){
-                            // Convert into dto, client only see dto (time format -> String)
-                            StringMessageInReportDTO msgDTO = StringMessageInReportMapper.INSTANCE.toDTO(savedMsg);
-
-                            log.info(String.format("In get_message event: %s",savedMsg));
-                            log.info(String.format("Data after mapping to DTO -> StringMessageInReportDTO (DTO): %s",msgDTO));
-
-                            x.sendEvent("get_message", msgDTO);
-                        }
-                    }
-            );
-
-
-            // Log important details of message
-            log.info(String.format("Sent message id: %d ,Report id: %d ,Report's user id: %d,Socket client id: %s -> msg: %s at %s",
-                    savedMsg.getId(),
-                    data.getReportId(),
-                    reportOfMessage.getUser().getId(),
-//                        reportOfMessage.getBugBountyProgram().getCompany().getId(),// todo: not working
-//                        reportOfMessage.getBugBountyProgram().getId(),// todo: not working
-                    socketIOClient.getSessionId().toString(),
-                    data.getContent(),
-                    LocalDateTime.now()));
+            }, socketIOClient);
         };
     }
 
-    private Report findReportById(Long reportId, SocketIOClient socketIOClient) {
-        Report report = null;
-        try {
-            report = reportsRepository.findById(reportId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Report not found with id: " + reportId));
-        } catch (ResourceNotFoundException e) {
-            // Handle the exception here, possibly by logging it or sending an error response
-            log.error("Resource not found: " + e.getMessage());
-            socketIOClient.sendEvent("error","Resource not found: " + e.getMessage());
+
+    private StringMessageInReport createStringMessageInReport(StringMessageInReportPayload data) {
+        StringMessageInReport strMessage = new StringMessageInReport();
+        strMessage.setContent(data.getContent());
+        strMessage.setEdited(false);
+        strMessage.setCreatedAt(LocalDateTime.now());
+        strMessage.setReplied(data.isReplied());
+
+        // Set "BaseMessage" (replyTo) if it is not null
+        if (data.getReplyToMessageId() != null) {
+            Optional<BaseMessageInReport> repliedMessageInReport = baseMessageInReportRepository.findById(data.getReplyToMessageId());
+            strMessage.setReplyTo(repliedMessageInReport.orElse(null));
         }
-        return report;
+
+        // Set "Report"
+        strMessage.setReport(socketEntityHelper.findReportById(data.getReportId()));
+
+        return strMessage;
     }
-//    private DataListener<FileMessageInReport> onFileMessageReceived() {
-//        return null;
-//    }
+
+    private Object getAuthenticatedUser() {
+        try {
+            return utilService.getAuthenticatedHacker();
+        } catch (UserNotFoundException e) {
+            // if exception occurs it is not Hacker
+            log.warn("It is not Hacker entity!");
+            return utilService.getAuthenticatedCompany();
+        }
+    }
+
+    private void sendMessageToRoom(SocketIOClient socketIOClient, StringMessageInReport savedMsg, String room) {
+
+        log.info(String.format("Room uuid: %s", room));
+
+        socketIOClient.getNamespace().getRoomOperations(room).getClients().forEach(x -> {
+            if (!x.getSessionId().equals(socketIOClient.getSessionId())) {
+                StringMessageInReportDTO msgDTO = StringMessageInReportMapper.INSTANCE.toDTO(savedMsg);
+                log.info(String.format("In get_message event: %s", savedMsg));
+                log.info(String.format("Data after mapping to DTO -> StringMessageInReportDTO (DTO): %s", msgDTO));
+                x.sendEvent("get_message", msgDTO);
+            }
+        });
+    }
+
+    private void logImportantDetails(StringMessageInReport savedMsg, StringMessageInReportPayload data, SocketIOClient socketIOClient) {
+        log.info(String.format("Sent message id: %d ,Report id: %d ,Report's user id: %d,Socket client id: %s -> msg: %s at %s",
+                savedMsg.getId(),
+                data.getReportId(),
+                savedMsg.getReport().getUser().getId(),
+                socketIOClient.getSessionId().toString(),
+                data.getContent(),
+                LocalDateTime.now()));
+        // todo: get program and company must be logged
+    }
+
+
+    public void validateHackerAndCompany(Object authenticatedUser, Long reportId, StringMessageInReport strMessage) {
+        setHackerFlag(authenticatedUser, strMessage);
+        checkUserOrCompanyReport(authenticatedUser, reportId);
+    }
+    //refactorThis
+    private void checkUserOrCompanyReport(Object authenticatedUser, Long reportId) {
+        if (authenticatedUser instanceof UserEntity) {
+            socketEntityHelper.checkUserReport(authenticatedUser, reportId);
+        } else if (authenticatedUser instanceof CompanyEntity) {
+            socketEntityHelper.checkCompanyReport(authenticatedUser, reportId);
+        } else {
+            throw new UnauthorizedException("User is neither Hacker nor Company!");
+        }
+    }
+    private void setHackerFlag(Object authenticatedUser, StringMessageInReport strMessage) {
+        if (authenticatedUser instanceof UserEntity) {
+            strMessage.setHacker(true);
+        } else if (authenticatedUser instanceof CompanyEntity) {
+            strMessage.setHacker(false);
+        } else {
+            throw new UnauthorizedException("User is neither Hacker nor Company!");
+        }
+    }
+
+
+
+
 
     //
     private ConnectListener onConnected() {
         return socketIOClient -> {
 
             // refactorThis
+            // If user authorized it sets or throw exception
+            setUserIfAuthorized(socketIOClient);
+
+            // Is it user or company if authorized
+            Object authenticatedUser = getAuthenticatedUser();
+
+            String room = socketIOClient.getHandshakeData().getSingleUrlParam("room");
+            Report reportOfMessage = reportsRepository.findByRoom(room).orElseThrow(() -> new ResourceNotFoundException("Report not found with room: " + room));
+
+            // Is it user or company if authorized
+            checkUserOrCompanyReport(authenticatedUser,reportOfMessage.getId());
+
+            socketIOClient.joinRoom(room);
+            log.info(String.format("SocketID: %s connected!", socketIOClient.getSessionId().toString()));
+            log.info(String.format("Connected to the room: %s",room));
+        };
+    }
+
+    private void setUserIfAuthorized(SocketIOClient socketIOClient) {
             String authorizationHeader = socketIOClient.getHandshakeData().getHttpHeaders().get("Authorization");
             log.info("Authorization Header of request: " + authorizationHeader);
             if(authorizationHeader == null){
-                log.error("Auth header is null");
-                socketIOClient.sendEvent("error","Authorization Header of request: null, You are unauthorized person");
+                throw new UnauthorizedException("Authorization Header of request: null, You are unauthorized person");
             }
 
             String token = jwtTokenProvider.validateBearerToken(authorizationHeader);
@@ -218,12 +259,6 @@ public class MessageInReportService {
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             }
-
-            String room = socketIOClient.getHandshakeData().getSingleUrlParam("room");
-            socketIOClient.joinRoom(room);
-            log.info(String.format("SocketID: %s connected!", socketIOClient.getSessionId().toString()));
-            log.info(String.format("Connected to the room: %s",room));
-        };
     }
 
     private DisconnectListener onDisconnected() {
@@ -231,6 +266,9 @@ public class MessageInReportService {
           log.info(String.format("SocketID: %s disconnected!", socketIOClient.getSessionId().toString()));
         };
     }
+
+    // Util methods
+
 
 
 }
