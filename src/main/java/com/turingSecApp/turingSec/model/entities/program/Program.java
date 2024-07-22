@@ -82,7 +82,6 @@ public class Program {
         if (fromDate != null && toDate != null) {
             return ChronoUnit.DAYS.between(fromDate, toDate);
         }
-        log.error("FromDate,toDate are null");
         return null;
     }
 

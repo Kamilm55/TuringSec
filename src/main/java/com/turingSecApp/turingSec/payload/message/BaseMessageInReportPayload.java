@@ -1,5 +1,6 @@
 package com.turingSecApp.turingSec.payload.message;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 @Data
@@ -7,10 +8,8 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class BaseMessageInReportPayload {
-
+    @JsonProperty(value = "isReplied")
     private boolean isReplied;
 
     private Long replyToMessageId;
-
-    private Long reportId;// bu cixacaq room ile tapa bilerik reportu
 }

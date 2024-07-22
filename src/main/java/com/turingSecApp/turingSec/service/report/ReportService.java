@@ -212,7 +212,7 @@ public class ReportService implements IBugBountyReportService {
         checkReportOwnership(report);
 
         // Find related program then remove from list<ReportEntity>, then you can delete
-        Program program = programRepository.findByReportsContains(report).orElseThrow(() -> new ResourceNotFoundException("Report not found with report:" + report));
+        Program program = programRepository.findByReportsContains(report).orElseThrow(() -> new ResourceNotFoundException("Program not found with this report:" + report));
         program.removeReport(report.getId());
 
         Report updatedReport = reportEntityHelper.deleteReportChildEntities(report);

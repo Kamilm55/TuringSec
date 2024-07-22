@@ -1,6 +1,9 @@
 package com.turingSecApp.turingSec.service;
 
+import com.corundumstudio.socketio.SocketIOClient;
 import com.turingSecApp.turingSec.exception.custom.CompanyNotFoundException;
+import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
+import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.model.entities.MockData;
 import com.turingSecApp.turingSec.model.entities.report.Report;
 import com.turingSecApp.turingSec.model.entities.role.Role;
@@ -46,6 +49,7 @@ public class MockDataService implements IMockDataService {
     private final RoleRepository roleRepository;
     private final CompanyRepository companyRepository;
     private final ReportsRepository reportsRepository;
+
 
     @Transactional
     public void testProxy() {

@@ -46,6 +46,6 @@ public class BaseMessageInReport {
     @JsonIgnore
     private BaseMessageInReport replyTo;
 
-    @ManyToOne
+    @ManyToOne(/*fetch = FetchType.LAZY*/) //todo: make lazy field and fix related problems, When mapping into DTO can be problem
     private Report report;
 }

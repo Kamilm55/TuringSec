@@ -12,5 +12,8 @@ public interface StringMessageInReportMapper {
 
     @Mapping(target = "reportId" , source = "report.id")
     @Mapping(target = "replyToId" , source = "replyTo.id")
-    StringMessageInReportDTO toDTO(StringMessageInReport stringMessageInReport);
+    @Mapping(target = "userId" , source = "report.user.id")
+    // Only eagerly fetched fields are converted here
+//    @Mapping(target = "companyId" , source = "report.program.company.id")
+    StringMessageInReportDTO toDTOEagerFields(StringMessageInReport stringMessageInReport);
 }
