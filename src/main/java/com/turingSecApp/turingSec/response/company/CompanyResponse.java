@@ -16,7 +16,7 @@ public class CompanyResponse {
     private String assets;
     private String message;
 
-    private boolean approved; // Indicates whether the company registration is approved
+    private boolean activated; // Indicates whether the company registration is approved
 
     //private Set<Role> roles;
 

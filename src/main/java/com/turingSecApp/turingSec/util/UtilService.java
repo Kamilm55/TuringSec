@@ -2,9 +2,11 @@ package com.turingSecApp.turingSec.util;
 
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.role.Role;
+import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
+import com.turingSecApp.turingSec.model.repository.AdminRepository;
 import com.turingSecApp.turingSec.model.repository.CompanyRepository;
 import com.turingSecApp.turingSec.model.repository.RoleRepository;
 import com.turingSecApp.turingSec.model.repository.UserRepository;
@@ -27,24 +29,21 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UtilService {
     private final CompanyRepository companyRepository;
+    private final AdminRepository adminRepository;
     private final ProgramRepository programRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
 
-
-    // In Socket retrieve authenticated entity
-    public UserEntity getCurrentUser(String accessToken) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
-            String username = authentication.getName();
-            return userRepository.findByUsername(username)
-                    .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
-        } else {
-            throw new UnauthorizedException();
-        }
-    }
+    // Get Current User
+//    public Object getCurrentUserByEmailForAllRole(String email){
+//        UserEntity user = userRepository.findByEmail(email);
+//        CompanyEntity company = companyRepository.findByEmail(email);
+//        AdminEntity
+//
+//    }
 
     // Method to retrieve authenticated user(Hacker)
+    // refactorThis
     public UserEntity getAuthenticatedHacker() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {

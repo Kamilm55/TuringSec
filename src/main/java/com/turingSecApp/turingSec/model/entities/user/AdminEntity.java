@@ -25,6 +25,8 @@ public class AdminEntity {
     private String password;
     private String email;
 
+    private boolean activated; // active as default
+
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

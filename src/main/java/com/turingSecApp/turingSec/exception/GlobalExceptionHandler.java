@@ -74,11 +74,19 @@ public class GlobalExceptionHandler {
         );
     }
 
+    // todo: remove this, from security layer of spring is enough
     @ExceptionHandler(com.turingSecApp.turingSec.exception.custom.BadCredentialsException.class)
     public ResponseEntity<ExceptionResponseMessages> handleBadCredentials(com.turingSecApp.turingSec.exception.custom.BadCredentialsException ex) {
         return new ResponseEntity<>(
-                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.CONFLICT) ,
-                HttpStatus.CONFLICT
+                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.UNAUTHORIZED) ,
+                HttpStatus.UNAUTHORIZED
+        );
+    }
+    @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
+    public ResponseEntity<ExceptionResponseMessages> handleBadCredentials(org.springframework.security.authentication.BadCredentialsException ex) {
+        return new ResponseEntity<>(
+                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.UNAUTHORIZED) ,
+                HttpStatus.UNAUTHORIZED
         );
     }
 

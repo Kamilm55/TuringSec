@@ -88,7 +88,7 @@ public class AdminService implements IAdminService {
             company.setPassword(passwordEncoder.encode(generatedPassword));
 
             // Set the approval status to true
-            company.setApproved(true);
+            company.setActivated(true);
 
             // Retrieve the "COMPANY" role
             Role companyRole = roleRepository.findByName("COMPANY");

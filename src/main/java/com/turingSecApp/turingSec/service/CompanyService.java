@@ -18,6 +18,7 @@ import com.turingSecApp.turingSec.service.user.UserService;
 import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.CompanyMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CompanyService implements ICompanyService {
     private final UserService userService;
     private final EmailNotificationService EmailNotificationService;
@@ -42,6 +44,7 @@ public class CompanyService implements ICompanyService {
 
     @Override
     public void registerCompany(RegisterCompanyPayload companyPayload) {
+        log.info(String.format("Company payload: %s", companyPayload));
         // Ensure the company doesn't already exist
         checkCompanyEmailUnique(companyPayload.getEmail());
 
@@ -49,9 +52,11 @@ public class CompanyService implements ICompanyService {
         Role companyRole = findCompanyRole();
 
         CompanyEntity company = buildCompanyEntity(companyPayload, companyRole);
+        log.info(String.format("Company object before save: %s", company));
 
         // Save the company
         CompanyEntity savedCompany = companyRepository.save(company);
+        log.info(String.format("Saved company: %s", savedCompany));
 
         // Notify admins for approval
         notifyAdminsForApproval(savedCompany);
@@ -82,7 +87,7 @@ public class CompanyService implements ICompanyService {
                 .message(companyPayload.getMessage())
                 .first_name(companyPayload.getFirstName())
                 .last_name(companyPayload.getLastName())
-                .approved(false)
+                .activated(false)
                 .roles(Collections.singleton(companyRole))
                 .build();
     }
@@ -157,6 +162,7 @@ public class CompanyService implements ICompanyService {
 
         // Send email notification to each admin
         for (AdminEntity admin : admins) {
+            log.info(String.format("Sent email of admins: %s", admin.getEmail()));
             EmailNotificationService.sendEmail(admin.getEmail(), subject, content);
         }
     }

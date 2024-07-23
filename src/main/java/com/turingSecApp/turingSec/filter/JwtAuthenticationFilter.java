@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String username = jwtTokenProvider.getUsernameFromToken(token);
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            if (userDetails != null/* && userService.findUserByUsername(username).isActivated()*/) { // todo:fix this for only user not company
+            if (userDetails != null/* && utilService.getCurrentUserByEmailForAllRole(email).isActivated()*/) {
                 System.out.println("UserDetails of current user: " + userDetails);
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(auth);

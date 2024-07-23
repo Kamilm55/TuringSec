@@ -31,7 +31,7 @@ public class CompanyEntity {
     private String message;
     private String password;
 
-    private boolean approved; // Indicates whether the company registration is approved
+    private boolean activated;// Indicates whether the company registration is approved
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(

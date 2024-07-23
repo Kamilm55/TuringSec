@@ -136,6 +136,7 @@ public class MockDataService implements IMockDataService {
                 .username("admin1_username")
                 .password(passwordEncoder.encode("adminPass"))
                 .email("kamilmmmdov2905@gmail.com")
+                .activated(true)
                 .build();
 
         AdminEntity admin2 = AdminEntity.builder()
@@ -144,6 +145,7 @@ public class MockDataService implements IMockDataService {
                 .username("admin2_username")
                 .password(passwordEncoder.encode("adminPass "))
                 .email("elnarzulfuqarli2001@gmail.com")
+                .activated(true)
                 .build();
 
         // Set admin roles
@@ -170,7 +172,7 @@ public class MockDataService implements IMockDataService {
                 .company_name("Company")
                 .job_title("CEO")
                 .message("I want to build company")
-                .approved(true)
+                .activated(true)
                 .password(passwordEncoder.encode("string"))
                 .build();
 
