@@ -111,9 +111,9 @@ public class SocketService {
     //    ** LocalDateTime nece serialize edile biler socket io message icinde ?
     @Transactional
     public DataListener<StringMessageInReportPayload> onStrMessageReceived() {
-        return (socketIOClient, data, ackSender) -> {
+        return (socketIOClient, dataPayload, ackSender) -> {
             socketExceptionHandler.executeWithExceptionHandling(() -> {
-                log.info(String.format("Data from client StringMessageInReportPayload -> (payload): %s", data));
+                log.info(String.format("Data from client StringMessageInReportPayload -> (payload): %s", dataPayload));
 
                 // Room from path query (urlParam) and get Report from room
                 String room = socketIOClient.getHandshakeData().getSingleUrlParam("room");
@@ -127,7 +127,7 @@ public class SocketService {
                 checkUserOrCompanyReport(authenticatedUser, reportOfMessage.getId());
 
                 // Create message from payload
-                StringMessageInReport strMessage = createStringMessageInReport(data,authenticatedUser,reportOfMessage);
+                StringMessageInReport strMessage = createStringMessageInReport(dataPayload,authenticatedUser,reportOfMessage);
 
                 // Save created strMessage obj
                 StringMessageInReport savedMsg = stringMessageInReportRepository.save(strMessage);
