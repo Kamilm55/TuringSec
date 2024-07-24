@@ -1,9 +1,9 @@
 package com.turingSecApp.turingSec.util.mapper;
 
+import com.turingSecApp.turingSec.model.entities.user.UserEntityI;
 import com.turingSecApp.turingSec.response.user.UserDTO;
 import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
-import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.response.admin.AdminDTO;
 import com.turingSecApp.turingSec.response.user.UserHackerDTO;
 import org.mapstruct.Mapper;
@@ -29,7 +29,7 @@ public interface UserMapper {
     @Mapping(target = "city", source = "hackerEntity.city")
     @Mapping(target = "hackerId", source = "hackerEntity.id") // Add this mapping for hackerId
     @Mapping(target = "userId", source = "userEntity.id") // Add this mapping for userId
-    UserHackerDTO toDto(UserEntity userEntity, HackerEntity hackerEntity);
+    UserHackerDTO toDto(UserEntityI userEntity, HackerEntity hackerEntity);
 
     @Mappings({
             @Mapping(source = "first_name", target = "firstName"),
@@ -37,7 +37,7 @@ public interface UserMapper {
             @Mapping(source = "hacker.id", target = "hackerId")
             // Add more mappings as needed
     })
-    UserDTO convert(UserEntity userEntity);
+    UserDTO convert(UserEntityI userEntity);
 
 //    UserDTOWithCity convert(UserEntity userEntity , HackerEntity hackerEntity);
     AdminDTO convert(AdminEntity adminEntity);

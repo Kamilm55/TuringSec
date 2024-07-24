@@ -3,12 +3,11 @@ package com.turingSecApp.turingSec.model.entities.report;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.report.embedded.*;
-import com.turingSecApp.turingSec.model.entities.user.UserEntity;
+import com.turingSecApp.turingSec.model.entities.user.UserEntityI;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
 import jakarta.persistence.*;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -57,7 +56,7 @@ public class Report {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @JsonIgnore
-    private UserEntity user;
+    private UserEntityI user;
 
 
     @ManyToOne(fetch = FetchType.LAZY)

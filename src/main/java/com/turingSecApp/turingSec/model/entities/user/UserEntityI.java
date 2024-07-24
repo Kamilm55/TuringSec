@@ -19,28 +19,15 @@
     @Data
     @Entity
     @Table(name = "users")
-    public class UserEntity {
+    public class UserEntityI implements IBaseUser {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;
         private String first_name;
         private String last_name;
-        private String country;
-
-
-        private String username;
-
-        private String password;
         private String email;
-
-
-        @Column(name = "activation_token")
-        private String activationToken;
-
-        @Column(name = "activated")
+        private String password;
         private boolean activated;
-
-
         @ManyToMany(fetch = FetchType.EAGER)
         @JoinTable(
                 name = "user_role",
@@ -49,6 +36,14 @@
         )
         @JsonIgnore
         private Set<Role> roles = new HashSet<>();;
+
+        private String username;
+        private String country;
+
+        @Column(name = "activation_token")
+        private String activationToken;
+
+
 
         @OneToMany(mappedBy = "user",fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
         private List<Report> reports = new ArrayList<>();

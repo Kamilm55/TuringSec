@@ -1,7 +1,5 @@
 package com.turingSecApp.turingSec.service.interfaces;
 
-import com.turingSecApp.turingSec.model.entities.program.Program;
-import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.payload.user.*;
 import com.turingSecApp.turingSec.response.program.ProgramDTO;
 import com.turingSecApp.turingSec.response.user.AuthResponse;

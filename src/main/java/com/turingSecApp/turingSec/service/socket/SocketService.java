@@ -14,7 +14,7 @@ import com.turingSecApp.turingSec.model.entities.message.StringMessageInReport;
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.report.Report;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
-import com.turingSecApp.turingSec.model.entities.user.UserEntity;
+import com.turingSecApp.turingSec.model.entities.user.UserEntityI;
 import com.turingSecApp.turingSec.model.repository.CompanyRepository;
 import com.turingSecApp.turingSec.model.repository.program.ProgramRepository;
 import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
@@ -216,7 +216,7 @@ public class SocketService {
 
     //refactorThis
     private void checkUserOrCompanyReport(Object authenticatedUser, Long reportId) {
-        if (authenticatedUser instanceof UserEntity) {
+        if (authenticatedUser instanceof UserEntityI) {
             socketEntityHelper.checkUserReport(authenticatedUser, reportId);
         } else if (authenticatedUser instanceof CompanyEntity) {
             socketEntityHelper.checkCompanyReport(authenticatedUser, reportId);
@@ -225,7 +225,7 @@ public class SocketService {
         }
     }
     private void setHackerFlag(Object authenticatedUser, StringMessageInReport strMessage) {
-        if (authenticatedUser instanceof UserEntity) {
+        if (authenticatedUser instanceof UserEntityI) {
             strMessage.setHacker(true);
         } else if (authenticatedUser instanceof CompanyEntity) {
             strMessage.setHacker(false);

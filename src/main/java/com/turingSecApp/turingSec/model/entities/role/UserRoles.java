@@ -1,10 +1,8 @@
 package com.turingSecApp.turingSec.model.entities.role;
 
 
-import com.turingSecApp.turingSec.model.entities.role.Role;
-import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
-import com.turingSecApp.turingSec.model.entities.user.UserEntity;
+import com.turingSecApp.turingSec.model.entities.user.UserEntityI;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,7 +24,7 @@ public class UserRoles {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private UserEntity user;
+    private UserEntityI user;
 
     @ManyToOne
     @JoinColumn(name = "role_id")

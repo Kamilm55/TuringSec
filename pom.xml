@@ -132,6 +132,12 @@
             <version>1.5.2.Final</version>
         </dependency>
 
+        <!--UUID generator-->
+        <dependency>
+            <groupId>com.fasterxml.uuid</groupId>
+            <artifactId>java-uuid-generator</artifactId>
+            <version>4.0.1</version>
+        </dependency>
         <!--Socket IO v1.7.17 for backend, v2 for frontend and postman-->
         <dependency>
             <groupId>com.corundumstudio.socketio</groupId>

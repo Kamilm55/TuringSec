@@ -1,15 +1,12 @@
 package com.turingSecApp.turingSec.service;
 
-import com.corundumstudio.socketio.SocketIOClient;
 import com.turingSecApp.turingSec.exception.custom.CompanyNotFoundException;
-import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
-import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.model.entities.MockData;
 import com.turingSecApp.turingSec.model.entities.report.Report;
 import com.turingSecApp.turingSec.model.entities.role.Role;
 import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
-import com.turingSecApp.turingSec.model.entities.user.UserEntity;
+import com.turingSecApp.turingSec.model.entities.user.UserEntityI;
 import com.turingSecApp.turingSec.model.repository.*;
 import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
 import com.turingSecApp.turingSec.payload.program.ProgramPayload;
@@ -58,7 +55,7 @@ public class MockDataService implements IMockDataService {
 
         log.info("report user: " + report.getUser());
 
-        UserEntity userOfReportMessage = report.getUser();
+        UserEntityI userOfReportMessage = report.getUser();
         System.out.println(userOfReportMessage);
     }
     @Override

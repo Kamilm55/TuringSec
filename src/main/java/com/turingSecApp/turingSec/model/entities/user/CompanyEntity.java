@@ -18,21 +18,15 @@ import java.util.Set;
 @ToString(exclude = {"roles", "bugBountyPrograms", "userRoles"})
 @Builder
 @Table(name = "companies")
-public class CompanyEntity {
+public class CompanyEntity implements IBaseUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String first_name;
     private String last_name;
     private String email;
-    private String company_name;
-    private String job_title;
-    private String assets;//no need for this field
-    private String message;
     private String password;
-
     private boolean activated;// Indicates whether the company registration is approved
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "company_role",
@@ -42,13 +36,21 @@ public class CompanyEntity {
     @JsonIgnore
     private Set<Role> roles = new HashSet<>();
 
-    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    @JsonIgnore
-    private Set<Program> bugBountyPrograms;
+    private String message;
+    private String company_name;
+    private String job_title;
+
+    private String assets;//no need for this field
+
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
     @JsonIgnore
     private Set<UserRoles> userRoles = new HashSet<>();;
+
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @JsonIgnore
+    private Set<Program> bugBountyPrograms;
+
 
     public void removeProgram(Long programId) {
         if (bugBountyPrograms != null) {

@@ -5,7 +5,6 @@ import com.turingSecApp.turingSec.model.entities.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,19 +14,15 @@ import java.util.Set;
 @Data
 @Builder
 @Table(name = "admins")
-public class AdminEntity {
+public class AdminEntity implements IBaseUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String first_name;
     private String last_name;
-    private String username;
-    private String password;
     private String email;
-
+    private String password;
     private boolean activated; // active as default
-
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_role",
@@ -36,5 +31,7 @@ public class AdminEntity {
     )
     @JsonIgnore
     private Set<Role> roles = new HashSet<>(); // add Admin role
+
+    private String username;
 
 }

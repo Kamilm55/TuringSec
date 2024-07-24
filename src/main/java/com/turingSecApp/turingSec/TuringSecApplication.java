@@ -1,11 +1,12 @@
 package com.turingSecApp.turingSec;
 
-import com.turingSecApp.turingSec.model.entities.report.Report;
+import com.fasterxml.uuid.Generators;
+import com.fasterxml.uuid.impl.NameBasedGenerator;
 import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
+import com.turingSecApp.turingSec.model.entities.user.IBaseUser;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
-import com.turingSecApp.turingSec.model.entities.user.UserEntity;
+import com.turingSecApp.turingSec.model.entities.user.UserEntityI;
 import com.turingSecApp.turingSec.model.repository.*;
-import com.turingSecApp.turingSec.model.repository.program.ProgramRepository;
 import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
 import com.turingSecApp.turingSec.service.program.ProgramService;
 import com.turingSecApp.turingSec.service.interfaces.IHackerService;
@@ -49,8 +50,8 @@ public class TuringSecApplication implements CommandLineRunner {
     public void run(String... args){
         mockDataService.insertMockData();
 
-
-        UserEntity hacker1 = userRepository.findByEmail("kamilmmmdov2905@gmail.com");
+        // Print Roles
+        UserEntityI hacker1 = userRepository.findByEmail("kamilmmmdov2905@gmail.com");
         if(hacker1!=null) {
             System.out.println("hacker roles: " + hacker1.getRoles().toString());
              System.out.println("hacker entity for user" + hacker1.getHacker());
@@ -63,6 +64,28 @@ public class TuringSecApplication implements CommandLineRunner {
 
         Optional<AdminEntity> admin1 = adminRepository.findByUsername("admin1_username");
         admin1.ifPresent(adminEntity -> System.out.println("admin roles: " + adminEntity.getRoles().toString()));
+
+        //
+        // todo: Implement Factory method pattern for IBaseUser
+        //  change jwt identifier to globalUserID (UUIDv5)
+
+
+        System.out.println("todo: Implement Factory method pattern for baseUser");
+
+        IBaseUser IBaseUser1 = hacker1;
+        IBaseUser IBaseUser2 = company;
+        IBaseUser IBaseUser3 = admin1.get();
+
+        System.out.println(IBaseUser1);
+        System.out.println(IBaseUser2);
+        System.out.println(IBaseUser3);
+
+        System.out.println(IBaseUser1.equals(hacker1) + " | " + IBaseUser2.equals(company) + " | " + IBaseUser3.equals(admin1.get()));
+
+        NameBasedGenerator generator = Generators.nameBasedGenerator(NameBasedGenerator.NAMESPACE_DNS);
+        String name = "globalUserID";
+        UUID uuid = generator.generate(name);
+        System.out.println("Generated UUIDv5 for global user id: " + uuid.toString());
 
     }
 

@@ -5,7 +5,7 @@ import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.helper.entityHelper.user.IUserEntityHelper;
 import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
-import com.turingSecApp.turingSec.model.entities.user.UserEntity;
+import com.turingSecApp.turingSec.model.entities.user.UserEntityI;
 import com.turingSecApp.turingSec.model.repository.HackerRepository;
 import com.turingSecApp.turingSec.model.repository.UserRepository;
 import com.turingSecApp.turingSec.payload.user.*;
@@ -47,7 +47,7 @@ public class UserManagementService {
         checkUserDoesNotExist(registerPayload);
 
         // Populate user entity and save as an inactive user
-        UserEntity user = populateUserAndSave(registerPayload,false);
+        UserEntityI user = populateUserAndSave(registerPayload,false);
 
         // Send activation email //todo: change to async event (kafka)
         sendActivationEmail(user);
@@ -67,9 +67,9 @@ public class UserManagementService {
         populateUserAndSave(registerPayload,true);
     }
 
-    private UserEntity populateUserAndSave(RegisterPayload registerPayload,boolean activated) {
+    private UserEntityI populateUserAndSave(RegisterPayload registerPayload, boolean activated) {
         // Create the user entity
-        UserEntity user = userEntityHelper.createUserEntity(registerPayload,activated);
+        UserEntityI user = userEntityHelper.createUserEntity(registerPayload,activated);
 
         // todo: save in one place
 
@@ -95,7 +95,7 @@ public class UserManagementService {
 
     public AuthResponse loginUser(LoginRequest loginRequest) {
         // Find user by email
-        UserEntity userEntity = userEntityHelper.findByEmail(loginRequest.getUsernameOrEmail());
+        UserEntityI userEntity = userEntityHelper.findByEmail(loginRequest.getUsernameOrEmail());
 
         // If user not found by email, try finding by username
         if (userEntity == null) {
@@ -115,21 +115,21 @@ public class UserManagementService {
          String token = generateTokenForUser(userEntity);
 
          // Retrieve user and hacker details from the database
-         UserEntity userById = userEntityHelper.findUserById(userEntity.getId());
+         UserEntityI userById = userEntityHelper.findUserById(userEntity.getId());
 
          // Create and return authentication response
          return buildAuthResponse(userById,token);
 
     }
 
-    private void checkPassword(LoginRequest loginRequest, UserEntity userEntity) {
+    private void checkPassword(LoginRequest loginRequest, UserEntityI userEntity) {
         if (!passwordEncoder.matches(loginRequest.getPassword(), userEntity.getPassword())) {
             // Authentication failed
             throw new BadCredentialsException("Invalid username/email or password.");
         }
     }
 
-    private void checkUserFoundOrNot(UserEntity userEntity) {
+    private void checkUserFoundOrNot(UserEntityI userEntity) {
         if (userEntity == null ) {
             throw new UserNotFoundException("User not found with email/username");
         }
@@ -137,7 +137,7 @@ public class UserManagementService {
 
     public void changePassword(ChangePasswordRequest request) {
         // Retrieve authenticated user
-        UserEntity user = utilService.getAuthenticatedHacker();
+        UserEntityI user = utilService.getAuthenticatedHacker();
 
         // Validate current password
         userEntityHelper.validateCurrentPassword(request, user);
@@ -149,7 +149,7 @@ public class UserManagementService {
 
     public void changeEmail(ChangeEmailRequest request) {
         // Retrieve authenticated user
-        UserEntity user = utilService.getAuthenticatedHacker();
+        UserEntityI user = utilService.getAuthenticatedHacker();
 
         // Validate current password
         userEntityHelper.validateCurrentPassword(request, user);
@@ -161,13 +161,13 @@ public class UserManagementService {
         updateEmail(request, user);
     }
 
-    private void updateEmail(ChangeEmailRequest request, UserEntity user) {
+    private void updateEmail(ChangeEmailRequest request, UserEntityI user) {
         user.setEmail(request.getNewEmail());
         userRepository.save(user);
     }
 
     public UserHackerDTO updateProfile(UserUpdateRequest userUpdateRequest) {
-        UserEntity userEntity = utilService.getAuthenticatedHacker();
+        UserEntityI userEntity = utilService.getAuthenticatedHacker();
         log.info(String.format("User with id: %s , username: %s updated info. User info before update: %s",userEntity.getId().toString(),userEntity.getUsername(),userEntity));
 
         userEntityHelper.updateUserProfile(userEntity, userUpdateRequest);
@@ -181,7 +181,7 @@ public class UserManagementService {
         }
 
 
-        UserEntity savedUser = userRepository.save(userEntity);
+        UserEntityI savedUser = userRepository.save(userEntity);
 
         log.info(String.format("User with id: %s , username: %s updated info. New user info after update: %s",savedUser.getId().toString(),savedUser.getUsername(),savedUser));
 
@@ -197,10 +197,10 @@ public class UserManagementService {
 
     public void deleteUser() {
         // Get the authenticated user's username from the security context
-        UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
+        UserEntityI authenticatedUser = utilService.getAuthenticatedHacker();
 
         // Find the user by username
-        UserEntity user = userEntityHelper.findUserByUsername(authenticatedUser.getUsername());
+        UserEntityI user = userEntityHelper.findUserByUsername(authenticatedUser.getUsername());
 
         // Delete the user
         userRepository.delete(user);
@@ -211,7 +211,7 @@ public class UserManagementService {
 
 
 //////////////////////////////////////////////////////////////////////
-    public void sendActivationEmail(UserEntity user) {
+    public void sendActivationEmail(UserEntityI user) {
         // Generate activation token and save it to the user entity
         String activationToken = utilService.generateActivationToken();
         user.setActivationToken(activationToken);
@@ -229,16 +229,16 @@ public class UserManagementService {
     }
 
 
-    private AuthResponse buildAuthResponse(UserEntity user, String token) {
+    private AuthResponse buildAuthResponse(UserEntityI user, String token) {
         // Retrieve the user and hacker details from the database
-        UserEntity userById = utilService.findUserById(user.getId());
+        UserEntityI userById = utilService.findUserById(user.getId());
         HackerEntity hackerFromDB = hackerRepository.findByUser(userById);
 
         // Build and return the authentication response
         return  utilService.buildAuthResponse(token, userById, hackerFromDB);
     }
     // Method to generate authentication token for the user
-    private String generateTokenForUser(UserEntity user) {
+    private String generateTokenForUser(UserEntityI user) {
         UserDetails userDetails = new CustomUserDetails(user);
         return jwtTokenProvider.generateToken(userDetails);
     }

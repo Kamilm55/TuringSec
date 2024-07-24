@@ -3,7 +3,7 @@ package com.turingSecApp.turingSec.service.user;
 import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.role.Role;
-import com.turingSecApp.turingSec.model.entities.user.UserEntity;
+import com.turingSecApp.turingSec.model.entities.user.UserEntityI;
 import com.turingSecApp.turingSec.model.repository.AdminRepository;
 import com.turingSecApp.turingSec.model.repository.CompanyRepository;
 import com.turingSecApp.turingSec.model.repository.RoleRepository;
@@ -29,7 +29,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity user = userRepository.findByUsername(username).orElse(null);
+        UserEntityI user = userRepository.findByUsername(username).orElse(null);
         System.out.println("(loadUserByUsername) -> username: " + username);
         System.out.println("(loadUserByUsername) -> user: " + user);
         if (user != null) {
