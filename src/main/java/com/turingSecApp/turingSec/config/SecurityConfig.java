@@ -122,6 +122,14 @@ public class SecurityConfig {
 
                             .requestMatchers("/api/bug-bounty-reports/{id}").hasRole("HACKER");
 
+                    //message
+                    request
+                            .requestMatchers("/api/messages/messages").hasRole("HACKER")
+                            .requestMatchers("/api/messages/messages").hasRole("COMPANY")
+                            .requestMatchers("/api/messages/message/{id}").hasRole("HACKER")
+                            .requestMatchers("/api/messages/message/{id}").hasRole("HACKER")
+                            .requestMatchers("/api/messages/admins/{reportId}").hasRole("ADMIN")
+                            .requestMatchers("/api/messages/admin/{id1}").hasRole("ADMIN");
 
                 })
                 .sessionManagement(sm->sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
