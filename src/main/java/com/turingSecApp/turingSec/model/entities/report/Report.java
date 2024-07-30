@@ -3,7 +3,7 @@ package com.turingSecApp.turingSec.model.entities.report;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.report.embedded.*;
-import com.turingSecApp.turingSec.model.entities.user.UserEntityI;
+import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
@@ -56,7 +56,7 @@ public class Report {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @JsonIgnore
-    private UserEntityI user;
+    private UserEntity user;
 
 
     @ManyToOne(fetch = FetchType.LAZY)

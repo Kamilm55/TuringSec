@@ -8,9 +8,4 @@ public interface ISocketEntityHelper {
     void checkUserReport(Object authenticatedUser, Long reportId) throws UserMustBeSameWithReportUserException;
     void checkCompanyReport(Object authenticatedUser, Long reportId) throws UserMustBeSameWithReportUserException;
     Report findReportById(Long reportId) throws ResourceNotFoundException;
-    void testProxy();
-
-    void testProxy(Report reportOfMessage);
-
-    void testProxy(Long reportId);
 }

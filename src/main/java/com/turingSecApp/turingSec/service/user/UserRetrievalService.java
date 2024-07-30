@@ -1,7 +1,7 @@
 package com.turingSecApp.turingSec.service.user;
 
 import com.turingSecApp.turingSec.helper.entityHelper.user.IUserEntityHelper;
-import com.turingSecApp.turingSec.model.entities.user.UserEntityI;
+import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.UserRepository;
 import com.turingSecApp.turingSec.response.program.ProgramDTO;
 import com.turingSecApp.turingSec.response.user.UserDTO;
@@ -29,7 +29,7 @@ public class UserRetrievalService {
     public boolean activateAccount(String token) {
 
         // Retrieve user by activation token
-        UserEntityI user = userRepository.findByActivationToken(token);
+        UserEntity user = userRepository.findByActivationToken(token);
 
         if (user != null /*&& !user.isActivated()*/) {
             // Activate the user by updating the account status or perform other necessary actions
@@ -42,7 +42,7 @@ public class UserRetrievalService {
     }
 
     public UserDTO getUserById(Long userId) {
-        UserEntityI user = userEntityHelper.findUserById(userId);
+        UserEntity user = userEntityHelper.findUserById(userId);
         return UserMapper.INSTANCE.convert(user);
     }
 

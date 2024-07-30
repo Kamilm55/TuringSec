@@ -25,7 +25,11 @@ public class SocketConfig {
     public SocketIOServer socketIOServer(){
         com.corundumstudio.socketio.Configuration socketConfig = new com.corundumstudio.socketio.Configuration();
         socketConfig.setHostname(host);
-        socketConfig.setPort(6000);// todo: for prod configure other port for socket
+        socketConfig.setPort(4000);// todo: for prod configure other port for socket
+
+
+        // Set CORS configuration
+        socketConfig.setOrigin("http://localhost:5173"); // Allow all origins for development; change for production
 
         // Inject custom JacksonJsonSupport to enable serialization of LocalDateTime
         socketConfig.setJsonSupport(new JacksonJsonSupport());

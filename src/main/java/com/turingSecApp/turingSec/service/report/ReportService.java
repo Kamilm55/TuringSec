@@ -5,7 +5,7 @@ import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.report.ReportCVSS;
 import com.turingSecApp.turingSec.model.entities.report.Report;
 import com.turingSecApp.turingSec.model.entities.report.ReportManual;
-import com.turingSecApp.turingSec.model.entities.user.UserEntityI;
+import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.*;
 import com.turingSecApp.turingSec.model.repository.program.ProgramRepository;
 import com.turingSecApp.turingSec.model.repository.report.ReportCVSSRepository;
@@ -63,7 +63,7 @@ public class ReportService implements IBugBountyReportService {
     @Override
     public ReportManual submitManualReport(List<MultipartFile> files, UserDetails userDetails, ReportManualPayload reportPayload, Long bugBountyProgramId) throws IOException {
         // Check the authenticated hacker
-        UserEntityI authenticatedUser = utilService.getAuthenticatedHacker();
+        UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
 
         // Fetch the BugBountyProgramEntity from the repository
         Program program = programRepository.findById(bugBountyProgramId)
@@ -102,7 +102,7 @@ public class ReportService implements IBugBountyReportService {
     }
 
     private void setAuthenticatedUserToReport(Long authenticatedUser, Report report) {
-        UserEntityI userFromDB = userRepository.findById(authenticatedUser)
+        UserEntity userFromDB = userRepository.findById(authenticatedUser)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + authenticatedUser + " not found"));
         report.setUser(userFromDB);
     }
@@ -113,7 +113,7 @@ public class ReportService implements IBugBountyReportService {
                 .orElseThrow(() -> new ResourceNotFoundException("Report not found with id:" + id));
 
         // Ensure that the authenticated hacker can only update their own report
-        UserEntityI authenticatedUser = utilService.getAuthenticatedHacker();
+        UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
         checkReportOwnership(existingReport);
 
         //todo: rewrite update methods , they must be able to change the type of the report (convert manual to CVSS or vice versa) when updating
@@ -134,7 +134,7 @@ public class ReportService implements IBugBountyReportService {
     @Override
     public ReportCVSS submitCVSSReport(List<MultipartFile> files, UserDetails userDetails,ReportCVSSPayload reportPayload, Long bugBountyProgramId) throws IOException {
         // Check the authenticated hacker
-        UserEntityI authenticatedUser = utilService.getAuthenticatedHacker();
+        UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
 
         // Fetch the BugBountyProgramEntity from the repository
         Program program = programRepository.findById(bugBountyProgramId)
@@ -168,7 +168,7 @@ public class ReportService implements IBugBountyReportService {
                 .orElseThrow(() -> new ResourceNotFoundException("Report not found with id:" + id));
 
         // Ensure that the authenticated hacker can only update their own report
-        UserEntityI authenticatedUser = utilService.getAuthenticatedHacker();
+        UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
         checkReportOwnership(existingReport);
 
         // Update existing report properties with values from the update payload
@@ -190,7 +190,7 @@ public class ReportService implements IBugBountyReportService {
     }
 
     private void checkReportOwnership(Report report) {
-        UserEntityI authenticatedUser = utilService.getAuthenticatedHacker();
+        UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
 
         if (!report.getUser().getId().equals(authenticatedUser.getId())) {
             throw new PermissionDeniedException();
@@ -224,7 +224,7 @@ public class ReportService implements IBugBountyReportService {
         String username = getUsernameFromToken();
 
         // Find the user by username
-        UserEntityI user = userRepository.findByUsername(username)
+        UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
 
         // Get all reports associated with the user

@@ -1,36 +1,36 @@
 package com.turingSecApp.turingSec.helper.entityHelper.user;
 
 import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
-import com.turingSecApp.turingSec.model.entities.user.UserEntityI;
+import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.payload.user.ChangeEmailRequest;
 import com.turingSecApp.turingSec.payload.user.ChangePasswordRequest;
 import com.turingSecApp.turingSec.payload.user.RegisterPayload;
 import com.turingSecApp.turingSec.payload.user.UserUpdateRequest;
 
 public interface IUserEntityHelper {
-    UserEntityI createUserEntity(RegisterPayload registerPayload, boolean activated);
-    void setHackerInUserEntity(UserEntityI user, HackerEntity hackerEntity);
-    void setUserInHackerEntity(UserEntityI user, HackerEntity hackerEntity);
+    UserEntity createUserEntity(RegisterPayload registerPayload, boolean activated);
+    void setHackerInUserEntity(UserEntity user, HackerEntity hackerEntity);
+    void setUserInHackerEntity(UserEntity user, HackerEntity hackerEntity);
 
-    HackerEntity createHackerEntity(UserEntityI user);
+    HackerEntity createHackerEntity(UserEntity user);
 
-    UserEntityI findByEmail(String email);
+    UserEntity findByEmail(String email);
 
-    UserEntityI findUserByUsername(String usernameOrEmail);
+    UserEntity findUserByUsername(String usernameOrEmail);
 
-    UserEntityI findUserById(Long id);
+    UserEntity findUserById(Long id);
 
-    HackerEntity findHackerByUser(UserEntityI userById);
+    HackerEntity findHackerByUser(UserEntity userById);
 
-    void validateCurrentPassword(ChangePasswordRequest request, UserEntityI user);
+    void validateCurrentPassword(ChangePasswordRequest request, UserEntity user);
 
-    public void validateCurrentPassword(ChangeEmailRequest request, UserEntityI user);
+    public void validateCurrentPassword(ChangeEmailRequest request, UserEntity user);
 
-    void updatePassword(String newPassword, String confirmNewPassword, UserEntityI user);
+    void updatePassword(String newPassword, String confirmNewPassword, UserEntity user);
 
     void checkIfEmailExists(String newEmail);
 
-    void updateUserProfile(UserEntityI userEntity, UserUpdateRequest userUpdateRequest);
+    void updateUserProfile(UserEntity userEntity, UserUpdateRequest userUpdateRequest);
 
     void updateHackerProfile(HackerEntity hackerEntity, UserUpdateRequest userUpdateRequest);
 }

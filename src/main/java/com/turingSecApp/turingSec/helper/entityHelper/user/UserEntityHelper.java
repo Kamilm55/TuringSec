@@ -6,7 +6,7 @@ import com.turingSecApp.turingSec.exception.custom.EmailAlreadyExistsException;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.model.entities.role.Role;
 import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
-import com.turingSecApp.turingSec.model.entities.user.UserEntityI;
+import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.HackerRepository;
 import com.turingSecApp.turingSec.model.repository.UserRepository;
 import com.turingSecApp.turingSec.payload.user.ChangeEmailRequest;
@@ -29,9 +29,9 @@ public class UserEntityHelper implements IUserEntityHelper{
     private final UserRepository userRepository;
     private final HackerRepository hackerRepository;
     @Override
-    public UserEntityI createUserEntity(RegisterPayload registerPayload, boolean activated) {
+    public UserEntity createUserEntity(RegisterPayload registerPayload, boolean activated) {
 
-        UserEntityI user = UserEntityI.builder()
+        UserEntity user = UserEntity.builder()
                 .first_name(registerPayload.getFirstName())
                 .last_name(registerPayload.getLastName())
                 .country(registerPayload.getCountry())
@@ -53,9 +53,9 @@ public class UserEntityHelper implements IUserEntityHelper{
     }
 
     @Override
-    public HackerEntity createHackerEntity(UserEntityI user) {
+    public HackerEntity createHackerEntity(UserEntity user) {
         //Note: To fetch user explicitly to avoid save process instead it updates because there is user entity with actual id not null
-        UserEntityI fetchedUser = findUserByUsername(user);
+        UserEntity fetchedUser = findUserByUsername(user);
 
         // Create and set basic fields
         HackerEntity hackerEntity = new HackerEntity();
@@ -67,42 +67,42 @@ public class UserEntityHelper implements IUserEntityHelper{
     }
 
     @Override
-    public UserEntityI findByEmail(String email) {
+    public UserEntity findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
     @Override
-    public UserEntityI findUserByUsername(String usernameOrEmail) {
+    public UserEntity findUserByUsername(String usernameOrEmail) {
         return  userRepository.findByUsername(usernameOrEmail).orElseThrow(()-> new UserNotFoundException("User not found with this username: " + usernameOrEmail));
     }
 
     @Override
-    public UserEntityI findUserById(Long userId) {
+    public UserEntity findUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User not found with this id: " + userId));
 
     }
 
     @Override
-    public HackerEntity findHackerByUser(UserEntityI userById) {
+    public HackerEntity findHackerByUser(UserEntity userById) {
         return hackerRepository.findByUser(userById);
     }
 
     @Override
-    public void validateCurrentPassword(ChangePasswordRequest request, UserEntityI user) {
+    public void validateCurrentPassword(ChangePasswordRequest request, UserEntity user) {
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
             throw new BadCredentialsException("Incorrect current password");
         }
     }
 
     @Override
-    public void validateCurrentPassword(ChangeEmailRequest request, UserEntityI user) {
+    public void validateCurrentPassword(ChangeEmailRequest request, UserEntity user) {
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new BadCredentialsException("Incorrect current password");
         }
     }
 
     @Override
-    public void updatePassword(String newPassword, String confirmNewPassword, UserEntityI user) {
+    public void updatePassword(String newPassword, String confirmNewPassword, UserEntity user) {
         // Validate new password and confirm new password
         if (!newPassword.equals(confirmNewPassword)) {
             throw new BadCredentialsException("New password and confirm new password do not match");
@@ -121,7 +121,7 @@ public class UserEntityHelper implements IUserEntityHelper{
     }
 
     @Override
-    public void updateUserProfile(UserEntityI userEntity, UserUpdateRequest userUpdateRequest) {
+    public void updateUserProfile(UserEntity userEntity, UserUpdateRequest userUpdateRequest) {
         userEntity.setUsername(userUpdateRequest.getUsername());
         userEntity.setFirst_name(userUpdateRequest.getFirstName());
         userEntity.setLast_name(userUpdateRequest.getLastName());
@@ -142,20 +142,20 @@ public class UserEntityHelper implements IUserEntityHelper{
     }
 
     @Override
-    public void setUserInHackerEntity(UserEntityI user, HackerEntity hackerEntity) {
+    public void setUserInHackerEntity(UserEntity user, HackerEntity hackerEntity) {
         //Note: To fetch user explicitly to avoid save process instead it updates because there is user entity with actual id not null
-        UserEntityI fetchedUser = findUserByUsername(user);
+        UserEntity fetchedUser = findUserByUsername(user);
 
         // Accomplish associations between user and hacker
         hackerEntity.setUser(fetchedUser);
     }
 
     @Override
-    public void setHackerInUserEntity(UserEntityI user, HackerEntity hackerEntity) {
+    public void setHackerInUserEntity(UserEntity user, HackerEntity hackerEntity) {
         // Accomplish associations between user and hacker
         user.setHacker(hackerEntity);
     }
-    private UserEntityI findUserByUsername(UserEntityI user) {
+    private UserEntity findUserByUsername(UserEntity user) {
         return userRepository.findByUsername(user.getUsername()).orElseThrow(() -> new UserNotFoundException("User with username " + user.getUsername() + " not found"));
     }
 }

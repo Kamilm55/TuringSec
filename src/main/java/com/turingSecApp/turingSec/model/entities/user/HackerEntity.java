@@ -36,7 +36,7 @@ public class HackerEntity {
     @OneToOne
     @JsonIgnore
     @JoinColumn(name = "user_id")
-    private UserEntityI user;
+    private UserEntity user;
 
 
 }

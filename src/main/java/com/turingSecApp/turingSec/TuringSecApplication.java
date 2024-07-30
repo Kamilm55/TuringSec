@@ -5,7 +5,7 @@ import com.fasterxml.uuid.impl.NameBasedGenerator;
 import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.model.entities.user.IBaseUser;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
-import com.turingSecApp.turingSec.model.entities.user.UserEntityI;
+import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.*;
 import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
 import com.turingSecApp.turingSec.service.program.ProgramService;
@@ -51,7 +51,7 @@ public class TuringSecApplication implements CommandLineRunner {
         mockDataService.insertMockData();
 
         // Print Roles
-        UserEntityI hacker1 = userRepository.findByEmail("kamilmmmdov2905@gmail.com");
+        UserEntity hacker1 = userRepository.findByEmail("kamilmmmdov2905@gmail.com");
         if(hacker1!=null) {
             System.out.println("hacker roles: " + hacker1.getRoles().toString());
              System.out.println("hacker entity for user" + hacker1.getHacker());
@@ -67,6 +67,7 @@ public class TuringSecApplication implements CommandLineRunner {
 
         //
         // todo: Implement Factory method pattern for IBaseUser
+        //  inherit from base user class as different tables
         //  change jwt identifier to globalUserID (UUIDv5)
 
 

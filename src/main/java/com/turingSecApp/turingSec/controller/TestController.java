@@ -1,7 +1,7 @@
 package com.turingSecApp.turingSec.controller;
 
 import com.turingSecApp.turingSec.model.entities.report.Report;
-import com.turingSecApp.turingSec.model.entities.user.UserEntityI;
+import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.MockDataService;
@@ -48,7 +48,7 @@ public class TestController {
 
         log.info("report user: " + report.getUser());
 
-        UserEntityI userOfReportMessage = report.getUser();
+        UserEntity userOfReportMessage = report.getUser();
         System.out.println(userOfReportMessage);
     }
 }

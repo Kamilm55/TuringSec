@@ -14,3 +14,11 @@ spring:
   h2:
     console:
       enabled: true
+
+# For testing with a local PostgreSQL database , first you should open docker
+# Uncomment and use the following line:
+#  datasource:
+#    url: jdbc:postgresql://localhost:5433/postgres
+#    driverClassName: org.postgresql.Driver
+#    username: postgres
+#    password: postgres

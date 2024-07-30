@@ -3,7 +3,7 @@ package com.turingSecApp.turingSec.service.user;
 import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.role.Role;
-import com.turingSecApp.turingSec.model.entities.user.UserEntityI;
+import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -24,8 +24,8 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (user instanceof UserEntityI) {
-            return getAuthoritiesFromRoles(((UserEntityI) user).getRoles());
+        if (user instanceof UserEntity) {
+            return getAuthoritiesFromRoles(((UserEntity) user).getRoles());
         } else if (user instanceof AdminEntity) {
             return getAuthoritiesFromRoles(((AdminEntity) user).getRoles());
         } else if (user instanceof CompanyEntity) {
@@ -43,8 +43,8 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        if (user instanceof UserEntityI) {
-            return ((UserEntityI) user).getPassword();
+        if (user instanceof UserEntity) {
+            return ((UserEntity) user).getPassword();
         } else if (user instanceof AdminEntity) {
             return ((AdminEntity) user).getPassword();
         } else if (user instanceof CompanyEntity) {
@@ -56,8 +56,8 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        if (user instanceof UserEntityI) {
-            return ((UserEntityI) user).getUsername();
+        if (user instanceof UserEntity) {
+            return ((UserEntity) user).getUsername();
         } else if (user instanceof AdminEntity) {
             return ((AdminEntity) user).getUsername();
         } else if (user instanceof CompanyEntity) {
@@ -92,8 +92,8 @@ public class CustomUserDetails implements UserDetails {
     }
 
     public Long getId() {
-        if (user instanceof UserEntityI) {
-            return ((UserEntityI) user).getId();
+        if (user instanceof UserEntity) {
+            return ((UserEntity) user).getId();
         } else if (user instanceof AdminEntity) {
             return ((AdminEntity) user).getId();
         } else if (user instanceof CompanyEntity) {

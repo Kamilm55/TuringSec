@@ -19,7 +19,7 @@
     @Data
     @Entity
     @Table(name = "users")
-    public class UserEntityI implements IBaseUser {
+    public class UserEntity implements IBaseUser {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long id;

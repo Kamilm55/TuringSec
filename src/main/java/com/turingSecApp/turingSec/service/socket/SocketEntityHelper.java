@@ -4,7 +4,7 @@ import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.exception.custom.UserMustBeSameWithReportUserException;
 import com.turingSecApp.turingSec.model.entities.report.Report;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
-import com.turingSecApp.turingSec.model.entities.user.UserEntityI;
+import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
 import com.turingSecApp.turingSec.service.socket.exceptionHandling.ISocketEntityHelper;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class SocketEntityHelper implements ISocketEntityHelper {
     @Override
     public void checkUserReport(Object authenticatedUser, Long reportId) throws UserMustBeSameWithReportUserException {
         Report reportOfMessage = findReportById(reportId);
-        UserEntityI userOfReportMessage = reportOfMessage.getUser();
+        UserEntity userOfReportMessage = reportOfMessage.getUser();
         if (!authenticatedUser.equals(userOfReportMessage)) {
             throw new UserMustBeSameWithReportUserException("Message of Hacker must be same with report's Hacker");
         }
@@ -53,35 +53,5 @@ public class SocketEntityHelper implements ISocketEntityHelper {
                 .orElseThrow(() -> new ResourceNotFoundException("Report not found with id: " + reportId));
     }
 
-    @Transactional
-    @Override
-    public void testProxy() {
 
-        Report report = reportsRepository.findById(1L).orElse(null);
-
-        log.info("report user in static reportId:: " + report.getUser());
-
-        UserEntityI userOfReportMessage = report.getUser();
-        System.out.println(userOfReportMessage);
-    }
-
-    @Override
-    @Transactional
-    public void testProxy(Report reportOfMessage) {
-        log.info("report user with direct obj: " + reportOfMessage.getUser());
-
-        UserEntityI userOfReportMessage = reportOfMessage.getUser();
-        System.out.println(userOfReportMessage);
-    }
-
-    @Override
-    @Transactional
-    public void testProxy(Long reportId) {
-        Report report = reportsRepository.findById(reportId).orElse(null);
-
-        log.info("report user in dynamic reportId: " + report.getUser());
-
-        UserEntityI userOfReportMessage = report.getUser();
-        System.out.println(userOfReportMessage);
-    }
 }

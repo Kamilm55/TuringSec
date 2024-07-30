@@ -4,7 +4,7 @@ import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.role.Role;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
-import com.turingSecApp.turingSec.model.entities.user.UserEntityI;
+import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.AdminRepository;
 import com.turingSecApp.turingSec.model.repository.CompanyRepository;
 import com.turingSecApp.turingSec.model.repository.RoleRepository;
@@ -43,7 +43,7 @@ public class UtilService {
 
     // Method to retrieve authenticated user(Hacker)
     // refactorThis
-    public UserEntityI getAuthenticatedHacker() {
+    public UserEntity getAuthenticatedHacker() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
             String username = authentication.getName();
@@ -90,7 +90,7 @@ public class UtilService {
         return UUID.randomUUID().toString();
     }
     // Method to build authentication response
-    public AuthResponse buildAuthResponse(String token, UserEntityI user, HackerEntity hacker) {
+    public AuthResponse buildAuthResponse(String token, UserEntity user, HackerEntity hacker) {
         return AuthResponse.builder()
                 .accessToken(token)
                 .userInfo(UserMapper.INSTANCE.toDto(user, hacker))
@@ -109,7 +109,7 @@ public class UtilService {
         }
     }
     // Method to check if the user is activated
-    public void checkUserIsActivated(UserEntityI userEntity) {
+    public void checkUserIsActivated(UserEntity userEntity) {
         if (!userEntity.isActivated()) {
             throw new UserNotActivatedException("User is not activated yet.");
         }
@@ -133,7 +133,7 @@ public class UtilService {
     // Media services
     public Long validateHacker(UserDetails userDetails) {
         validateUserDetails(userDetails);
-        UserEntityI userEntity = getUserEntity(userDetails);
+        UserEntity userEntity = getUserEntity(userDetails);
         return getHackerId(userEntity);
     }
     private void validateUserDetails(UserDetails userDetails) {
@@ -141,12 +141,12 @@ public class UtilService {
             throw new UnauthorizedException();
         }
     }
-    private UserEntityI getUserEntity(UserDetails userDetails) {
+    private UserEntity getUserEntity(UserDetails userDetails) {
         String username = userDetails.getUsername();
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
     }
-    private Long getHackerId(UserEntityI userEntity) {
+    private Long getHackerId(UserEntity userEntity) {
         HackerEntity hackerEntity = userEntity.getHacker();
         if (hackerEntity == null) {
             throw new UserNotFoundException("Hacker ID not found for the authenticated user!");
@@ -157,7 +157,7 @@ public class UtilService {
         return programRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Bug Bounty Program not found with id:" + id));
     }
 
-    public UserEntityI findUserById(Long userId) {
+    public UserEntity findUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User not found with this id: " + userId));
     }
 }

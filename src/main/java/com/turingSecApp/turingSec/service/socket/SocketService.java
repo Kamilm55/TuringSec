@@ -14,8 +14,9 @@ import com.turingSecApp.turingSec.model.entities.message.StringMessageInReport;
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.report.Report;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
-import com.turingSecApp.turingSec.model.entities.user.UserEntityI;
+import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.CompanyRepository;
+import com.turingSecApp.turingSec.model.repository.UserRepository;
 import com.turingSecApp.turingSec.model.repository.program.ProgramRepository;
 import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
 import com.turingSecApp.turingSec.model.repository.reportMessage.BaseMessageInReportRepository;
@@ -49,13 +50,14 @@ public class SocketService {
     private final JwtUtil jwtTokenProvider;
     private final ISocketEntityHelper socketEntityHelper;
     private final UserDetailsServiceImpl userDetailsService;
+    private final UserRepository userRepository;
     private final UtilService utilService;
     private final BaseMessageInReportRepository baseMessageInReportRepository;
     private final StringMessageInReportRepository stringMessageInReportRepository;
 
     private SocketIOServer socketIOServer;
 
-    public SocketService(ReportsRepository reportsRepository, SocketExceptionHandler socketExceptionHandler, ProgramRepository programRepository, CompanyRepository companyRepository, MockDataService mockDataService, JwtUtil jwtTokenProvider, ISocketEntityHelper socketEntityHelper, UserDetailsServiceImpl userDetailsService, UtilService utilService, BaseMessageInReportRepository baseMessageInReportRepository, StringMessageInReportRepository stringMessageInReportRepository, SocketIOServer socketIOServer) {
+    public SocketService(ReportsRepository reportsRepository, SocketExceptionHandler socketExceptionHandler, ProgramRepository programRepository, CompanyRepository companyRepository, MockDataService mockDataService, JwtUtil jwtTokenProvider, ISocketEntityHelper socketEntityHelper, UserDetailsServiceImpl userDetailsService, UserRepository userRepository, UtilService utilService, BaseMessageInReportRepository baseMessageInReportRepository, StringMessageInReportRepository stringMessageInReportRepository, SocketIOServer socketIOServer) {
         // Inject other class
         this.reportsRepository = reportsRepository;
         this.socketExceptionHandler = socketExceptionHandler;
@@ -65,6 +67,7 @@ public class SocketService {
         this.jwtTokenProvider = jwtTokenProvider;
         this.socketEntityHelper = socketEntityHelper;
         this.userDetailsService = userDetailsService;
+        this.userRepository = userRepository;
         this.utilService = utilService;
         this.baseMessageInReportRepository = baseMessageInReportRepository;
         this.stringMessageInReportRepository = stringMessageInReportRepository;
@@ -113,14 +116,19 @@ public class SocketService {
     public DataListener<StringMessageInReportPayload> onStrMessageReceived() {
         return (socketIOClient, dataPayload, ackSender) -> {
             socketExceptionHandler.executeWithExceptionHandling(() -> {
+                String authorizationHeader = socketIOClient.getHandshakeData().getSingleUrlParam("Authorization");
+                log.info("Authorization Header of request: " + authorizationHeader);
                 log.info(String.format("Data from client StringMessageInReportPayload -> (payload): %s", dataPayload));
 
                 // Room from path query (urlParam) and get Report from room
                 String room = socketIOClient.getHandshakeData().getSingleUrlParam("room");
                 Report reportOfMessage = reportsRepository.findByRoom(room).orElseThrow(() -> new ResourceNotFoundException("Report not found with room: " + room));
 
+                // TODO: delete after test
+                UserEntity mockUser = userRepository.findByUsername("Username").get();
+
                 // Is it user or company if authorized
-                Object authenticatedUser = getAuthenticatedUser();
+                Object authenticatedUser = mockUser;
                 log.info("User/Company info: " + authenticatedUser);
 
                 // Validate the hacker/company and set Hacker
@@ -216,7 +224,7 @@ public class SocketService {
 
     //refactorThis
     private void checkUserOrCompanyReport(Object authenticatedUser, Long reportId) {
-        if (authenticatedUser instanceof UserEntityI) {
+        if (authenticatedUser instanceof UserEntity) {
             socketEntityHelper.checkUserReport(authenticatedUser, reportId);
         } else if (authenticatedUser instanceof CompanyEntity) {
             socketEntityHelper.checkCompanyReport(authenticatedUser, reportId);
@@ -225,7 +233,7 @@ public class SocketService {
         }
     }
     private void setHackerFlag(Object authenticatedUser, StringMessageInReport strMessage) {
-        if (authenticatedUser instanceof UserEntityI) {
+        if (authenticatedUser instanceof UserEntity) {
             strMessage.setHacker(true);
         } else if (authenticatedUser instanceof CompanyEntity) {
             strMessage.setHacker(false);
@@ -239,18 +247,20 @@ public class SocketService {
     private ConnectListener onConnected() {
         return socketIOClient -> {
             socketExceptionHandler.executeWithExceptionHandling(()->{
+                String authorizationHeader = socketIOClient.getHandshakeData().getSingleUrlParam("Authorization");
+                log.info("Authorization Header of request: " + authorizationHeader);
                 // If user not authorized throw exception
-                setUserIfAuthorized(socketIOClient);
+//                setUserIfAuthorized(socketIOClient);
 
                 // Is it user or company if authorized
-                Object authenticatedUser = getAuthenticatedUser();
-                log.info("User/Company info: " + authenticatedUser);
+//                Object authenticatedUser = getAuthenticatedUser();
+//                log.info("User/Company info: " + authenticatedUser);
 
                 String room = socketIOClient.getHandshakeData().getSingleUrlParam("room");
                 Report reportOfMessage = reportsRepository.findByRoom(room).orElseThrow(() -> new ResourceNotFoundException("Report not found with room: " + room));
 
                 // Is it user or company if authorized
-                checkUserOrCompanyReport(authenticatedUser,reportOfMessage.getId());
+//                checkUserOrCompanyReport(authenticatedUser,reportOfMessage.getId());
 
                 socketIOClient.joinRoom(room);
                 log.info(String.format("SocketID: %s connected!", socketIOClient.getSessionId().toString()));
