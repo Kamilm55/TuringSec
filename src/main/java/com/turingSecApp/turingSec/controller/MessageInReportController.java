@@ -1,16 +1,23 @@
 package com.turingSecApp.turingSec.controller;
 
 
+import com.turingSecApp.turingSec.payload.message.StringMessageInReportPayload;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.response.message.StringMessageInReportDTO;
 import com.turingSecApp.turingSec.service.interfaces.IMessageInReportService;
+import com.turingSecApp.turingSec.service.interfaces.IStompMessageInReportService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/messages")
+@RequestMapping("/api/messagesInReport")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
 public class MessageInReportController {
 
@@ -29,29 +36,28 @@ public class MessageInReportController {
     //   3. get all Deleted mesaj yeni entity yarat deletedAt,-> getAll, getById -> ancaq Admin
     //   4. edit ucun -> getAll, getById -> ancaq Admin
 
-    private final IMessageInReportService reportService;
+    private final IMessageInReportService messageInReportService;
 
-    @GetMapping("/messages")
+    @GetMapping
     public BaseResponse<List<StringMessageInReportDTO>> getMessages(@RequestParam String room) {
-        return BaseResponse.success(reportService.getMessagesByRoom(room));
+        return BaseResponse.success(messageInReportService.getMessagesByRoom(room));
     }
 
-    @GetMapping("/message/{id}")
+    @GetMapping("/{id}")
     public BaseResponse<StringMessageInReportDTO> getMessageById(@PathVariable Long id) {
-        return BaseResponse.success(reportService.getMessageById(id));
+        return BaseResponse.success(messageInReportService.getMessageById(id));
     }
 
 
-    @GetMapping("/admins/{reportId}")
+    @GetMapping("/{reportId}/admin")
     public BaseResponse<List<StringMessageInReportDTO>> getMessageByReportId(@PathVariable Long reportId){
-        return BaseResponse.success(reportService.getMessageByReportId(reportId));
+        return BaseResponse.success(messageInReportService.getMessageByReportId(reportId));
     }
 
 
-    @GetMapping("/admin/{id1}")
-    public BaseResponse<StringMessageInReportDTO> getMessageWithId(@PathVariable Long id1){
-        return BaseResponse.success(reportService.getMessageWithId(id1));
+    @GetMapping("/{id}/admin")
+    public BaseResponse<StringMessageInReportDTO> getMessageWithId(@PathVariable Long id){
+        return BaseResponse.success(messageInReportService.getMessageWithId(id));
     }
-
 
 }

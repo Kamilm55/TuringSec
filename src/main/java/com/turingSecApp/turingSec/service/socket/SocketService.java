@@ -124,11 +124,9 @@ public class SocketService {
                 String room = socketIOClient.getHandshakeData().getSingleUrlParam("room");
                 Report reportOfMessage = reportsRepository.findByRoom(room).orElseThrow(() -> new ResourceNotFoundException("Report not found with room: " + room));
 
-                // TODO: delete after test
-                UserEntity mockUser = userRepository.findByUsername("Username").get();
 
                 // Is it user or company if authorized
-                Object authenticatedUser = mockUser;
+                Object authenticatedUser = getAuthenticatedUser();
                 log.info("User/Company info: " + authenticatedUser);
 
                 // Validate the hacker/company and set Hacker

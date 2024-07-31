@@ -59,8 +59,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> {
                     request.requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll();
 
-                    // Socket IO
-                    request.requestMatchers("/ws/**").authenticated();
+                    // Socket //todo
+                    request.requestMatchers("/ws/**").permitAll();
 
                     // Media controller
                     request.requestMatchers("/api/background-image-for-hacker/**", "/api/image-for-hacker/**", "/api/report-media/**").permitAll();//.authenticated();
@@ -127,10 +127,8 @@ public class SecurityConfig {
 
                     //message
                     request
-                            .requestMatchers("/api/messages/messages").hasRole("HACKER")
-                            .requestMatchers("/api/messages/messages").hasRole("COMPANY")
-                            .requestMatchers("/api/messages/message/{id}").hasRole("HACKER")
-                            .requestMatchers("/api/messages/message/{id}").hasRole("HACKER")
+                            .requestMatchers("/api/messages/messages").hasAnyRole("HACKER","COMPANY")
+                            .requestMatchers("/api/messages/message/{id}").hasAnyRole("HACKER","COMPANY")
                             .requestMatchers("/api/messages/admins/{reportId}").hasRole("ADMIN")
                             .requestMatchers("/api/messages/admin/{id1}").hasRole("ADMIN");
 

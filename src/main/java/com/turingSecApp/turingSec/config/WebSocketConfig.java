@@ -19,8 +19,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        // This means that messages sent to destinations starting with "/user" will be routed to the broker.
-        registry.enableSimpleBroker("/user");
+        // Enable an in-memory message broker with destinations prefixed with /topic and /queue
+        registry.enableSimpleBroker("/topic", "/queue");
 
         // Sets the prefix for application destinations. Messages sent from clients with destinations
         // starting with "/app" will be routed to methods annotated with @MessageMapping.

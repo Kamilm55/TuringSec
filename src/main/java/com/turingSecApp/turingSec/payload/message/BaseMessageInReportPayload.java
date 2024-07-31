@@ -1,6 +1,6 @@
 package com.turingSecApp.turingSec.payload.message;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Data
@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class BaseMessageInReportPayload {
-    @JsonProperty(value = "isReplied")
+    @NotNull
     private boolean isReplied;
 
     private Long replyToMessageId;

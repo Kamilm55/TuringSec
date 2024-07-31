@@ -14,5 +14,6 @@ public interface IMessageInReportService {
     List<StringMessageInReportDTO> getMessageByReportId(Long reportId);
 
     StringMessageInReportDTO getMessageWithId(Long id);
+
 }
 
