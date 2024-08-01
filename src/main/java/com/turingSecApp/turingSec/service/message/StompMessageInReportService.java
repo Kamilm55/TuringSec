@@ -61,6 +61,7 @@ public class StompMessageInReportService implements IStompMessageInReportService
 
         // Convert to DTO with lazy fields' id
         StringMessageInReportDTO msgDTO = toStringMessageInReportDTO(savedMsg);
+        log.info(String.format("Data after converting into DTO  -> StringMessageInReportDTO): %s", msgDTO));
 
         // Send message with socket
         messagingTemplate.convertAndSend(
