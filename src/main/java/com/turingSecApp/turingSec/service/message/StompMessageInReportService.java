@@ -44,7 +44,7 @@ public class StompMessageInReportService implements IStompMessageInReportService
     @Override
     public void sendTextMessageToReportRoom(String room, StringMessageInReportPayload strMessageInReportPayload) {
 
-        // todo: auth issues
+        // todo: auth issues --> https://docs.spring.io/spring-security/reference/servlet/integrations/websocket.html#websocket-authorization
 
         Report reportOfMessage = reportsRepository.findByRoom(room).orElseThrow(() -> new ResourceNotFoundException("Report not found with room: " + room));
 

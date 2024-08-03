@@ -2,11 +2,11 @@ package com.turingSecApp.turingSec.service;
 
 import com.turingSecApp.turingSec.exception.custom.CompanyNotFoundException;
 import com.turingSecApp.turingSec.model.entities.MockData;
-import com.turingSecApp.turingSec.model.entities.report.Report;
+import com.turingSecApp.turingSec.model.entities.report.embedded.ProofOfConcept;
+import com.turingSecApp.turingSec.model.entities.report.embedded.ReportWeakness;
 import com.turingSecApp.turingSec.model.entities.role.Role;
 import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
-import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.*;
 import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
 import com.turingSecApp.turingSec.payload.program.ProgramPayload;
@@ -14,22 +14,24 @@ import com.turingSecApp.turingSec.payload.program.ProhibitPayload;
 import com.turingSecApp.turingSec.payload.program.asset.AssetPayload;
 import com.turingSecApp.turingSec.payload.program.asset.BaseProgramAssetPayload;
 import com.turingSecApp.turingSec.payload.program.asset.ProgramAssetPayload;
+import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
+import com.turingSecApp.turingSec.payload.report.child.ReportAssetPayload;
 import com.turingSecApp.turingSec.payload.user.RegisterPayload;
+import com.turingSecApp.turingSec.service.interfaces.IBugBountyReportService;
 import com.turingSecApp.turingSec.service.interfaces.IMockDataService;
 import com.turingSecApp.turingSec.service.interfaces.IUserService;
 import com.turingSecApp.turingSec.service.program.ProgramService;
+import com.turingSecApp.turingSec.service.report.ReportService;
 import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -40,6 +42,7 @@ public class MockDataService implements IMockDataService {
     private final ProgramService programService;
     private final UtilService utilService;
     private final PasswordEncoder passwordEncoder;
+    private final IBugBountyReportService reportService;
 
     private final UserRepository userRepository;
     private final AdminRepository adminRepository;
@@ -48,16 +51,6 @@ public class MockDataService implements IMockDataService {
     private final ReportsRepository reportsRepository;
 
 
-    @Transactional
-    public void testProxy() {
-
-        Report report = reportsRepository.findById(1L).orElse(null);
-
-        log.info("report user: " + report.getUser());
-
-        UserEntity userOfReportMessage = report.getUser();
-        System.out.println(userOfReportMessage);
-    }
     @Override
     public void insertMockData() {
         System.out.println(mockDataRepository.findById(1L));
@@ -72,7 +65,7 @@ public class MockDataService implements IMockDataService {
             insertCompany();
             insertAdmins();
             insertProgram();
-            //insertReports()
+            insertReports();
 
             mockData.setInsertedMockNumber(1);
             mockDataRepository.save(mockData); // save mock data in table with value 1
@@ -87,6 +80,34 @@ public class MockDataService implements IMockDataService {
             throw new RuntimeException(errorMsg);
         }
 
+    }
+
+    private void insertReports() {
+        // Insert 1 mock manual report
+
+        // Populate payload
+        ReportManualPayload reportManualPayload = new ReportManualPayload();
+        reportManualPayload.setLastActivity(Date.from(Instant.now()));
+        reportManualPayload.setRewardsStatus("200$");
+        reportManualPayload.setReportTemplate("report template");
+        reportManualPayload.setCollaboratorPayload(new ArrayList<>());
+
+        ReportAssetPayload reportAssetPayload = new ReportAssetPayload("domain","y.com");
+        reportManualPayload.setReportAssetPayload(reportAssetPayload);
+
+        ReportWeakness reportWeakness = new ReportWeakness("Weakness type","Weaknes name");
+        reportManualPayload.setWeakness(reportWeakness);
+
+        ProofOfConcept proofOfConcept = new ProofOfConcept("Title","Example.com","DESCRIPTION");
+        reportManualPayload.setProofOfConcept(proofOfConcept);
+        reportManualPayload.setSeverity("SEVERITY");
+
+        // Submit
+        try {
+            reportService.submitManualReportForTest(new ArrayList<>(),reportManualPayload,1L);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

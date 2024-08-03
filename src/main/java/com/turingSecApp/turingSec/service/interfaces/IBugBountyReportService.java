@@ -23,13 +23,15 @@ public interface IBugBountyReportService {
     List<ReportsByUserDTO> getBugBountyReportsForCompanyPrograms();
 
     // Manual
+    ReportManual submitManualReportForTest(List<MultipartFile> files,ReportManualPayload reportPayload, Long bugBountyProgramId) throws IOException;
+
     ReportManual submitManualReport(List<MultipartFile> files,UserDetails userDetails, ReportManualPayload reportPayload, Long bugBountyProgramId) throws IOException;
-    ReportManual updateManualReport(Long id, ReportManualPayload reportPayload);
+//    ReportManual updateManualReport(Long id, ReportManualPayload reportPayload);
 
     // CVSSReport
     ReportCVSS submitCVSSReport(List<MultipartFile> files, UserDetails userDetails,ReportCVSSPayload reportPayload, Long bugBountyProgramId) throws IOException;
 
-    ReportCVSS updateCVSSReport(Long id, ReportCVSSPayload bugBountyReportUpdatePayload);
+//    ReportCVSS updateCVSSReport(Long id, ReportCVSSPayload bugBountyReportUpdatePayload);
 
     //
 }

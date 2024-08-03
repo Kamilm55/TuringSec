@@ -2,23 +2,33 @@ package com.turingSecApp.turingSec.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.turingSecApp.turingSec.filter.websocket.JwtChannelInterceptor;
+import com.turingSecApp.turingSec.filter.websocket.JwtHandshakeInterceptor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.converter.DefaultContentTypeResolver;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.converter.MessageConverter;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.sockjs.transport.TransportHandler;
+import org.springframework.web.socket.sockjs.transport.handler.DefaultSockJsService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebSocketMessageBroker
+@RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    private final JwtHandshakeInterceptor jwtHandshakeInterceptor;
+    private final JwtChannelInterceptor jwtChannelInterceptor;
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         // Enable an in-memory message broker with destinations prefixed with /topic and /queue
@@ -41,6 +51,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 // Allows connections from any origin to avoid CORS issues.
                 // For a more secure setup, specify the allowed origins explicitly.
                 .setAllowedOriginPatterns("*")
+                // Custom Handshake Interceptor: JwtHandshakeInterceptor validates the JWT token during the WebSocket handshake and sets the security context.
+//                .addInterceptors(jwtHandshakeInterceptor)
                 // Enables SockJS fallback options if WebSocket is not available.
                 .withSockJS();
     }
@@ -70,6 +82,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         return false;
     }
 
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        // Channel Interceptor: JwtChannelInterceptor ensures that WebSocket messages are processed with the authenticated user.
+        registration.interceptors(jwtChannelInterceptor);
+    }
 
 
 }

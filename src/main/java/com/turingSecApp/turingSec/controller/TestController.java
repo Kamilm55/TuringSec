@@ -33,22 +33,5 @@ public class TestController {
         URI uri = new URI("app/users"); //mock uri
         return BaseResponse.created(data,uri,"msg");
     }
-    @GetMapping("/lazyInit")
-    public BaseResponse<Void> testLazyInit() {
-//        testProxy();
 
-        mockDataService.testProxy();
-        return BaseResponse.success();
-    }
-
-    @Transactional
-    public void testProxy() {
-
-        Report report = reportsRepository.findById(1L).orElse(null);
-
-        log.info("report user: " + report.getUser());
-
-        UserEntity userOfReportMessage = report.getUser();
-        System.out.println(userOfReportMessage);
-    }
 }

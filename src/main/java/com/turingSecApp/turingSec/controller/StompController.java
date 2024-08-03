@@ -4,28 +4,35 @@ import com.turingSecApp.turingSec.payload.message.StringMessageInReportPayload;
 import com.turingSecApp.turingSec.service.interfaces.IStompMessageInReportService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.handler.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
+@Slf4j
 public class StompController {
 
     private final IStompMessageInReportService stompMessageInReportService;
 
     @MessageMapping("/{room}/sendMessage") //  stompClient.send('/app/{room}/sendMessage', {}, JSON.stringify);
-    public void sendTextMessageToReportRoom(@DestinationVariable String room, @Payload @Valid StringMessageInReportPayload strMessageInReportPayload){
+    public void sendTextMessageToReportRoom(
+            @Headers Map<String, Object> headers,
+            @DestinationVariable String room,
+            @Payload @Valid StringMessageInReportPayload strMessageInReportPayload) {
+        // todo: get auth header and intercept all websocket handshake set authentication to security context
+        System.out.println("headers: " + headers.toString());
          stompMessageInReportService.sendTextMessageToReportRoom(room,strMessageInReportPayload);
     }
-
 
 
     // For testing websocket

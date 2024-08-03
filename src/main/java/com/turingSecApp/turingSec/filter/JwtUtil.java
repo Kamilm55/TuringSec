@@ -50,6 +50,9 @@ public class JwtUtil {
         String bearerToken = request.getHeader("Authorization");
         return validateBearerToken(bearerToken);
     }
+    public String resolveToken(String AuthorizationHeader) {
+        return validateBearerToken(AuthorizationHeader);
+    }
 
     public String validateBearerToken(String bearerToken) {
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {

@@ -61,6 +61,32 @@ public class ReportService implements IBugBountyReportService {
        return bugBountyReportRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Report not found with id:" + id));
     }
     @Override
+    public ReportManual submitManualReportForTest(List<MultipartFile> files, ReportManualPayload reportPayload, Long bugBountyProgramId) throws IOException {
+        // Fetch the BugBountyProgramEntity from the repository
+        Program program = programRepository.findById(bugBountyProgramId)
+                .orElseThrow(() -> new ResourceNotFoundException("Program not found with id:" + bugBountyProgramId));
+
+        // Create a new report entity -> for basic type fields or embeddable
+        ReportManual report = reportEntityHelper.createReportManualFromPayload(reportPayload);
+
+        // Set the user for the bug bounty report
+        setAuthenticatedUserToReport(1L, report);
+
+        // Set room explicitly
+        report.setRoom("191ded5d-148b-446d-8069-e8a8bd8c7ec6");
+
+        // Set the bug bounty program for the bug bounty report
+        report.setBugBountyProgram(program);
+        Report savedReport1 = reportManualRepository.save(report);
+
+        ///
+        // Set child reference type fields with the relation
+        ReportManual savedReport = (ReportManual) reportEntityHelper.setChildReferenceFieldsFromPayload(reportPayload,savedReport1);
+
+        return /*ReportMapper.INSTANCE.toDTO(savedReport)*/savedReport;
+
+    }
+    @Override
     public ReportManual submitManualReport(List<MultipartFile> files, UserDetails userDetails, ReportManualPayload reportPayload, Long bugBountyProgramId) throws IOException {
         // Check the authenticated hacker
         UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
@@ -92,7 +118,8 @@ public class ReportService implements IBugBountyReportService {
 
     private void setAttachmentsToReportIfFilesExist(List<MultipartFile> files, UserDetails userDetails, Report report) throws IOException {
         Long hackerId = utilService.validateHacker(userDetails);
-        //todo: check report belongs to this user? do in saveVideoOrImg
+        //todo: check report belongs to this user?
+
 
         // Call the service method to save the video
         if (files!=null){
@@ -101,35 +128,35 @@ public class ReportService implements IBugBountyReportService {
         }
     }
 
-    private void setAuthenticatedUserToReport(Long authenticatedUser, Report report) {
-        UserEntity userFromDB = userRepository.findById(authenticatedUser)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + authenticatedUser + " not found"));
+    private void setAuthenticatedUserToReport(Long authenticatedUserID, Report report) {
+        UserEntity userFromDB = userRepository.findById(authenticatedUserID)
+                .orElseThrow(() -> new UserNotFoundException("User with id " + authenticatedUserID + " not found"));
         report.setUser(userFromDB);
     }
-    @Override
-    public ReportManual updateManualReport(Long id, ReportManualPayload reportPayload) {
-        // Retrieve existing report from the repository
-        ReportManual existingReport = reportManualRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Report not found with id:" + id));
-
-        // Ensure that the authenticated hacker can only update their own report
-        UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
-        checkReportOwnership(existingReport);
-
-        //todo: rewrite update methods , they must be able to change the type of the report (convert manual to CVSS or vice versa) when updating
-
-        // Set the user for the bug bounty report
-        setAuthenticatedUserToReport(authenticatedUser.getId(), existingReport);
-
-        // todo: updating related bidirectional fields like submit method to combine post and put methods
-        // Clear previous collaborators, what you give in list i paste into  collaborators and update
-        existingReport.setCollaborators(new ArrayList<>());
-
-        // Update collaborators and save report
-        reportEntityHelper.saveCollaborators(reportPayload.getCollaboratorPayload() , existingReport);
-
-        return /*ReportMapper.INSTANCE.toDTO(existingReport)*/existingReport;
-    }
+//    @Override
+//    public ReportManual updateManualReport(Long id, ReportManualPayload reportPayload) {
+//        // Retrieve existing report from the repository
+//        ReportManual existingReport = reportManualRepository.findById(id)
+//                .orElseThrow(() -> new ResourceNotFoundException("Report not found with id:" + id));
+//
+//        // Ensure that the authenticated hacker can only update their own report
+//        UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
+//        checkReportOwnership(existingReport);
+//
+//        //todo: rewrite update methods , they must be able to change the type of the report (convert manual to CVSS or vice versa) when updating
+//
+//        // Set the user for the bug bounty report
+//        setAuthenticatedUserToReport(authenticatedUser.getId(), existingReport);
+//
+//        // todo: updating related bidirectional fields like submit method to combine post and put methods
+//        // Clear previous collaborators, what you give in list i paste into  collaborators and update
+//        existingReport.setCollaborators(new ArrayList<>());
+//
+//        // Update collaborators and save report
+//        reportEntityHelper.saveCollaborators(reportPayload.getCollaboratorPayload() , existingReport);
+//
+//        return /*ReportMapper.INSTANCE.toDTO(existingReport)*/existingReport;
+//    }
 
     @Override
     public ReportCVSS submitCVSSReport(List<MultipartFile> files, UserDetails userDetails,ReportCVSSPayload reportPayload, Long bugBountyProgramId) throws IOException {
@@ -161,33 +188,33 @@ public class ReportService implements IBugBountyReportService {
         return /*ReportMapper.INSTANCE.toDTO(savedReport)*/savedReport;
     }
 
-    @Override
-    public ReportCVSS updateCVSSReport(Long id, ReportCVSSPayload bugBountyReportUpdatePayload) {
-        // Retrieve existing report from the repository
-        ReportCVSS existingReport = reportCVSSRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Report not found with id:" + id));
-
-        // Ensure that the authenticated hacker can only update their own report
-        UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
-        checkReportOwnership(existingReport);
-
-        // Update existing report properties with values from the update payload
-        updateReportProperties(existingReport, bugBountyReportUpdatePayload);
-
-
-        // Set the user for the bug bounty report
-        setAuthenticatedUserToReport(authenticatedUser.getId(), existingReport);
-
-        // todo: updating related bidirectional fields like submit method to combine post and put methods
-        // Clear previous collaborators, what you give in list i paste into  collaborators and update
-        existingReport.setCollaborators(new ArrayList<>());
-
-        // Update collaborators and save report
-        reportEntityHelper.saveCollaborators(bugBountyReportUpdatePayload.getCollaboratorPayload() , existingReport);
-
-        return /*ReportMapper.INSTANCE.toDTO(existingReport)*/existingReport;
-
-    }
+//    @Override
+//    public ReportCVSS updateCVSSReport(Long id, ReportCVSSPayload bugBountyReportUpdatePayload) {
+//        // Retrieve existing report from the repository
+//        ReportCVSS existingReport = reportCVSSRepository.findById(id)
+//                .orElseThrow(() -> new ResourceNotFoundException("Report not found with id:" + id));
+//
+//        // Ensure that the authenticated hacker can only update their own report
+//        UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
+//        checkReportOwnership(existingReport);
+//
+//        // Update existing report properties with values from the update payload
+//        updateReportProperties(existingReport, bugBountyReportUpdatePayload);
+//
+//
+//        // Set the user for the bug bounty report
+//        setAuthenticatedUserToReport(authenticatedUser.getId(), existingReport);
+//
+//        // todo: updating related bidirectional fields like submit method to combine post and put methods
+//        // Clear previous collaborators, what you give in list i paste into  collaborators and update
+//        existingReport.setCollaborators(new ArrayList<>());
+//
+//        // Update collaborators and save report
+//        reportEntityHelper.saveCollaborators(bugBountyReportUpdatePayload.getCollaboratorPayload() , existingReport);
+//
+//        return /*ReportMapper.INSTANCE.toDTO(existingReport)*/existingReport;
+//
+//    }
 
     private void checkReportOwnership(Report report) {
         UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
@@ -273,6 +300,7 @@ public class ReportService implements IBugBountyReportService {
        // Retrieve bug bounty reports submitted for the company's programs
        return getReportsForCompanyPrograms(company);
    }
+
 
 
 
