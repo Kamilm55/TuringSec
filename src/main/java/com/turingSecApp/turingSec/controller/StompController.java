@@ -26,11 +26,8 @@ public class StompController {
 
     @MessageMapping("/{room}/sendMessage") //  stompClient.send('/app/{room}/sendMessage', {}, JSON.stringify);
     public void sendTextMessageToReportRoom(
-            @Headers Map<String, Object> headers,
             @DestinationVariable String room,
             @Payload @Valid StringMessageInReportPayload strMessageInReportPayload) {
-        // todo: get auth header and intercept all websocket handshake set authentication to security context
-        System.out.println("headers: " + headers.toString());
          stompMessageInReportService.sendTextMessageToReportRoom(room,strMessageInReportPayload);
     }
 

@@ -41,8 +41,8 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
                     return true;
                 }
             }
-//            return true;
-        throw new UnauthorizedException();
+            return true;
+//        throw new UnauthorizedException();
     }
 
     @Override

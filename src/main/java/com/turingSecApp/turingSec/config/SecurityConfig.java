@@ -23,6 +23,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -48,9 +50,19 @@ public class SecurityConfig {
     }
 
     @Bean
+    public CsrfTokenRepository csrfTokenRepository() {
+        HttpSessionCsrfTokenRepository repository = new HttpSessionCsrfTokenRepository();
+        repository.setHeaderName("X-CSRF-TOKEN");
+        return repository;
+    }
+    @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http , JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                // Apply CSRF protection selectively to STOMP endpoints
+//                .csrf(  csrf -> csrf
+//                    .requireCsrfProtectionMatcher(request -> request.getServletPath().startsWith("/ws"))
+//                )
                 .headers(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling( (exception)->
@@ -58,6 +70,9 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(request -> {
                     request.requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll();
+
+                    // CSRF controller
+                    request.requestMatchers("/api/csrf/**").authenticated();
 
                     // Socket //todo
                     request.requestMatchers("/ws/**").permitAll();

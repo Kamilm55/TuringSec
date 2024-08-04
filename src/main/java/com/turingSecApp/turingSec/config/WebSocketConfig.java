@@ -2,6 +2,7 @@ package com.turingSecApp.turingSec.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.turingSecApp.turingSec.filter.websocket.CsrfChannelInterceptor;
 import com.turingSecApp.turingSec.filter.websocket.JwtChannelInterceptor;
 import com.turingSecApp.turingSec.filter.websocket.JwtHandshakeInterceptor;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final JwtHandshakeInterceptor jwtHandshakeInterceptor;
     private final JwtChannelInterceptor jwtChannelInterceptor;
+    private final CsrfChannelInterceptor csrfChannelInterceptor;
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         // Enable an in-memory message broker with destinations prefixed with /topic and /queue
@@ -51,8 +53,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 // Allows connections from any origin to avoid CORS issues.
                 // For a more secure setup, specify the allowed origins explicitly.
                 .setAllowedOriginPatterns("*")
-                // Custom Handshake Interceptor: JwtHandshakeInterceptor validates the JWT token during the WebSocket handshake and sets the security context.
-//                .addInterceptors(jwtHandshakeInterceptor)
+                .addInterceptors(jwtHandshakeInterceptor)
                 // Enables SockJS fallback options if WebSocket is not available.
                 .withSockJS();
     }
@@ -82,11 +83,16 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         return false;
     }
 
+//    @Override
+//    public void configureClientInboundChannel(ChannelRegistration registration) {
+//        // Channel Interceptor: JwtChannelInterceptor ensures that WebSocket messages are processed with the authenticated user.
+//        registration.interceptors(jwtChannelInterceptor);
+//    }
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        // Channel Interceptor: JwtChannelInterceptor ensures that WebSocket messages are processed with the authenticated user.
-        registration.interceptors(jwtChannelInterceptor);
+        registration.interceptors(csrfChannelInterceptor);
     }
+
 
 
 }
