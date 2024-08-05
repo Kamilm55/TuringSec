@@ -89,7 +89,7 @@ public class ReportService implements IBugBountyReportService {
     @Override
     public ReportManual submitManualReport(List<MultipartFile> files, UserDetails userDetails, ReportManualPayload reportPayload, Long bugBountyProgramId) throws IOException {
         // Check the authenticated hacker
-        UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
+        UserEntity authenticatedUser = utilService.getAuthenticatedHackerWithHTTP();
 
         // Fetch the BugBountyProgramEntity from the repository
         Program program = programRepository.findById(bugBountyProgramId)
@@ -161,7 +161,7 @@ public class ReportService implements IBugBountyReportService {
     @Override
     public ReportCVSS submitCVSSReport(List<MultipartFile> files, UserDetails userDetails,ReportCVSSPayload reportPayload, Long bugBountyProgramId) throws IOException {
         // Check the authenticated hacker
-        UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
+        UserEntity authenticatedUser = utilService.getAuthenticatedHackerWithHTTP();
 
         // Fetch the BugBountyProgramEntity from the repository
         Program program = programRepository.findById(bugBountyProgramId)
@@ -217,7 +217,7 @@ public class ReportService implements IBugBountyReportService {
 //    }
 
     private void checkReportOwnership(Report report) {
-        UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
+        UserEntity authenticatedUser = utilService.getAuthenticatedHackerWithHTTP();
 
         if (!report.getUser().getId().equals(authenticatedUser.getId())) {
             throw new PermissionDeniedException();

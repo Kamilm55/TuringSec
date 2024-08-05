@@ -29,7 +29,7 @@ public class ProgramRetrievalService {
 
     public List<ProgramDTO> getCompanyAllBugBountyPrograms() {
         // Retrieve the company associated with the authenticated user
-        CompanyEntity company = utilService.getAuthenticatedCompany();
+        CompanyEntity company = utilService.getAuthenticatedCompanyWithHTTP();
 
         // Get programs belonging to the company
         List<Program> programList = programRepository.findByCompany(company);

@@ -176,11 +176,11 @@ public class SocketService {
 
     private Object getAuthenticatedUser() {
         try {
-            return utilService.getAuthenticatedHacker();
+            return utilService.getAuthenticatedHackerWithHTTP();
         } catch (UserNotFoundException e) {
             // if exception occurs it is not Hacker
             log.warn("It is not Hacker entity!");
-            return utilService.getAuthenticatedCompany();
+            return utilService.getAuthenticatedCompanyWithHTTP();
         }
     }
 

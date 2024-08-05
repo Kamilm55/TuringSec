@@ -1,10 +1,9 @@
-package com.turingSecApp.turingSec.config;
+package com.turingSecApp.turingSec.config.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.turingSecApp.turingSec.filter.websocket.CsrfChannelInterceptor;
 import com.turingSecApp.turingSec.filter.websocket.JwtChannelInterceptor;
-import com.turingSecApp.turingSec.filter.websocket.JwtHandshakeInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +27,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final JwtHandshakeInterceptor jwtHandshakeInterceptor;
     private final JwtChannelInterceptor jwtChannelInterceptor;
     private final CsrfChannelInterceptor csrfChannelInterceptor;
     @Override
@@ -53,7 +51,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 // Allows connections from any origin to avoid CORS issues.
                 // For a more secure setup, specify the allowed origins explicitly.
                 .setAllowedOriginPatterns("*")
-                .addInterceptors(jwtHandshakeInterceptor)
                 // Enables SockJS fallback options if WebSocket is not available.
                 .withSockJS();
     }

@@ -88,11 +88,11 @@ public class StompMessageInReportService implements IStompMessageInReportService
     }
     private Object getAuthenticatedUser() {
         try {
-            return utilService.getAuthenticatedHacker();
+            return utilService.getAuthenticatedHackerWithHTTP();
         } catch (UserNotFoundException e) {
             // if exception occurs it is not Hacker
             log.warn("It is not Hacker entity!");
-            return utilService.getAuthenticatedCompany();
+            return utilService.getAuthenticatedCompanyWithHTTP();
         }
     }
     private StringMessageInReport createStringMessageInReport(StringMessageInReportPayload data,Object authenticatedUser,Report reportOfMessage) {

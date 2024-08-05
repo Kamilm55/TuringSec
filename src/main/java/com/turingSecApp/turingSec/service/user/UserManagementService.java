@@ -137,7 +137,7 @@ public class UserManagementService {
 
     public void changePassword(ChangePasswordRequest request) {
         // Retrieve authenticated user
-        UserEntity user = utilService.getAuthenticatedHacker();
+        UserEntity user = utilService.getAuthenticatedHackerWithHTTP();
 
         // Validate current password
         userEntityHelper.validateCurrentPassword(request, user);
@@ -149,7 +149,7 @@ public class UserManagementService {
 
     public void changeEmail(ChangeEmailRequest request) {
         // Retrieve authenticated user
-        UserEntity user = utilService.getAuthenticatedHacker();
+        UserEntity user = utilService.getAuthenticatedHackerWithHTTP();
 
         // Validate current password
         userEntityHelper.validateCurrentPassword(request, user);
@@ -167,7 +167,7 @@ public class UserManagementService {
     }
 
     public UserHackerDTO updateProfile(UserUpdateRequest userUpdateRequest) {
-        UserEntity userEntity = utilService.getAuthenticatedHacker();
+        UserEntity userEntity = utilService.getAuthenticatedHackerWithHTTP();
         log.info(String.format("User with id: %s , username: %s updated info. User info before update: %s",userEntity.getId().toString(),userEntity.getUsername(),userEntity));
 
         userEntityHelper.updateUserProfile(userEntity, userUpdateRequest);
@@ -197,7 +197,7 @@ public class UserManagementService {
 
     public void deleteUser() {
         // Get the authenticated user's username from the security context
-        UserEntity authenticatedUser = utilService.getAuthenticatedHacker();
+        UserEntity authenticatedUser = utilService.getAuthenticatedHackerWithHTTP();
 
         // Find the user by username
         UserEntity user = userEntityHelper.findUserByUsername(authenticatedUser.getUsername());

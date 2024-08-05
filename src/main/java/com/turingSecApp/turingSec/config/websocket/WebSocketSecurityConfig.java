@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.config;
+package com.turingSecApp.turingSec.config.websocket;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

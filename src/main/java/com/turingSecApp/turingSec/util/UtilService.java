@@ -1,5 +1,6 @@
 package com.turingSecApp.turingSec.util;
 
+import com.turingSecApp.turingSec.config.websocket.CustomWebsocketSecurityContext;
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.role.Role;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
@@ -15,6 +16,7 @@ import com.turingSecApp.turingSec.response.program.BugBountyProgramWithAssetType
 import com.turingSecApp.turingSec.response.user.AuthResponse;
 import com.turingSecApp.turingSec.util.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,25 +28,48 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class UtilService {
     private final CompanyRepository companyRepository;
     private final AdminRepository adminRepository;
     private final ProgramRepository programRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final CustomWebsocketSecurityContext websocketSecurityContext;
 
-    // Get Current User
-//    public Object getCurrentUserByEmailForAllRole(String email){
-//        UserEntity user = userRepository.findByEmail(email);
-//        CompanyEntity company = companyRepository.findByEmail(email);
-//        AdminEntity
-//
-//    }
+
+    //todo: separate websocket and http util service
+    public Object getAuthenticatedBaseUser() {
+        try {
+            return getAuthenticatedHackerWithHTTP();
+        } catch (UserNotFoundException e) {
+            // if exception occurs it is not Hacker
+            log.warn("It is not Hacker entity!");
+            return getAuthenticatedCompanyWithHTTP();
+        }
+    }
+    //
+    public Object getAuthenticatedBaseUserForWebsocket() {
+        try {
+            return getAuthenticatedHackerWithWEBSOCKET();
+        } catch (UserNotFoundException e) {
+            // if exception occurs it is not Hacker
+            log.warn("It is not Hacker entity!");
+            return getAuthenticatedCompanyWithWEBSOCKET();
+        }
+    }
 
     // Method to retrieve authenticated user(Hacker)
     // refactorThis
-    public UserEntity getAuthenticatedHacker() {
+    public UserEntity getAuthenticatedHackerWithHTTP(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return getAuthenticatedHacker(authentication);
+    }
+    public UserEntity getAuthenticatedHackerWithWEBSOCKET(){
+        Authentication authentication =  websocketSecurityContext.getAuthentication();
+        return getAuthenticatedHacker(authentication);
+    }
+    public UserEntity getAuthenticatedHacker(Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
             String username = authentication.getName();
             return userRepository.findByUsername(username)
@@ -55,8 +80,15 @@ public class UtilService {
     }
 
     // Method to retrieve authenticated company
-    public CompanyEntity getAuthenticatedCompany() {
+    public CompanyEntity getAuthenticatedCompanyWithHTTP() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return getAuthenticatedCompany(authentication);
+    }
+    public CompanyEntity getAuthenticatedCompanyWithWEBSOCKET() {
+        Authentication authentication =  websocketSecurityContext.getAuthentication();
+        return getAuthenticatedCompany(authentication);
+    }
+    public CompanyEntity getAuthenticatedCompany(Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
             String email = authentication.getName();
             CompanyEntity company = companyRepository.findByEmail(email);

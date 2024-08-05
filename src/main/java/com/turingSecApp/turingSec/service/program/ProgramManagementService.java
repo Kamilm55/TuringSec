@@ -22,7 +22,7 @@ public class ProgramManagementService  {
 
     @Transactional
     public ProgramDTO createBugBountyProgram(ProgramPayload programPayload) {
-        CompanyEntity company = utilService.getAuthenticatedCompany();
+        CompanyEntity company = utilService.getAuthenticatedCompanyWithHTTP();
 
         return convertToProgramEntityAndSave(programPayload, company);
     }
@@ -62,7 +62,7 @@ public class ProgramManagementService  {
     @Transactional
     public void deleteBugBountyProgram(Long id) {
         // Get the company associated with the authenticated user
-        CompanyEntity company = utilService.getAuthenticatedCompany();
+        CompanyEntity company = utilService.getAuthenticatedCompanyWithHTTP();
 
         // Retrieve the bug bounty program by ID
         Program program = utilService.findProgramById(id);

@@ -17,12 +17,10 @@ import com.turingSecApp.turingSec.service.interfaces.IMessageInReportService;
 import com.turingSecApp.turingSec.service.socket.exceptionHandling.ISocketEntityHelper;
 import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.StringMessageInReportMapper;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +42,7 @@ public class MessageInReportService implements IMessageInReportService {
         Report report = reportsRepository.findByRoom(room)
                 .orElseThrow(() -> new ResourceNotFoundException("Report not found with room: " + room));
                 // Is it user or company if authorized
-        Object authenticatedUser = getAuthenticatedUser();
+        Object authenticatedUser = utilService.getAuthenticatedBaseUser();
         log.info("User/Company info: " + authenticatedUser);
 
         // Validate the hacker/company and set Hacker
@@ -65,7 +63,7 @@ public class MessageInReportService implements IMessageInReportService {
         Report report = message.getReport();
 
         // Is it user or company if authorized
-        Object authenticatedUser = getAuthenticatedUser();
+        Object authenticatedUser = utilService.getAuthenticatedBaseUser();
         log.info("User/Company info: " + authenticatedUser);
 
         // Validate the hacker/company and set Hacker
@@ -116,15 +114,6 @@ public class MessageInReportService implements IMessageInReportService {
         return dtoEagerFields;
     }
 
-    private Object getAuthenticatedUser() {
-        try {
-            return utilService.getAuthenticatedHacker();
-        } catch (UserNotFoundException e) {
-            // if exception occurs it is not Hacker
-            log.warn("It is not Hacker entity!");
-            return utilService.getAuthenticatedCompany();
-        }
-    }
 
     private void checkUserOrCompanyReport(Object authenticatedUser, Long reportId) {
         if (authenticatedUser instanceof UserEntity) {

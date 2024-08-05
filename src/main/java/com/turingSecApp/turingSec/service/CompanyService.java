@@ -138,7 +138,7 @@ public class CompanyService implements ICompanyService {
     @Override
     public CompanyResponse getCurrentUser() {
         // Retrieve user details from the database
-        CompanyEntity company = utilService.getAuthenticatedCompany();
+        CompanyEntity company = utilService.getAuthenticatedCompanyWithHTTP();
 
         return CompanyMapper.INSTANCE.convertToResponse(company);
     }

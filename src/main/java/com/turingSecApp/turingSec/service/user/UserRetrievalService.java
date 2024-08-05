@@ -47,7 +47,7 @@ public class UserRetrievalService {
     }
 
     public UserDTO getCurrentUser() {
-        return UserMapper.INSTANCE.convert(utilService.getAuthenticatedHacker());
+        return UserMapper.INSTANCE.convert(utilService.getAuthenticatedHackerWithHTTP());
     }
 
     public List<UserHackerDTO> getAllActiveUsers() {
