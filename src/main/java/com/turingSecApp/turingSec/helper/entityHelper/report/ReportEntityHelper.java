@@ -10,7 +10,7 @@ import com.turingSecApp.turingSec.model.repository.*;
 import com.turingSecApp.turingSec.model.repository.program.ProgramRepository;
 import com.turingSecApp.turingSec.model.repository.report.ReportCVSSRepository;
 import com.turingSecApp.turingSec.model.repository.report.ReportManualRepository;
-import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
+import com.turingSecApp.turingSec.model.repository.report.ReportRepository;
 import com.turingSecApp.turingSec.payload.report.BugBountyReportPayload;
 import com.turingSecApp.turingSec.payload.report.ReportCVSSPayload;
 import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
@@ -26,13 +26,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ReportEntityHelper implements IReportEntityHelper {
-    private final ReportsRepository reportsRepository;
+    private final ReportRepository reportRepository;
     private final ReportManualRepository reportManualRepository;
     private final ReportCVSSRepository reportCVSSRepository;
     private final UtilService utilService;
 
     private final CollaboratorRepository collaboratorRepository;
-    private final ReportsRepository bugBountyReportRepository;
+    private final ReportRepository bugBountyReportRepository;
     private final UserRepository userRepository;
     private final ProgramRepository programRepository;
 
@@ -46,7 +46,7 @@ public class ReportEntityHelper implements IReportEntityHelper {
 
         // Add more child entity deletion logic here if needed
 
-       return reportsRepository.save(report);
+       return reportRepository.save(report);
     }
 
     @Override

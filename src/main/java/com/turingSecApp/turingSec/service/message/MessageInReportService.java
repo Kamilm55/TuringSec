@@ -2,7 +2,6 @@ package com.turingSecApp.turingSec.service.message;
 
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
-import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.model.entities.message.StringMessageInReport;
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.report.Report;
@@ -10,7 +9,7 @@ import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.CompanyRepository;
 import com.turingSecApp.turingSec.model.repository.program.ProgramRepository;
-import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
+import com.turingSecApp.turingSec.model.repository.report.ReportRepository;
 import com.turingSecApp.turingSec.model.repository.reportMessage.StringMessageInReportRepository;
 import com.turingSecApp.turingSec.response.message.StringMessageInReportDTO;
 import com.turingSecApp.turingSec.service.interfaces.IMessageInReportService;
@@ -29,7 +28,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MessageInReportService implements IMessageInReportService {
 
-    private final ReportsRepository reportsRepository;
+    private final ReportRepository reportRepository;
     private final ProgramRepository programRepository;
     private final CompanyRepository companyRepository;
     private final StringMessageInReportRepository stringMessageInReportRepository;
@@ -39,7 +38,7 @@ public class MessageInReportService implements IMessageInReportService {
 
     @Override
     public List<StringMessageInReportDTO> getMessagesByRoom(String room) {
-        Report report = reportsRepository.findByRoom(room)
+        Report report = reportRepository.findByRoom(room)
                 .orElseThrow(() -> new ResourceNotFoundException("Report not found with room: " + room));
                 // Is it user or company if authorized
         Object authenticatedUser = utilService.getAuthenticatedBaseUser();
@@ -76,7 +75,7 @@ public class MessageInReportService implements IMessageInReportService {
     @Override
     public List<StringMessageInReportDTO> getMessageByReportId(Long reportId) {
         // Find the report by ID or throw an exception if not found
-        Report report = reportsRepository.findById(reportId)
+        Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new ResourceNotFoundException("Report not found with id: " + reportId));
 
         // Retrieve messages associated with the report

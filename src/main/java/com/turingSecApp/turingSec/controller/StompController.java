@@ -4,14 +4,21 @@ import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.config.websocket.CustomWebsocketSecurityContext;
 import com.turingSecApp.turingSec.payload.message.StringMessageInReportPayload;
 import com.turingSecApp.turingSec.service.interfaces.IStompMessageInReportService;
+import com.turingSecApp.turingSec.service.socket.exceptionHandling.SocketErrorMessage;
 import com.turingSecApp.turingSec.service.user.UserDetailsServiceImpl;
 import com.turingSecApp.turingSec.util.UtilService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.*;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.user.SimpSession;
+import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
@@ -28,13 +35,22 @@ public class StompController {
     @MessageMapping("/{room}/sendMessage") //  stompClient.send('/app/{room}/sendMessage', {}, JSON.stringify);
     public void sendTextMessageToReportRoom(
             @DestinationVariable String room,
-            @Payload @Valid StringMessageInReportPayload strMessageInReportPayload) {
-        Object authenticatedBaseUser = utilService.getAuthenticatedBaseUserForWebsocket();
+            @Payload @Valid StringMessageInReportPayload strMessageInReportPayload,
+            SimpMessageHeaderAccessor headerAccessor
+            ) {
+         stompMessageInReportService.sendTextMessageToReportRoom(room,strMessageInReportPayload,headerAccessor);
+    }
 
-        System.out.println("authenticatedBaseUser: " + authenticatedBaseUser);
 
-//        System.out.println("user details:" + userDetails);
-         stompMessageInReportService.sendTextMessageToReportRoom(room,strMessageInReportPayload);
+    @MessageMapping("/{sessionId}/error")
+//    @SendTo("/topic/{sessionId}/error")
+    public void test2(
+//            @DestinationVariable String room,
+            @Payload SocketErrorMessage errorDetails){
+
+//        System.out.println(room);
+        System.out.println(errorDetails.toString());
+
     }
 
 

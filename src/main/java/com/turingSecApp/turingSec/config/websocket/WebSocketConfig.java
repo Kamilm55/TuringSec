@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.turingSecApp.turingSec.filter.websocket.CsrfChannelInterceptor;
 import com.turingSecApp.turingSec.filter.websocket.JwtChannelInterceptor;
+import com.turingSecApp.turingSec.filter.websocket.ReportRoomInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final JwtChannelInterceptor jwtChannelInterceptor;
+    private final ReportRoomInterceptor reportRoomInterceptor;
     private final CsrfChannelInterceptor csrfChannelInterceptor;
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
@@ -87,7 +89,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 //    }
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(csrfChannelInterceptor);
+        // 1.csrfChannelInterceptor -> (todo) 2.authChannelInterceptor -> 3. ReportRoomInterceptor
+        registration.interceptors(csrfChannelInterceptor,reportRoomInterceptor);
     }
 
 

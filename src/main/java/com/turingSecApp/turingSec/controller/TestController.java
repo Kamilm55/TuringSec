@@ -1,14 +1,11 @@
 package com.turingSecApp.turingSec.controller;
 
-import com.turingSecApp.turingSec.model.entities.report.Report;
-import com.turingSecApp.turingSec.model.entities.user.UserEntity;
-import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
+import com.turingSecApp.turingSec.model.repository.report.ReportRepository;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.MockDataService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +21,7 @@ import java.net.URISyntaxException;
 @RequiredArgsConstructor
 @Slf4j
 public class TestController {
-    private final ReportsRepository reportsRepository;
+    private final ReportRepository reportRepository;
     private final MockDataService mockDataService;
 
     @GetMapping

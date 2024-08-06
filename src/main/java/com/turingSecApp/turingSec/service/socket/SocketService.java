@@ -18,7 +18,7 @@ import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.CompanyRepository;
 import com.turingSecApp.turingSec.model.repository.UserRepository;
 import com.turingSecApp.turingSec.model.repository.program.ProgramRepository;
-import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
+import com.turingSecApp.turingSec.model.repository.report.ReportRepository;
 import com.turingSecApp.turingSec.model.repository.reportMessage.BaseMessageInReportRepository;
 import com.turingSecApp.turingSec.model.repository.reportMessage.StringMessageInReportRepository;
 import com.turingSecApp.turingSec.payload.message.StringMessageInReportPayload;
@@ -42,7 +42,7 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class SocketService {
-    private final ReportsRepository reportsRepository;
+    private final ReportRepository reportRepository;
     private final SocketExceptionHandler socketExceptionHandler;
     private final ProgramRepository programRepository;
     private final CompanyRepository companyRepository;
@@ -57,9 +57,9 @@ public class SocketService {
 
     private SocketIOServer socketIOServer;
 
-    public SocketService(ReportsRepository reportsRepository, SocketExceptionHandler socketExceptionHandler, ProgramRepository programRepository, CompanyRepository companyRepository, MockDataService mockDataService, JwtUtil jwtTokenProvider, ISocketEntityHelper socketEntityHelper, UserDetailsServiceImpl userDetailsService, UserRepository userRepository, UtilService utilService, BaseMessageInReportRepository baseMessageInReportRepository, StringMessageInReportRepository stringMessageInReportRepository, SocketIOServer socketIOServer) {
+    public SocketService(ReportRepository reportRepository, SocketExceptionHandler socketExceptionHandler, ProgramRepository programRepository, CompanyRepository companyRepository, MockDataService mockDataService, JwtUtil jwtTokenProvider, ISocketEntityHelper socketEntityHelper, UserDetailsServiceImpl userDetailsService, UserRepository userRepository, UtilService utilService, BaseMessageInReportRepository baseMessageInReportRepository, StringMessageInReportRepository stringMessageInReportRepository, SocketIOServer socketIOServer) {
         // Inject other class
-        this.reportsRepository = reportsRepository;
+        this.reportRepository = reportRepository;
         this.socketExceptionHandler = socketExceptionHandler;
         this.programRepository = programRepository;
         this.companyRepository = companyRepository;
@@ -115,37 +115,37 @@ public class SocketService {
     @Transactional
     public DataListener<StringMessageInReportPayload> onStrMessageReceived() {
         return (socketIOClient, dataPayload, ackSender) -> {
-            socketExceptionHandler.executeWithExceptionHandling(() -> {
-                String authorizationHeader = socketIOClient.getHandshakeData().getSingleUrlParam("Authorization");
-                log.info("Authorization Header of request: " + authorizationHeader);
-                log.info(String.format("Data from client StringMessageInReportPayload -> (payload): %s", dataPayload));
-
-                // Room from path query (urlParam) and get Report from room
-                String room = socketIOClient.getHandshakeData().getSingleUrlParam("room");
-                Report reportOfMessage = reportsRepository.findByRoom(room).orElseThrow(() -> new ResourceNotFoundException("Report not found with room: " + room));
-
-
-                // Is it user or company if authorized
-                Object authenticatedUser = getAuthenticatedUser();
-                log.info("User/Company info: " + authenticatedUser);
-
-                // Validate the hacker/company and set Hacker
-                checkUserOrCompanyReport(authenticatedUser, reportOfMessage.getId());
-
-                // Create message from payload
-                StringMessageInReport strMessage = createStringMessageInReport(dataPayload,authenticatedUser,reportOfMessage);
-
-                // Save created strMessage obj
-                StringMessageInReport savedMsg = stringMessageInReportRepository.save(strMessage);
-                log.info(String.format("Data after save -> StringMessageInReport (entity): %s", savedMsg));
-
-                // Send message to the report's room
-                sendMessageToRoom(socketIOClient, savedMsg, room);
-
-                // Sample response to the client
-                ackSender.sendAckData("Message received successfully");
-
-            }, socketIOClient);
+//            socketExceptionHandler.executeWithExceptionHandling(() -> {
+//                String authorizationHeader = socketIOClient.getHandshakeData().getSingleUrlParam("Authorization");
+//                log.info("Authorization Header of request: " + authorizationHeader);
+//                log.info(String.format("Data from client StringMessageInReportPayload -> (payload): %s", dataPayload));
+//
+//                // Room from path query (urlParam) and get Report from room
+//                String room = socketIOClient.getHandshakeData().getSingleUrlParam("room");
+//                Report reportOfMessage = reportRepository.findByRoom(room).orElseThrow(() -> new ResourceNotFoundException("Report not found with room: " + room));
+//
+//
+//                // Is it user or company if authorized
+//                Object authenticatedUser = getAuthenticatedUser();
+//                log.info("User/Company info: " + authenticatedUser);
+//
+//                // Validate the hacker/company and set Hacker
+//                checkUserOrCompanyReport(authenticatedUser, reportOfMessage.getId());
+//
+//                // Create message from payload
+//                StringMessageInReport strMessage = createStringMessageInReport(dataPayload,authenticatedUser,reportOfMessage);
+//
+//                // Save created strMessage obj
+//                StringMessageInReport savedMsg = stringMessageInReportRepository.save(strMessage);
+//                log.info(String.format("Data after save -> StringMessageInReport (entity): %s", savedMsg));
+//
+//                // Send message to the report's room
+//                sendMessageToRoom(socketIOClient, savedMsg, room);
+//
+//                // Sample response to the client
+//                ackSender.sendAckData("Message received successfully");
+//
+//            });
         };
     }
 
@@ -244,26 +244,26 @@ public class SocketService {
     //
     private ConnectListener onConnected() {
         return socketIOClient -> {
-            socketExceptionHandler.executeWithExceptionHandling(()->{
-                String authorizationHeader = socketIOClient.getHandshakeData().getSingleUrlParam("Authorization");
-                log.info("Authorization Header of request: " + authorizationHeader);
-                // If user not authorized throw exception
-//                setUserIfAuthorized(socketIOClient);
-
-                // Is it user or company if authorized
-//                Object authenticatedUser = getAuthenticatedUser();
-//                log.info("User/Company info: " + authenticatedUser);
-
-                String room = socketIOClient.getHandshakeData().getSingleUrlParam("room");
-                Report reportOfMessage = reportsRepository.findByRoom(room).orElseThrow(() -> new ResourceNotFoundException("Report not found with room: " + room));
-
-                // Is it user or company if authorized
-//                checkUserOrCompanyReport(authenticatedUser,reportOfMessage.getId());
-
-                socketIOClient.joinRoom(room);
-                log.info(String.format("SocketID: %s connected!", socketIOClient.getSessionId().toString()));
-                log.info(String.format("Connected to the room: %s",room));
-            },socketIOClient);
+//            socketExceptionHandler.executeWithExceptionHandling(()->{
+//                String authorizationHeader = socketIOClient.getHandshakeData().getSingleUrlParam("Authorization");
+//                log.info("Authorization Header of request: " + authorizationHeader);
+//                // If user not authorized throw exception
+////                setUserIfAuthorized(socketIOClient);
+//
+//                // Is it user or company if authorized
+////                Object authenticatedUser = getAuthenticatedUser();
+////                log.info("User/Company info: " + authenticatedUser);
+//
+//                String room = socketIOClient.getHandshakeData().getSingleUrlParam("room");
+//                Report reportOfMessage = reportRepository.findByRoom(room).orElseThrow(() -> new ResourceNotFoundException("Report not found with room: " + room));
+//
+//                // Is it user or company if authorized
+////                checkUserOrCompanyReport(authenticatedUser,reportOfMessage.getId());
+//
+//                socketIOClient.joinRoom(room);
+//                log.info(String.format("SocketID: %s connected!", socketIOClient.getSessionId().toString()));
+//                log.info(String.format("Connected to the room: %s",room));
+//            });
         };
     }
 

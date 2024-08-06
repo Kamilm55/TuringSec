@@ -3,7 +3,7 @@ package com.turingSecApp.turingSec.file_upload.service;
 import com.turingSecApp.turingSec.model.entities.report.Media;
 import com.turingSecApp.turingSec.model.entities.report.Report;
 import com.turingSecApp.turingSec.model.entities.report.embedded.AttachmentDetails;
-import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
+import com.turingSecApp.turingSec.model.repository.report.ReportRepository;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.file_upload.exception.FileNotFoundException;
 import com.turingSecApp.turingSec.file_upload.repository.MediaRepository;
@@ -22,7 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReportMediaService implements IFileService,IMultiFileService{
     private final MediaRepository mediaRepository;
-    private final ReportsRepository reportsRepository;
+    private final ReportRepository reportRepository;
     private final ModelMapper modelMapper;
     private final GlobalConstants globalConstants;
 
@@ -43,7 +43,7 @@ public class ReportMediaService implements IFileService,IMultiFileService{
     }
     @Override
     public FileResponse saveVideoOrImg(MultipartFile multipartFile, Long reportId) throws IOException {
-        Report report = reportsRepository.findById(reportId)
+        Report report = reportRepository.findById(reportId)
                 .orElseThrow(() -> new ResourceNotFoundException("Report not found with id:" + reportId));
 
         Media newFile =  new Media();
@@ -59,7 +59,7 @@ public class ReportMediaService implements IFileService,IMultiFileService{
         AttachmentDetails attachmentDetails = new AttachmentDetails(media_url,content_type);
         report.addAttachment(attachmentDetails);
 
-        reportsRepository.save(report);
+        reportRepository.save(report);
 
         return fileResponse;
     }

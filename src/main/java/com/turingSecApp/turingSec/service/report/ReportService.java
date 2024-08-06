@@ -10,7 +10,7 @@ import com.turingSecApp.turingSec.model.repository.*;
 import com.turingSecApp.turingSec.model.repository.program.ProgramRepository;
 import com.turingSecApp.turingSec.model.repository.report.ReportCVSSRepository;
 import com.turingSecApp.turingSec.model.repository.report.ReportManualRepository;
-import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
+import com.turingSecApp.turingSec.model.repository.report.ReportRepository;
 import com.turingSecApp.turingSec.exception.custom.PermissionDeniedException;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class ReportService implements IBugBountyReportService {
-    private final ReportsRepository bugBountyReportRepository;
+    private final ReportRepository bugBountyReportRepository;
     private final ReportManualRepository reportManualRepository;
     private final ReportCVSSRepository reportCVSSRepository;
     private final UtilService utilService;

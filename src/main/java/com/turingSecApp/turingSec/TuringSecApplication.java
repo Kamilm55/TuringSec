@@ -7,7 +7,7 @@ import com.turingSecApp.turingSec.model.entities.user.IBaseUser;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.*;
-import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
+import com.turingSecApp.turingSec.model.repository.report.ReportRepository;
 import com.turingSecApp.turingSec.service.program.ProgramService;
 import com.turingSecApp.turingSec.service.interfaces.IHackerService;
 import com.turingSecApp.turingSec.service.interfaces.IMockDataService;
@@ -37,7 +37,7 @@ public class TuringSecApplication implements CommandLineRunner {
     private final UserRepository userRepository;
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
-    private final ReportsRepository reportsRepository;
+    private final ReportRepository reportRepository;
     private final ProgramService programService;
     private final UtilService utilService;
     private  final IMockDataService mockDataService;

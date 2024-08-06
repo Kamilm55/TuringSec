@@ -1,80 +1,83 @@
 package com.turingSecApp.turingSec.service.socket.exceptionHandling;
 
-import com.corundumstudio.socketio.SocketIOClient;
-import com.corundumstudio.socketio.SocketIOServer;
+import com.turingSecApp.turingSec.config.websocket.adapter.CustomHeaderAccessor;
 import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
 import com.turingSecApp.turingSec.exception.custom.UserMustBeSameWithReportUserException;
-import com.turingSecApp.turingSec.filter.JwtUtil;
-import com.turingSecApp.turingSec.model.repository.CompanyRepository;
-import com.turingSecApp.turingSec.model.repository.program.ProgramRepository;
-import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
-import com.turingSecApp.turingSec.model.repository.reportMessage.BaseMessageInReportRepository;
-import com.turingSecApp.turingSec.model.repository.reportMessage.StringMessageInReportRepository;
-import com.turingSecApp.turingSec.response.message.StringMessageInReportDTO;
-import com.turingSecApp.turingSec.service.socket.SocketService;
-import com.turingSecApp.turingSec.service.user.UserDetailsServiceImpl;
-import com.turingSecApp.turingSec.util.UtilService;
-import com.turingSecApp.turingSec.util.mapper.StringMessageInReportMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class SocketExceptionHandler {
-
-    private Map<String, Object> errorDetails = new HashMap<>();
-
+    private SocketErrorMessage socketErrorMessage = new SocketErrorMessage();
 
 
-//        ThrowingConsumer<SocketIOClient> action // it can be used
-    public void executeWithExceptionHandling(Runnable action, SocketIOClient socketIOClient) {
+    public Message<?> executeWithExceptionHandling(Runnable action, CustomHeaderAccessor accessor,Message<?> messageFromInterceptor) {
+        String sessionId = accessor.getSessionId();
+
+        System.out.println("sesion id: " + sessionId);
+
         try {
             action.run();
         }
         catch (UserMustBeSameWithReportUserException | UnauthorizedException customEx){
-            handleException(customEx, socketIOClient);
-
-            // Disconnect the client
-            socketIOClient.disconnect();
+            handleException(customEx,sessionId,accessor,messageFromInterceptor);
         }
         catch (Exception ex) {
-            handleException(ex, socketIOClient);
+            log.error("Unhandled ex in socket exHandler!");
+            handleException(ex,sessionId,accessor,messageFromInterceptor);
         }
+
+        return socketErrorMessage;
     }
 
-    private void handleException(Exception ex, SocketIOClient socketIOClient) {
+    public void executeWithExceptionHandling(Runnable action, CustomHeaderAccessor accessor, SimpMessagingTemplate messagingTemplate) {
+        String sessionId = accessor.getSessionId();
+
+        try {
+            action.run();
+        }
+        catch (UserMustBeSameWithReportUserException | UnauthorizedException customEx){
+            handleException(customEx,sessionId);
+
+            //todo: @MessageMapping("/{sessionId}/error") -> bura erroru gonder
+
+            // Disconnect the client (direct disconnect is not possible in stomp)
+//            messagingTemplate.convertAndSend(String.format("/topic/%s/close",sessionId),"You must close socket with session id:" + sessionId);
+
+        }
+        catch (Exception ex) {
+            handleException(ex, sessionId);
+        }
+
+    }
+
+    private void handleException(Exception ex, String sessionId,CustomHeaderAccessor accessor,Message<?> message) {
         // Populate error details before log and send as an event
-        populateErrorDetails(ex);
+        populateErrorDetails(ex,sessionId);
 
-        logError();
-        sendErrorEvent(socketIOClient);
+        socketErrorMessage.setHeaders(message.getHeaders());
+//        accessor.setDestination(String.format("/topic/%s/error",sessionId));
+
+//        accessor.setDestination("/topic/error"); // problem bu deyil
+
+        log.error("Error in socket: " + socketErrorMessage.toString());
+    }
+    private void handleException(Exception ex, String sessionId) {
+        // Populate error details before log and send as an event
+        populateErrorDetails(ex,sessionId);
+
+        log.error("Error in socket: " + socketErrorMessage.toString());
     }
 
-    private void logError() {
-        // Custom logging implementation
-        log.error(String.format("Error Details: key: %s, message: %s, \n stackTrace: %s", errorDetails.get("key"),errorDetails.get("message"),errorDetails.get("stackTrace")));
-    }
 
-    private void sendErrorEvent(SocketIOClient socketIOClient) {
-        // Custom event sending implementation
 
-        // Send the error event for only own user without room, because error can be thrown before joining room
-        // this error only visible for who sent
-        socketIOClient.getNamespace().getAllClients().forEach(x -> {
-            if (x.getSessionId().equals(socketIOClient.getSessionId())) {
-                log.warn("log works inside  exhandler: "  );
-                x.sendEvent("error", errorDetails);
-            }
-        });
-
-    }
-
-    private void populateErrorDetails(Exception ex){
+    private void populateErrorDetails(Exception ex, String sessionId){
         // Create a detailed error message
         String key = ex.getClass().getName();
         String message = ex.getMessage();
@@ -83,9 +86,15 @@ public class SocketExceptionHandler {
                 .collect(Collectors.joining("\n"));
 
         // Create a structured error object
-        errorDetails.put("stackTrace", stackTrace);
-        errorDetails.put("message", message);
-        errorDetails.put("key", key);
+        socketErrorMessage.setKey(key);
+        socketErrorMessage.setSessionId(sessionId);
+        socketErrorMessage.setMessage(message);
+        socketErrorMessage.setStackTrace(stackTrace);
+
+
+        // destionationu  deyisdir (header da ola biler)
+        // todo: servis ve interceptor ex handler ayir
+
     }
 
 }

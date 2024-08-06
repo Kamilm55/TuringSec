@@ -5,7 +5,7 @@ import com.turingSecApp.turingSec.exception.custom.UserMustBeSameWithReportUserE
 import com.turingSecApp.turingSec.model.entities.report.Report;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
-import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
+import com.turingSecApp.turingSec.model.repository.report.ReportRepository;
 import com.turingSecApp.turingSec.service.socket.exceptionHandling.ISocketEntityHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @RequiredArgsConstructor
 public class SocketEntityHelper implements ISocketEntityHelper {
-    private final ReportsRepository reportsRepository;
+    private final ReportRepository reportRepository;
 
     // Learn: Issue Explanation
     //  1.Proxy-Based Transaction Management:
@@ -49,7 +49,7 @@ public class SocketEntityHelper implements ISocketEntityHelper {
 
     @Override
     public Report findReportById(Long reportId) throws ResourceNotFoundException {
-        return reportsRepository.findById(reportId)
+        return reportRepository.findById(reportId)
                 .orElseThrow(() -> new ResourceNotFoundException("Report not found with id: " + reportId));
     }
 

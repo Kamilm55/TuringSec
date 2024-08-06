@@ -1,8 +1,10 @@
 package com.turingSecApp.turingSec.filter.websocket;
 
 import com.turingSecApp.turingSec.config.websocket.CustomWebsocketSecurityContext;
+import com.turingSecApp.turingSec.config.websocket.adapter.StompHeaderAccessorAdapter;
 import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
 import com.turingSecApp.turingSec.filter.JwtUtil;
+import com.turingSecApp.turingSec.service.socket.exceptionHandling.SocketExceptionHandler;
 import com.turingSecApp.turingSec.service.user.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -33,42 +36,49 @@ public class CsrfChannelInterceptor implements ChannelInterceptor {
     private final CsrfTokenRepository csrfTokenRepository;
     private final JwtUtil jwtTokenProvider;
     private final UserDetailsServiceImpl userDetailsService;
-
     private final CustomWebsocketSecurityContext customWebsocketSecurityContext;
+
+    private final SocketExceptionHandler socketExceptionHandler;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         // Wrap the message to access its headers
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        StompHeaderAccessorAdapter accessorAdapter = new StompHeaderAccessorAdapter(accessor);
 
-        if (StompCommand.CONNECT.equals(accessor.getCommand())){
-            // Check csrf
-            checkCSRF(accessor);
-        }
+//        socketExceptionHandler.executeWithExceptionHandling( () -> {
+                if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+                    // Check csrf
+                    checkCSRF(accessor);
+                }
 
-        // Check if the message is a CONNECT command , it can be a SUBSCRIBE command or other
-        if (StompCommand.CONNECT.equals(accessor.getCommand()) | StompCommand.SUBSCRIBE.equals(accessor.getCommand()) | StompCommand.SEND.equals(accessor.getCommand()) ){
-            // Print headers and payload
-            log.info("Message Headers: " + message.getHeaders());
+                // Check if the message is a CONNECT command , it can be a SUBSCRIBE command or other
+                if (StompCommand.CONNECT.equals(accessor.getCommand()) | StompCommand.SUBSCRIBE.equals(accessor.getCommand()) | StompCommand.SEND.equals(accessor.getCommand())) {
+                    log.info("Message Headers: " + message.getHeaders());
+                    log.info("Session id:" + accessor.getSessionId());
 
-            Map<String,Object> nativeHeaders = (Map<String, Object>) message.getHeaders().get("nativeHeaders");
+                    Map<String, Object> nativeHeaders = (Map<String, Object>) message.getHeaders().get("nativeHeaders");
 
-            // Get the Authorization header value, it is in List format -> In STOMP (Streaming Text Oriented Messaging Protocol) over WebSockets, headers can sometimes be represented as List<String> because STOMP allows for multiple values for a single header key. This is different from typical HTTP headers, where each header key usually has a single value.
-            List<String> authorizationHeaderList = (List<String>) nativeHeaders.get("Authorization");
+                    // Get the Authorization header value, it is in List format -> In STOMP (Streaming Text Oriented Messaging Protocol) over WebSockets, headers can sometimes be represented as List<String> because STOMP allows for multiple values for a single header key. This is different from typical HTTP headers, where each header key usually has a single value.
+                    List<String> authorizationHeaderList = (List<String>) nativeHeaders.get("Authorization");
 
-            String authorizationHeader = authorizationHeaderList.get(0);
+                    String authorizationHeader = authorizationHeaderList.get(0);
 
-            // Set Auth if authorizationHeader is not null, if it is null throw unauthorized exception
-            if (!setAuth(authorizationHeader,accessor)) {
-            throw new UnauthorizedException();
-            }
-        }
+                    // Set Auth if authorizationHeader is not null, if it is null throw unauthorized exception
+                    if (!setAuth(authorizationHeader, accessor)) {
+                        throw new UnauthorizedException();
+                    }
+                }
+                accessor.setHeader("sessionId", accessor.getSessionId());
+
+//        },accessorAdapter);
+
         // Return the message if validation passes
         return message;
     }
 
     private boolean setAuth(String authorizationHeader, StompHeaderAccessor accessor) {
-        log.info("Authorization Header: {}", authorizationHeader);
+//        log.info("Authorization Header: {}", authorizationHeader);
 
         // If no authorization header is present, authentication fails
         if (authorizationHeader == null) {
@@ -101,9 +111,6 @@ public class CsrfChannelInterceptor implements ChannelInterceptor {
 
 
        customWebsocketSecurityContext.setAuthentication(auth);
-
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().toString());
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         return true;
     }
 
@@ -112,7 +119,7 @@ public class CsrfChannelInterceptor implements ChannelInterceptor {
             // Retrieve the CSRF token from the message headers
             String actualTokenValue = accessor.getFirstNativeHeader("X-CSRF-TOKEN");
 
-            log.info("Received CSRF token value: " + actualTokenValue);
+//            log.info("Received CSRF token value: " + actualTokenValue);
 
             if (actualTokenValue == null) {
                 log.error("CSRF token is missing in CONNECT headers");

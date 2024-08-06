@@ -8,7 +8,7 @@ import com.turingSecApp.turingSec.model.entities.role.Role;
 import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.repository.*;
-import com.turingSecApp.turingSec.model.repository.report.ReportsRepository;
+import com.turingSecApp.turingSec.model.repository.report.ReportRepository;
 import com.turingSecApp.turingSec.payload.program.ProgramPayload;
 import com.turingSecApp.turingSec.payload.program.ProhibitPayload;
 import com.turingSecApp.turingSec.payload.program.asset.AssetPayload;
@@ -21,7 +21,6 @@ import com.turingSecApp.turingSec.service.interfaces.IBugBountyReportService;
 import com.turingSecApp.turingSec.service.interfaces.IMockDataService;
 import com.turingSecApp.turingSec.service.interfaces.IUserService;
 import com.turingSecApp.turingSec.service.program.ProgramService;
-import com.turingSecApp.turingSec.service.report.ReportService;
 import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +47,7 @@ public class MockDataService implements IMockDataService {
     private final AdminRepository adminRepository;
     private final RoleRepository roleRepository;
     private final CompanyRepository companyRepository;
-    private final ReportsRepository reportsRepository;
+    private final ReportRepository reportRepository;
 
 
     @Override
