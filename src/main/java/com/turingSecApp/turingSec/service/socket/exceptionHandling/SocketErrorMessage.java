@@ -28,13 +28,21 @@ public class SocketErrorMessage implements Message {
         return "SocketErrorMessage{" +
                 "sessionId='" + sessionId + '\'' +
                 ", key='" + key + '\'' +
-                ", message='" + message + '\'' +
+                ", message='" + message + '\n' +
+                ", headers=" + headers +'\n' +
                 ", stackTrace='" + formatStackTrace(stackTrace) + '\'' +
-                ", headers=" + headers +
                 '}';
     }
 
     private String formatStackTrace(String stackTrace) {
         return stackTrace != null ? stackTrace.replace(",", ",\n") : null;
+    }
+
+    public String toStringForWebsocketMsg() {
+        return "SocketErrorMessage{" +
+                "sessionId='" + sessionId + '\'' +
+                ", key='" + key + '\'' +
+                ", message='" + message +
+                '}';
     }
 }

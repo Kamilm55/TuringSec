@@ -50,7 +50,7 @@ public class StompMessageInReportService implements IStompMessageInReportService
     public void sendTextMessageToReportRoom(String room, StringMessageInReportPayload strMessageInReportPayload, SimpMessageHeaderAccessor headerAccessor) {
         SimpHeaderAccessorAdapter accessorAdapter = new SimpHeaderAccessorAdapter(headerAccessor);
 
-        socketExceptionHandler.executeWithExceptionHandling( () -> {
+//        socketExceptionHandler.executeWithExceptionHandling( () -> {
             Report reportOfMessage = reportRepository.findByRoom(room).orElseThrow(() -> new ResourceNotFoundException("Report not found with room: " + room));
 
             // Is it user or company if authorized
@@ -73,7 +73,7 @@ public class StompMessageInReportService implements IStompMessageInReportService
                     String.format("/topic/%s/messagesInReport", room), //  stompClient.subscribe('/topic/{room}/messages'...
                     msgDTO
             );
-        }, accessorAdapter,messagingTemplate);
+//        }, accessorAdapter,messagingTemplate);
     }
     private StringMessageInReportDTO toStringMessageInReportDTO(StringMessageInReport savedMsg) {
         StringMessageInReportDTO dtoEagerFields = StringMessageInReportMapper.INSTANCE.toDTOEagerFields(savedMsg);

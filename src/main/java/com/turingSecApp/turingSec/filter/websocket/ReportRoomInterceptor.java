@@ -1,6 +1,5 @@
 package com.turingSecApp.turingSec.filter.websocket;
 
-import com.turingSecApp.turingSec.config.websocket.CustomMessagingService;
 import com.turingSecApp.turingSec.config.websocket.adapter.StompHeaderAccessorAdapter;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
@@ -12,8 +11,8 @@ import com.turingSecApp.turingSec.service.socket.SocketEntityHelper;
 import com.turingSecApp.turingSec.service.socket.exceptionHandling.SocketExceptionHandler;
 import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -35,6 +34,7 @@ public class ReportRoomInterceptor  implements ChannelInterceptor {
 
 //    private final CustomMessagingService customMessagingService;
 
+    @SneakyThrows
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
@@ -44,9 +44,10 @@ public class ReportRoomInterceptor  implements ChannelInterceptor {
             Object authenticatedUser = utilService.getAuthenticatedBaseUserForWebsocket();
 
 
+            if(2+2==4)throw new RuntimeException("Rand ex");
             // todo: FunctionalInterface for this if and send error event
             // Check if the message is a CONNECT | SUBSCRIBE | SEND
-            if (StompCommand.CONNECT.equals(accessor.getCommand())  | StompCommand.SUBSCRIBE.equals(accessor.getCommand()) | StompCommand.SEND.equals(accessor.getCommand())) {
+            if (/*StompCommand.CONNECT.equals(accessor.getCommand())  | */StompCommand.SUBSCRIBE.equals(accessor.getCommand()) | StompCommand.SEND.equals(accessor.getCommand())) {
                 // Common fields for events
 
                 log.info("Message" + message);
@@ -74,10 +75,10 @@ public class ReportRoomInterceptor  implements ChannelInterceptor {
 //                }
             }
         },accessorAdapter,message);
-
-        if (errMessage != null) {
-            return errMessage;
-        }
+//
+//        if (errMessage != null) {
+//            return errMessage;
+//        }
             return message;
     }
 

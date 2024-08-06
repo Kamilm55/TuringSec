@@ -1,8 +1,10 @@
 package com.turingSecApp.turingSec.service.socket.exceptionHandling;
 
+import com.turingSecApp.turingSec.config.websocket.SocketErrorMessageSingleton;
 import com.turingSecApp.turingSec.config.websocket.adapter.CustomHeaderAccessor;
 import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
 import com.turingSecApp.turingSec.exception.custom.UserMustBeSameWithReportUserException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -13,11 +15,11 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class SocketExceptionHandler {
-    private SocketErrorMessage socketErrorMessage = new SocketErrorMessage();
 
 
-    public Message<?> executeWithExceptionHandling(Runnable action, CustomHeaderAccessor accessor,Message<?> messageFromInterceptor) {
+    public Message<?> executeWithExceptionHandling(Runnable action, CustomHeaderAccessor accessor,Message<?> messageFromInterceptor) throws Exception  {
         String sessionId = accessor.getSessionId();
 
         System.out.println("sesion id: " + sessionId);
@@ -27,12 +29,22 @@ public class SocketExceptionHandler {
         }
         catch (UserMustBeSameWithReportUserException | UnauthorizedException customEx){
             handleException(customEx,sessionId,accessor,messageFromInterceptor);
+
+            throw new RuntimeException(customEx.getMessage());
         }
         catch (Exception ex) {
             log.error("Unhandled ex in socket exHandler!");
             handleException(ex,sessionId,accessor,messageFromInterceptor);
+            throw new RuntimeException(ex.getMessage());
         }
 
+        SocketErrorMessage socketErrorMessage = SocketErrorMessageSingleton.getInstance();
+
+        System.out.println("AT the end socketErrorMessage:" + socketErrorMessage);
+
+        if(socketErrorMessage.getKey() == null ){
+            return messageFromInterceptor;
+        }
         return socketErrorMessage;
     }
 
@@ -61,16 +73,19 @@ public class SocketExceptionHandler {
         // Populate error details before log and send as an event
         populateErrorDetails(ex,sessionId);
 
+        SocketErrorMessage socketErrorMessage = SocketErrorMessageSingleton.getInstance();
         socketErrorMessage.setHeaders(message.getHeaders());
 //        accessor.setDestination(String.format("/topic/%s/error",sessionId));
 
-//        accessor.setDestination("/topic/error"); // problem bu deyil
+        accessor.setDestination("/topic/error");
 
         log.error("Error in socket: " + socketErrorMessage.toString());
     }
     private void handleException(Exception ex, String sessionId) {
         // Populate error details before log and send as an event
         populateErrorDetails(ex,sessionId);
+
+        SocketErrorMessage socketErrorMessage = SocketErrorMessageSingleton.getInstance();
 
         log.error("Error in socket: " + socketErrorMessage.toString());
     }
@@ -86,14 +101,11 @@ public class SocketExceptionHandler {
                 .collect(Collectors.joining("\n"));
 
         // Create a structured error object
+        SocketErrorMessage socketErrorMessage = SocketErrorMessageSingleton.getInstance();
         socketErrorMessage.setKey(key);
         socketErrorMessage.setSessionId(sessionId);
         socketErrorMessage.setMessage(message);
         socketErrorMessage.setStackTrace(stackTrace);
-
-
-        // destionationu  deyisdir (header da ola biler)
-        // todo: servis ve interceptor ex handler ayir
 
     }
 

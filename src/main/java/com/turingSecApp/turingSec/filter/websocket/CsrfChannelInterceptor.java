@@ -46,33 +46,37 @@ public class CsrfChannelInterceptor implements ChannelInterceptor {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         StompHeaderAccessorAdapter accessorAdapter = new StompHeaderAccessorAdapter(accessor);
 
-//        socketExceptionHandler.executeWithExceptionHandling( () -> {
-                if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-                    // Check csrf
-                    checkCSRF(accessor);
+//        Message<?> errMessage = socketExceptionHandler.executeWithExceptionHandling(() -> {
+            if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+                // Check csrf
+                checkCSRF(accessor);
+            }
+
+            // Check if the message is a CONNECT command , it can be a SUBSCRIBE command or other
+            if (StompCommand.CONNECT.equals(accessor.getCommand()) | StompCommand.SUBSCRIBE.equals(accessor.getCommand()) | StompCommand.SEND.equals(accessor.getCommand())) {
+                log.info("Message Headers: " + message.getHeaders());
+                log.info("Session id:" + accessor.getSessionId());
+
+                Map<String, Object> nativeHeaders = (Map<String, Object>) message.getHeaders().get("nativeHeaders");
+
+                // Get the Authorization header value, it is in List format -> In STOMP (Streaming Text Oriented Messaging Protocol) over WebSockets, headers can sometimes be represented as List<String> because STOMP allows for multiple values for a single header key. This is different from typical HTTP headers, where each header key usually has a single value.
+                List<String> authorizationHeaderList = (List<String>) nativeHeaders.get("Authorization");
+
+                String authorizationHeader = authorizationHeaderList.get(0);
+
+                // Set Auth if authorizationHeader is not null, if it is null throw unauthorized exception
+                if (!setAuth(authorizationHeader, accessor)) {
+                    throw new UnauthorizedException();
                 }
+            }
+//            accessor.setHeader("sessionId", accessor.getSessionId());
 
-                // Check if the message is a CONNECT command , it can be a SUBSCRIBE command or other
-                if (StompCommand.CONNECT.equals(accessor.getCommand()) | StompCommand.SUBSCRIBE.equals(accessor.getCommand()) | StompCommand.SEND.equals(accessor.getCommand())) {
-                    log.info("Message Headers: " + message.getHeaders());
-                    log.info("Session id:" + accessor.getSessionId());
-
-                    Map<String, Object> nativeHeaders = (Map<String, Object>) message.getHeaders().get("nativeHeaders");
-
-                    // Get the Authorization header value, it is in List format -> In STOMP (Streaming Text Oriented Messaging Protocol) over WebSockets, headers can sometimes be represented as List<String> because STOMP allows for multiple values for a single header key. This is different from typical HTTP headers, where each header key usually has a single value.
-                    List<String> authorizationHeaderList = (List<String>) nativeHeaders.get("Authorization");
-
-                    String authorizationHeader = authorizationHeaderList.get(0);
-
-                    // Set Auth if authorizationHeader is not null, if it is null throw unauthorized exception
-                    if (!setAuth(authorizationHeader, accessor)) {
-                        throw new UnauthorizedException();
-                    }
-                }
-                accessor.setHeader("sessionId", accessor.getSessionId());
-
-//        },accessorAdapter);
-
+//        }, accessorAdapter, message);
+//
+//
+//        if (errMessage != null) {
+//            return errMessage;
+//        }
         // Return the message if validation passes
         return message;
     }

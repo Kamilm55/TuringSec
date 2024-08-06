@@ -67,4 +67,8 @@ public class StompController {
     public Map<String,String> test(@Payload Map<String,String> msgObj){
         return msgObj;
     }
+
+    public void sendErrorMessage(String id, String s) {
+
+    }
 }

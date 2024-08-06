@@ -1,10 +1,10 @@
 package com.turingSecApp.turingSec.config.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.turingSecApp.turingSec.filter.websocket.CsrfChannelInterceptor;
 import com.turingSecApp.turingSec.filter.websocket.JwtChannelInterceptor;
 import com.turingSecApp.turingSec.filter.websocket.ReportRoomInterceptor;
+import com.turingSecApp.turingSec.service.socket.exceptionHandling.SocketErrorMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,11 +17,9 @@ import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-import org.springframework.web.socket.sockjs.transport.TransportHandler;
-import org.springframework.web.socket.sockjs.transport.handler.DefaultSockJsService;
+import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -31,6 +29,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final JwtChannelInterceptor jwtChannelInterceptor;
     private final ReportRoomInterceptor reportRoomInterceptor;
     private final CsrfChannelInterceptor csrfChannelInterceptor;
+
+
+    @Bean
+    public SocketErrorMessage socketErrorMessage() {
+        return new SocketErrorMessage();
+    }
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         // Enable an in-memory message broker with destinations prefixed with /topic and /queue
@@ -82,17 +87,19 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         return false;
     }
 
-//    @Override
-//    public void configureClientInboundChannel(ChannelRegistration registration) {
-//        // Channel Interceptor: JwtChannelInterceptor ensures that WebSocket messages are processed with the authenticated user.
-//        registration.interceptors(jwtChannelInterceptor);
-//    }
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
         // 1.csrfChannelInterceptor -> (todo) 2.authChannelInterceptor -> 3. ReportRoomInterceptor
         registration.interceptors(csrfChannelInterceptor,reportRoomInterceptor);
     }
 
+    @Override
+    public void configureWebSocketTransport(WebSocketTransportRegistration registration) {
+
+        registration.addDecoratorFactory(handler -> new CustomWebSocketHandlerDecorator(handler));
+
+
+    }
 
 
 }
