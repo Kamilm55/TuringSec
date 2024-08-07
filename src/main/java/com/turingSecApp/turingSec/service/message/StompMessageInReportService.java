@@ -46,10 +46,38 @@ public class StompMessageInReportService implements IStompMessageInReportService
     private final UtilService utilService;
     private final SocketExceptionHandler socketExceptionHandler;
 
+    //  1. Exceptionlar error event name ile atilmalidi ,  hem log hem sendEvent +
+    //  2. headerda access token alinmalidi, ve mesaji gonderen Hacker yoxsa Company-di tapa bilerik token vasitesile , (en 1-ci unauthorized olmadigini yoxlamalyiq, eks halda exception) +
+    //  3. Payloaddan entity-e kecirerken eger token ile tapdigimiz user hackerdisa -> isHacker=true , company-dirse -> isHacker=false edib save edirik +
+    //  6. Token-den extract etdiyimiz user(hacker) hemin reportun useri ile eyni olmalidi , deyilse exception ("Message of Hacker must be same with report Hacker") -> (hem log hem de sendEvent ile error eventinde ex-mesaji gondermek) +
+    //  7. Token-den extract etdiyimiz company hemin reportun company-si ile eyni olmalidi , deyilse exception +
+    //    hacker ve ya company reporta aid deyilse mesaj gondere bilmir (connect ola bilmir) , room-a girmeye icaze verme +
+    //  8. bu room reportun fieldi-dir, ona gore bu room fieldi ile reportu tapa bilerik -> // room as query ?room= uuid of msg's report +
+    //   (*Reportu room ile , user ve company-de report ile tapa bilerik)
+    //    dto-ya cevirerken her iki id-ni set et ,  reportdan gotur , isHackeride set et entityden
+    //  4. Reportun yalniz bir user(hacker) ve bir company id-si ola biler , isHacker true ve ya false ferq etmir
+    //      hansi hal olursa olsun her iki id DTO-da gorunmelidi entity-de yox(report-dan goture bilerik bu iki value-nu)  ,
+    //      frontendler isHacker-a gore mesaji gonderenin company yoxsa hacker oldugunu mueyyenlesdirib lazim olan id-ni isledecekler
+    // TODO: TASKS
+    //  11. Message payload validationlar edilmelidi, log ve event olaraq gonder -> customize (SimpAnnotationMethodMessageHandler (handleMatch)  ) which abstract class is AbstractMethodMessageHandler.handleMatch then add to config -> WebSocketAnnotationMethodMessageHandler burada catch olur
+    // todo:  executeWithExceptionHandling for @Service (topic/baseUserId/error) , butun errorlari buna cevir
+    //  5. DTO-da company ve hacker-in img,background img gosterilmelidi (baseUser-dan gelecek)
+    //    * Butun log-lardaki melumatlar dogru olmalidi, payload->entity->dto hamisi duzgun sekilde yaradilmalidi
+    //  14. reply etmemisden qabag hemin mesaj movcud deyilse exception
+    //      Adminler reportId ile istenilen report altindaki, butun mesajlari gore biler list<DTO> seklinde
+    //      Silinmis mesajlar, editlenmis mesajlarida bu 3 task - http-dir socket ile deyil
+    //   12. getMessage ile evvelki gonderilen mesajlar gorunmelidi ama list<DTO> seklinde
+    //   reporta da createdAt elave et
+    //   13. Butun bu tasklar bitenden sonra -> editMessage, deleteMessage, deleteMessageList (every user only edit or delete own), edited or deleted messages must be tracked in logs and db, explore: "can we store logs?(not to use safe delete)"
+    //   10. *** Mesaj eger reply-dirsa isReplied true,repliedTo - da id-si verilir, amma DTO-da reply olunan mesajin contenti yoxdu ***
+
+
     @Override
     public void sendTextMessageToReportRoom(String room, StringMessageInReportPayload strMessageInReportPayload, SimpMessageHeaderAccessor headerAccessor) {
         SimpHeaderAccessorAdapter accessorAdapter = new SimpHeaderAccessorAdapter(headerAccessor);
 
+
+        // todo:  executeWithExceptionHandling for @Service (topic/baseUserId/error) , butun errorlari buna cevir
 //        socketExceptionHandler.executeWithExceptionHandling( () -> {
             Report reportOfMessage = reportRepository.findByRoom(room).orElseThrow(() -> new ResourceNotFoundException("Report not found with room: " + room));
 

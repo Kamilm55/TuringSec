@@ -47,14 +47,17 @@ public class CustomWebSocketSessionDecorator extends WebSocketSessionDecorator {
 
         System.out.println("socketErrorMessage values: " + socketErrorMessage);
 
-        // Format the message as needed
-        String formattedMessage = String.format("{\"destination\": \"%s\", \"payload\": \"%s\"}", "/topic/error", socketErrorMessage.toStringForWebsocketMsg());
+        // Constructing the error message manually
+        String errorMessage = String.format(
+                "ERROR\nmessage:%s\ncontent-length:0\n\n\u0000",// ERROR message format for stomp (if the format is different client does not make sense)
+                socketErrorMessage.toStringForWebsocketMsg()
+        );
 
         // Create the WebSocket message
-        TextMessage message = new TextMessage(formattedMessage);
+        TextMessage message = new TextMessage(errorMessage);
 
         // Send the message
-        session.sendMessage(message);
+        session.sendMessage(message); // If sendMessage is used with a specific WebSocket session, it will send the message only to that particular session. It sends to user which session id = current session id
     }
 }
 

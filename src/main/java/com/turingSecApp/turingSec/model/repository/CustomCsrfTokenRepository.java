@@ -11,10 +11,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class CustomCsrfTokenRepository implements CsrfTokenRepository {
 
-    private final String staticToken = "123456789"; // Static token for simulation
+    private final String staticToken = "DQsImV4cCI6MTcyMzI5NTEwNH0"; // Static token for simulation
 
     @Override
     public CsrfToken generateToken(HttpServletRequest request) {
+        // Return a static CSRF token
+        return new DefaultCsrfToken("X-CSRF-TOKEN", "_csrf", staticToken);
+    }
+
+    public CsrfToken generateToken() {
         // Return a static CSRF token
         return new DefaultCsrfToken("X-CSRF-TOKEN", "_csrf", staticToken);
     }
@@ -32,8 +37,12 @@ public class CustomCsrfTokenRepository implements CsrfTokenRepository {
 
     @Override
     public CsrfToken loadToken(HttpServletRequest request) {
-        // Load the CSRF token from the session
-        HttpSession session = request.getSession(false);
+        // Load the CSRF token from the db
+//        HttpSession session = request.getSession(false);
         return /*(session != null) ? (CsrfToken) session.getAttribute("CSRF_TOKEN") : */generateToken(request);
+    }
+    public CsrfToken loadToken() {
+        // Load the CSRF token from the db
+        return generateToken();
     }
 }

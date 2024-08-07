@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.service.socket.exceptionHandling;
+package com.turingSecApp.turingSec.service.socket;
 
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.exception.custom.UserMustBeSameWithReportUserException;

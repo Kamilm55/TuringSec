@@ -4,9 +4,11 @@ import com.turingSecApp.turingSec.config.websocket.CustomWebsocketSecurityContex
 import com.turingSecApp.turingSec.config.websocket.adapter.StompHeaderAccessorAdapter;
 import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
 import com.turingSecApp.turingSec.filter.JwtUtil;
+import com.turingSecApp.turingSec.model.repository.CustomCsrfTokenRepository;
 import com.turingSecApp.turingSec.service.socket.exceptionHandling.SocketExceptionHandler;
 import com.turingSecApp.turingSec.service.user.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -33,20 +35,21 @@ import java.util.Map;
 public class CsrfChannelInterceptor implements ChannelInterceptor {
 
     //todo: generate actual csrf in db for every user not static
-    private final CsrfTokenRepository csrfTokenRepository;
+    private final CustomCsrfTokenRepository csrfTokenRepository;
     private final JwtUtil jwtTokenProvider;
     private final UserDetailsServiceImpl userDetailsService;
     private final CustomWebsocketSecurityContext customWebsocketSecurityContext;
 
     private final SocketExceptionHandler socketExceptionHandler;
 
+    @SneakyThrows
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         // Wrap the message to access its headers
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         StompHeaderAccessorAdapter accessorAdapter = new StompHeaderAccessorAdapter(accessor);
 
-//        Message<?> errMessage = socketExceptionHandler.executeWithExceptionHandling(() -> {
+        Message<?> errMessage = socketExceptionHandler.executeWithExceptionHandling(() -> {
             if (StompCommand.CONNECT.equals(accessor.getCommand())) {
                 // Check csrf
                 checkCSRF(accessor);
@@ -71,12 +74,12 @@ public class CsrfChannelInterceptor implements ChannelInterceptor {
             }
 //            accessor.setHeader("sessionId", accessor.getSessionId());
 
-//        }, accessorAdapter, message);
+        }, accessorAdapter, message);
 //
 //
-//        if (errMessage != null) {
-//            return errMessage;
-//        }
+        if (errMessage != null) {
+            return errMessage;
+        }
         // Return the message if validation passes
         return message;
     }
@@ -123,7 +126,6 @@ public class CsrfChannelInterceptor implements ChannelInterceptor {
             // Retrieve the CSRF token from the message headers
             String actualTokenValue = accessor.getFirstNativeHeader("X-CSRF-TOKEN");
 
-//            log.info("Received CSRF token value: " + actualTokenValue);
 
             if (actualTokenValue == null) {
                 log.error("CSRF token is missing in CONNECT headers");
@@ -131,7 +133,7 @@ public class CsrfChannelInterceptor implements ChannelInterceptor {
             }
 
             // Load the expected CSRF token using the current request
-            CsrfToken expectedToken = /*csrfTokenRepository.loadToken(request);*/new DefaultCsrfToken("X-CSRF-TOKEN", "_csrf", "123456789");
+            CsrfToken expectedToken = csrfTokenRepository.loadToken();
             if (expectedToken == null) {
                 log.error("Expected CSRF token could not be found in the repository");
                 throw new IllegalStateException("CSRF Token could not be found");

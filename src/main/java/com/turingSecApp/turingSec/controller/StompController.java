@@ -32,7 +32,7 @@ public class StompController {
     private final IStompMessageInReportService stompMessageInReportService;
     private final UtilService utilService;
 
-    @MessageMapping("/{room}/sendMessage") //  stompClient.send('/app/{room}/sendMessage', {}, JSON.stringify);
+    @MessageMapping("/{room}/sendMessageInReport") //  stompClient.send('/app/{room}/sendMessageInReport', {}, JSON.stringify);
     public void sendTextMessageToReportRoom(
             @DestinationVariable String room,
             @Payload @Valid StringMessageInReportPayload strMessageInReportPayload,

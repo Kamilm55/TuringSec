@@ -40,45 +40,45 @@ public class ReportRoomInterceptor  implements ChannelInterceptor {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         StompHeaderAccessorAdapter accessorAdapter = new StompHeaderAccessorAdapter(accessor);
 
-        Message<?> errMessage = socketExceptionHandler.executeWithExceptionHandling( () -> {
+        socketExceptionHandler.executeWithExceptionHandling( () -> {
             Object authenticatedUser = utilService.getAuthenticatedBaseUserForWebsocket();
 
-
-            if(2+2==4)throw new RuntimeException("Rand ex");
             // todo: FunctionalInterface for this if and send error event
             // Check if the message is a CONNECT | SUBSCRIBE | SEND
             if (/*StompCommand.CONNECT.equals(accessor.getCommand())  | */StompCommand.SUBSCRIBE.equals(accessor.getCommand()) | StompCommand.SEND.equals(accessor.getCommand())) {
-                // Common fields for events
+            log.info("Message" + message);
 
-                log.info("Message" + message);
-
+            // Common field for events
             String destination = getDestinationFromHeaders(message);
-            String room = extractRoomFromSubscription(destination);
 
-            Report report = reportRepository.findByRoom(room)
-                    .orElseThrow(() -> new ResourceNotFoundException("Report not found with room: " + room));
+            // Subscription in Report Room
+            if(destination.contains("messagesInReport")  ){
+                String room = extractRoomFromSubscription(destination);
 
-            if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
-                handleSubscription(authenticatedUser, report);
-            } else if (StompCommand.SEND.equals(accessor.getCommand())) {
-                handleSend(authenticatedUser, report);
+
+                Report report = reportRepository.findByRoom(room)
+                        .orElseThrow(() -> new ResourceNotFoundException(String.format("Report not found with room %s",room)));
+
+                if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
+                    handleSubscription(authenticatedUser, report);
+                }
             }
 
-//                if (StompCommand.DISCONNECT.equals(accessor.getCommand())) {
-//                    String sessionId = accessor.getSessionId();
-//
-//                    // Here you might want to notify or log the disconnection event
-//                    customMessagingService.sendMessage(
-//                            String.format("/topic/%s/notification",sessionId),
-//                            "You have been disconnected"
-//                    );
-//                }
+            // SEND in Report Room
+            if (destination.contains("sendMessageInReport")) {
+                String room = extractRoomFromSend(destination);
+
+                Report report = reportRepository.findByRoom(room)
+                                .orElseThrow(() -> new ResourceNotFoundException(String.format("Report not found with room %s",room)));
+
+                if (StompCommand.SEND.equals(accessor.getCommand())) {
+                            handleSend(authenticatedUser, report);
+                }
+            }
+
             }
         },accessorAdapter,message);
-//
-//        if (errMessage != null) {
-//            return errMessage;
-//        }
+
             return message;
     }
 
@@ -92,8 +92,10 @@ public class ReportRoomInterceptor  implements ChannelInterceptor {
 
     private void checkUserOrCompanyReport(Object authenticatedUser, Long reportId) {
         if (authenticatedUser instanceof UserEntity) {
+            log.info("It is User Entity");
             socketEntityHelper.checkUserReport(authenticatedUser, reportId);
         } else if (authenticatedUser instanceof CompanyEntity) {
+            log.info("It is Company Entity");
             socketEntityHelper.checkCompanyReport(authenticatedUser, reportId);
         } else {
             throw new UnauthorizedException("User is neither Hacker nor Company!");
@@ -130,7 +132,7 @@ public class ReportRoomInterceptor  implements ChannelInterceptor {
 
     public String extractRoomFromSend(String destination) {
         String[] parts = destination.split("/");
-        if (parts.length >= 4 && "app".equals(parts[1]) && "sendMessage".equals(parts[3])) {
+        if (parts.length >= 4 && "app".equals(parts[1]) && "sendMessageInReport".equals(parts[3])) {
             return parts[2];
         }
         throw new IllegalArgumentException("Invalid destination format");

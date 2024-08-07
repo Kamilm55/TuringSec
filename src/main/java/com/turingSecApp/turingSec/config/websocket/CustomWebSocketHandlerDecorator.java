@@ -54,6 +54,12 @@ public class CustomWebSocketHandlerDecorator extends WebSocketHandlerDecorator {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
         try {
+            SocketErrorMessage socketErrorMessage = SocketErrorMessageSingleton.getInstance();
+            socketErrorMessage.setMessage(null);
+            socketErrorMessage.setKey(null);
+            socketErrorMessage.setSessionId(null);
+            socketErrorMessage.setHeaders(null);
+
             super.afterConnectionClosed(session, closeStatus);
         } catch (Exception ex) {
         System.out.println("afterConnectionClosed");

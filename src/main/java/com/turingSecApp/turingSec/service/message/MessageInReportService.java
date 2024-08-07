@@ -13,7 +13,7 @@ import com.turingSecApp.turingSec.model.repository.report.ReportRepository;
 import com.turingSecApp.turingSec.model.repository.reportMessage.StringMessageInReportRepository;
 import com.turingSecApp.turingSec.response.message.StringMessageInReportDTO;
 import com.turingSecApp.turingSec.service.interfaces.IMessageInReportService;
-import com.turingSecApp.turingSec.service.socket.exceptionHandling.ISocketEntityHelper;
+import com.turingSecApp.turingSec.service.socket.ISocketEntityHelper;
 import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.StringMessageInReportMapper;
 import lombok.RequiredArgsConstructor;

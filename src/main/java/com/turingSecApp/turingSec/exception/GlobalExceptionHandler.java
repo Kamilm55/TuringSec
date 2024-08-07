@@ -157,6 +157,22 @@ public class GlobalExceptionHandler {
     }
 
     // Validation exceptions
+
+    // For Websocket
+    @ExceptionHandler(value = org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public ResponseEntity<?> handleMethodArgumentNotValid(org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        System.out.println("errors: " + errors.toString());
+        return new ResponseEntity<>(errors, HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    // For Http
     // Learn:
     //  MethodArgumentNotValidException is specific to Spring and is thrown when there are validation errors during the binding of method parameters, typically in a Spring MVC controller method.
     //  It is commonly used when validating incoming request data, such as form submissions or JSON payloads,

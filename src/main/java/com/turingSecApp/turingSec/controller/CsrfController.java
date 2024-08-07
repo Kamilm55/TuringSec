@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
 public class CsrfController {
-    private final String exampleToken = "123456789";
     private final CustomCsrfTokenRepository customCsrfTokenRepository;
 
     @GetMapping("/csrf-token")

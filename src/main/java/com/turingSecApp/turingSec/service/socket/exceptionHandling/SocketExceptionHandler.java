@@ -40,8 +40,7 @@ public class SocketExceptionHandler {
 
         SocketErrorMessage socketErrorMessage = SocketErrorMessageSingleton.getInstance();
 
-        System.out.println("AT the end socketErrorMessage:" + socketErrorMessage);
-
+        // After closing socket I must set key to null
         if(socketErrorMessage.getKey() == null ){
             return messageFromInterceptor;
         }
@@ -59,6 +58,7 @@ public class SocketExceptionHandler {
 
             //todo: @MessageMapping("/{sessionId}/error") -> bura erroru gonder
 
+//            messagingTemplate.convertAndSend("topic/error");
             // Disconnect the client (direct disconnect is not possible in stomp)
 //            messagingTemplate.convertAndSend(String.format("/topic/%s/close",sessionId),"You must close socket with session id:" + sessionId);
 
