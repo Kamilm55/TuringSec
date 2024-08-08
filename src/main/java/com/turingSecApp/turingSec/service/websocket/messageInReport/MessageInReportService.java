@@ -43,7 +43,6 @@ public class MessageInReportService implements IMessageInReportService {
 
         List<StringMessageInReport> messages = stringMessageInReportRepository.findByReport_Id(report.getId());
 
-
         return messages.stream()
                 .map(commonMessageInReportService::toStringMessageInReportDTO)
                 .collect(Collectors.toList());

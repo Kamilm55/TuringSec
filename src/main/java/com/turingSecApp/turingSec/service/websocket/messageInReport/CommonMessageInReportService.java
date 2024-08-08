@@ -27,6 +27,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class CommonMessageInReportService implements ICommonMessageInReportService {
+
     private final IMessageInReportEntityHelper messageInReportEntityHelper;
     private final BaseMessageInReportRepository baseMessageInReportRepository;
     private final CompanyRepository companyRepository;
