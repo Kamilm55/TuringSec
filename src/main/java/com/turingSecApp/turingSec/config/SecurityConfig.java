@@ -142,10 +142,10 @@ public class SecurityConfig {
 
                     //message
                     request
-                            .requestMatchers("/api/messages/messages").hasAnyRole("HACKER","COMPANY")
-                            .requestMatchers("/api/messages/message/{id}").hasAnyRole("HACKER","COMPANY")
-                            .requestMatchers("/api/messages/admins/{reportId}").hasRole("ADMIN")
-                            .requestMatchers("/api/messages/admin/{id1}").hasRole("ADMIN");
+                            .requestMatchers("/api/messagesInReport").hasAnyRole("HACKER","COMPANY")
+                            .requestMatchers("/api/messagesInReport/{id}").hasAnyRole("HACKER","COMPANY")
+                            .requestMatchers("/api/messagesInReport/{reportId}/admin").hasRole("ADMIN")
+                            .requestMatchers("/api/messagesInReport/{id}/admin/").hasRole("ADMIN");
 
                 })
                 .sessionManagement(sm->sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

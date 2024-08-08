@@ -31,7 +31,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -45,6 +44,8 @@ public class StompMessageInReportService implements IStompMessageInReportService
     private final StringMessageInReportRepository stringMessageInReportRepository;
     private final UtilService utilService;
     private final SocketExceptionHandler socketExceptionHandler;
+
+
 
     //  1. Exceptionlar error event name ile atilmalidi ,  hem log hem sendEvent +
     //  2. headerda access token alinmalidi, ve mesaji gonderen Hacker yoxsa Company-di tapa bilerik token vasitesile , (en 1-ci unauthorized olmadigini yoxlamalyiq, eks halda exception) +

@@ -69,7 +69,7 @@ public class ReportRoomInterceptor  implements ChannelInterceptor {
                 String room = extractRoomFromSend(destination);
 
                 Report report = reportRepository.findByRoom(room)
-                                .orElseThrow(() -> new ResourceNotFoundException(String.format("Report not found with room %s",room)));
+                                .orElseThrow(() -> new ResourceNotFoundException(String.format("Report not found with room -> %s",room)));
 
                 if (StompCommand.SEND.equals(accessor.getCommand())) {
                             handleSend(authenticatedUser, report);
