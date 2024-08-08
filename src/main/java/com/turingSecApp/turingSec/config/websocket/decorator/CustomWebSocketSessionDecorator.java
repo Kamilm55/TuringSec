@@ -1,7 +1,7 @@
-package com.turingSecApp.turingSec.config.websocket;
+package com.turingSecApp.turingSec.config.websocket.decorator;
 
-import com.turingSecApp.turingSec.service.socket.exceptionHandling.SocketErrorMessage;
-import com.turingSecApp.turingSec.service.socket.exceptionHandling.SocketExceptionHandler;
+import com.turingSecApp.turingSec.exception.websocket.exceptionHandling.SocketErrorMessage;
+import com.turingSecApp.turingSec.exception.websocket.exceptionHandling.SocketErrorMessageSingleton;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -24,6 +24,7 @@ public class CustomWebSocketSessionDecorator extends WebSocketSessionDecorator {
         // Custom behavior before closing the session
         log.info("Preparing to close WebSocket session...");
 
+        // Send error msf before close
         sendMessageWithSession();
 
         // Call the actual close method of the delegate
@@ -37,6 +38,7 @@ public class CustomWebSocketSessionDecorator extends WebSocketSessionDecorator {
         // Custom behavior before closing the session
         log.info("Preparing to close WebSocket session with status: " + status);
 
+        // Send error msf before close
         sendMessageWithSession();
 
         // Call the actual close method of the delegate with status
@@ -45,9 +47,7 @@ public class CustomWebSocketSessionDecorator extends WebSocketSessionDecorator {
     private void sendMessageWithSession() throws IOException {
         SocketErrorMessage socketErrorMessage = SocketErrorMessageSingleton.getInstance();
 
-        System.out.println("socketErrorMessage values: " + socketErrorMessage);
-
-        // Constructing the error message manually
+        // Constructing the error message manually in the stomp error format
         String errorMessage = String.format(
                 "ERROR\nmessage:%s\ncontent-length:0\n\n\u0000",// ERROR message format for stomp (if the format is different client does not make sense)
                 socketErrorMessage.toStringForWebsocketMsg()

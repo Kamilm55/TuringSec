@@ -1,10 +1,11 @@
 package com.turingSecApp.turingSec.config.websocket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.turingSecApp.turingSec.config.websocket.decorator.CustomWebSocketHandlerDecorator;
 import com.turingSecApp.turingSec.filter.websocket.CsrfChannelInterceptor;
-import com.turingSecApp.turingSec.filter.websocket.JwtChannelInterceptor;
-import com.turingSecApp.turingSec.filter.websocket.ReportRoomInterceptor;
-import com.turingSecApp.turingSec.service.socket.exceptionHandling.SocketErrorMessage;
+import com.turingSecApp.turingSec.filter.websocket.AuthorizationChannelInterceptor;
+import com.turingSecApp.turingSec.filter.websocket.custom.ReportRoomInterceptor;
+import com.turingSecApp.turingSec.exception.websocket.exceptionHandling.SocketErrorMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +27,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final JwtChannelInterceptor jwtChannelInterceptor;
+    private final AuthorizationChannelInterceptor authorizationChannelInterceptor;
     private final ReportRoomInterceptor reportRoomInterceptor;
     private final CsrfChannelInterceptor csrfChannelInterceptor;
 
@@ -89,8 +90,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        // 1.csrfChannelInterceptor -> (todo) 2.authChannelInterceptor -> 3. ReportRoomInterceptor
-        registration.interceptors(csrfChannelInterceptor,reportRoomInterceptor);
+        // All interceptors must be configured here.
+        // 1.csrfChannelInterceptor -> 2.authChannelInterceptor -> 3. ReportRoomInterceptor
+        registration.interceptors(csrfChannelInterceptor,authorizationChannelInterceptor,reportRoomInterceptor);
     }
 
     @Override

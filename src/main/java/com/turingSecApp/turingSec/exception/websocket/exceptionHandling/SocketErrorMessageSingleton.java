@@ -1,6 +1,4 @@
-package com.turingSecApp.turingSec.config.websocket;
-
-import com.turingSecApp.turingSec.service.socket.exceptionHandling.SocketErrorMessage;
+package com.turingSecApp.turingSec.exception.websocket.exceptionHandling;
 
 public class SocketErrorMessageSingleton {
 

@@ -1,6 +1,5 @@
 package com.turingSecApp.turingSec.service.interfaces;
 
-import com.turingSecApp.turingSec.config.websocket.adapter.SimpHeaderAccessorAdapter;
 import com.turingSecApp.turingSec.payload.message.StringMessageInReportPayload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 

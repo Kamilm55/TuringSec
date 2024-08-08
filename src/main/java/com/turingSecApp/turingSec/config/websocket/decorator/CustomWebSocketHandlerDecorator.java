@@ -1,6 +1,7 @@
-package com.turingSecApp.turingSec.config.websocket;
+package com.turingSecApp.turingSec.config.websocket.decorator;
 
-import com.turingSecApp.turingSec.service.socket.exceptionHandling.SocketErrorMessage;
+import com.turingSecApp.turingSec.exception.websocket.exceptionHandling.SocketErrorMessage;
+import com.turingSecApp.turingSec.exception.websocket.exceptionHandling.SocketErrorMessageSingleton;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,6 @@ public class CustomWebSocketHandlerDecorator extends WebSocketHandlerDecorator {
         try {
             super.handleMessage(session, message);
         } catch (Exception ex) {
-        System.out.println("handleMessage");
             handleException(session, ex);
         }
     }
@@ -46,7 +46,6 @@ public class CustomWebSocketHandlerDecorator extends WebSocketHandlerDecorator {
         try {
             super.handleTransportError(session, exception);
         } catch (Exception ex) {
-        System.out.println("handleTransportError");
             handleException(session, ex);
         }
     }
@@ -54,6 +53,7 @@ public class CustomWebSocketHandlerDecorator extends WebSocketHandlerDecorator {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus closeStatus) throws Exception {
         try {
+            // Clear singleton error message
             SocketErrorMessage socketErrorMessage = SocketErrorMessageSingleton.getInstance();
             socketErrorMessage.setMessage(null);
             socketErrorMessage.setKey(null);
@@ -62,20 +62,13 @@ public class CustomWebSocketHandlerDecorator extends WebSocketHandlerDecorator {
 
             super.afterConnectionClosed(session, closeStatus);
         } catch (Exception ex) {
-        System.out.println("afterConnectionClosed");
             handleException(session, ex);
         }
     }
 
     private void handleException(WebSocketSession session, Exception ex) {
         try {
-
-            System.out.println("///");
-            logger.error("WebSocket error in session " + session.getId(), ex);
-            System.out.println("///");
-
-
-//            stompController.sendErrorMessage(session.getId(), "Error: " + ex.getMessage());
+            logger.error("WebSocket error in session: " + session.getId(), ex);
         } catch (Exception sendEx) {
             logger.error("Failed to send error message to session " + session.getId(), sendEx);
         }

@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.service.socket.exceptionHandling;
+package com.turingSecApp.turingSec.exception.websocket.exceptionHandling;
 
 import lombok.Data;
 import lombok.ToString;

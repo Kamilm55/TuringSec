@@ -149,12 +149,7 @@
             <artifactId>spring-websocket</artifactId>
             <version>6.1.6</version>
         </dependency>
-        <!--Socket IO v1.7.17 for backend, v2 for frontend and postman-->
-        <dependency>
-            <groupId>com.corundumstudio.socketio</groupId>
-            <artifactId>netty-socketio</artifactId>
-            <version>1.7.17</version>
-        </dependency>
+
         <!--This module provides support for Java 8 date/time types like LocalDateTime. (serialize/deserialize LocalDateTime)-->
 <!--        <dependency>-->
 <!--            <groupId>com.fasterxml.jackson.datatype</groupId>-->

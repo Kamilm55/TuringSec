@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.service.socket.exceptionHandling;
+package com.turingSecApp.turingSec.exception.websocket.exceptionHandling;
 
 @FunctionalInterface
 public interface ThrowingConsumer<T> {

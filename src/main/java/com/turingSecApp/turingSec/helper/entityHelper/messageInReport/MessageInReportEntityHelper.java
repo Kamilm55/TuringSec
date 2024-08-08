@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.service.socket;
+package com.turingSecApp.turingSec.helper.entityHelper.messageInReport;
 
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.exception.custom.UserMustBeSameWithReportUserException;
@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class SocketEntityHelper implements ISocketEntityHelper {
+public class MessageInReportEntityHelper implements IMessageInReportEntityHelper {
     private final ReportRepository reportRepository;
 
     // Learn: Issue Explanation

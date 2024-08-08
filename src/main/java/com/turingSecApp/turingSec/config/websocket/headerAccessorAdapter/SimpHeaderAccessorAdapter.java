@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.config.websocket.adapter;
+package com.turingSecApp.turingSec.config.websocket.headerAccessorAdapter;
 
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 

@@ -1,4 +1,4 @@
-package com.turingSecApp.turingSec.config.websocket;
+package com.turingSecApp.turingSec.config.websocket.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,7 +9,8 @@ import org.springframework.security.messaging.access.intercept.MessageMatcherDel
 @Configuration
 public class WebSocketSecurityConfig   {
 
-    //Note: it is not like http security filter chain
+    // Note: it is not like http security filter chain
+    // Not works as expected
 
     // This method creates a bean of type AuthorizationManager<Message<?>>.
     // The AuthorizationManager is responsible for handling message-level authorization.

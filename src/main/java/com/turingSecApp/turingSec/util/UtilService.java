@@ -1,6 +1,6 @@
 package com.turingSecApp.turingSec.util;
 
-import com.turingSecApp.turingSec.config.websocket.CustomWebsocketSecurityContext;
+import com.turingSecApp.turingSec.config.websocket.security.CustomWebsocketSecurityContext;
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.role.Role;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;

@@ -1,7 +1,6 @@
-package com.turingSecApp.turingSec.service.socket.exceptionHandling;
+package com.turingSecApp.turingSec.exception.websocket.exceptionHandling;
 
-import com.turingSecApp.turingSec.config.websocket.SocketErrorMessageSingleton;
-import com.turingSecApp.turingSec.config.websocket.adapter.CustomHeaderAccessor;
+import com.turingSecApp.turingSec.config.websocket.headerAccessorAdapter.CustomHeaderAccessor;
 import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
 import com.turingSecApp.turingSec.exception.custom.UserMustBeSameWithReportUserException;
 import lombok.RequiredArgsConstructor;
@@ -17,36 +16,43 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class SocketExceptionHandler {
+    // Note: Any of websocket component from comes websocket library cannot be injected into this class -> it creates circular flow
 
-
+    // For Interceptors
     public Message<?> executeWithExceptionHandling(Runnable action, CustomHeaderAccessor accessor,Message<?> messageFromInterceptor) throws Exception  {
         String sessionId = accessor.getSessionId();
 
-        System.out.println("sesion id: " + sessionId);
+        SocketErrorMessage socketErrorMessage = SocketErrorMessageSingleton.getInstance();
 
         try {
             action.run();
         }
         catch (UserMustBeSameWithReportUserException | UnauthorizedException customEx){
-            handleException(customEx,sessionId,accessor,messageFromInterceptor);
-
-            throw new RuntimeException(customEx.getMessage());
+            handleExceptionAndThrowExceptionAgain(accessor, messageFromInterceptor, customEx, socketErrorMessage, sessionId);
         }
         catch (Exception ex) {
             log.error("Unhandled ex in socket exHandler!");
-            handleException(ex,sessionId,accessor,messageFromInterceptor);
-            throw new RuntimeException(ex.getMessage());
+            handleExceptionAndThrowExceptionAgain(accessor, messageFromInterceptor, ex, socketErrorMessage, sessionId);
         }
-
-        SocketErrorMessage socketErrorMessage = SocketErrorMessageSingleton.getInstance();
 
         // After closing socket I must set key to null
         if(socketErrorMessage.getKey() == null ){
             return messageFromInterceptor;
         }
+
+        // If socketErrorMessage key is not null, it means there is an error
         return socketErrorMessage;
     }
 
+    private void handleExceptionAndThrowExceptionAgain(CustomHeaderAccessor accessor, Message<?> messageFromInterceptor, Exception ex, SocketErrorMessage socketErrorMessage, String sessionId) {
+        // For handle exception by my custom logic
+        handleException(socketErrorMessage, ex, sessionId, accessor, messageFromInterceptor);
+
+        // Throw exception again -> Websocket Exception handler handles this and close socket (which I also customize before closing logic)
+        throw new RuntimeException(ex.getMessage());
+    }
+
+    //todo: For service methods
     public void executeWithExceptionHandling(Runnable action, CustomHeaderAccessor accessor, SimpMessagingTemplate messagingTemplate) {
         String sessionId = accessor.getSessionId();
 
@@ -54,7 +60,7 @@ public class SocketExceptionHandler {
             action.run();
         }
         catch (UserMustBeSameWithReportUserException | UnauthorizedException customEx){
-            handleException(customEx,sessionId);
+//            handleException(customEx,sessionId);
 
             //todo: @MessageMapping("/{sessionId}/error") -> bura erroru gonder
 
@@ -64,35 +70,24 @@ public class SocketExceptionHandler {
 
         }
         catch (Exception ex) {
-            handleException(ex, sessionId);
+//            handleException(ex, sessionId);
         }
 
     }
 
-    private void handleException(Exception ex, String sessionId,CustomHeaderAccessor accessor,Message<?> message) {
+    private void handleException(SocketErrorMessage socketErrorMessage,Exception ex, String sessionId,CustomHeaderAccessor accessor,Message<?> message) {
         // Populate error details before log and send as an event
-        populateErrorDetails(ex,sessionId);
+        populateErrorDetails(socketErrorMessage,ex,sessionId);
 
-        SocketErrorMessage socketErrorMessage = SocketErrorMessageSingleton.getInstance();
         socketErrorMessage.setHeaders(message.getHeaders());
-//        accessor.setDestination(String.format("/topic/%s/error",sessionId));
 
         accessor.setDestination("/topic/error");
 
-        log.error("Error in socket: " + socketErrorMessage.toString());
-    }
-    private void handleException(Exception ex, String sessionId) {
-        // Populate error details before log and send as an event
-        populateErrorDetails(ex,sessionId);
-
-        SocketErrorMessage socketErrorMessage = SocketErrorMessageSingleton.getInstance();
-
-        log.error("Error in socket: " + socketErrorMessage.toString());
+        log.error("Error in socket: " + socketErrorMessage);
     }
 
 
-
-    private void populateErrorDetails(Exception ex, String sessionId){
+    private void populateErrorDetails(SocketErrorMessage socketErrorMessage,Exception ex, String sessionId){
         // Create a detailed error message
         String key = ex.getClass().getName();
         String message = ex.getMessage();
@@ -101,7 +96,6 @@ public class SocketExceptionHandler {
                 .collect(Collectors.joining("\n"));
 
         // Create a structured error object
-        SocketErrorMessage socketErrorMessage = SocketErrorMessageSingleton.getInstance();
         socketErrorMessage.setKey(key);
         socketErrorMessage.setSessionId(sessionId);
         socketErrorMessage.setMessage(message);
