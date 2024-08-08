@@ -27,7 +27,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class CommonMessageInReportService implements ICommonMessageInReportService {
-    private final IMessageInReportEntityHelper socketEntityHelper;
+    private final IMessageInReportEntityHelper messageInReportEntityHelper;
     private final BaseMessageInReportRepository baseMessageInReportRepository;
     private final CompanyRepository companyRepository;
     private final ProgramRepository programRepository;
@@ -36,10 +36,10 @@ public class CommonMessageInReportService implements ICommonMessageInReportServi
     public void checkUserOrCompanyReport(Object authenticatedUser, Long reportId) {
         if (authenticatedUser instanceof UserEntity) {
             log.info("It is User Entity");
-            socketEntityHelper.checkUserReport(authenticatedUser, reportId);
+            messageInReportEntityHelper.checkUserReport(authenticatedUser, reportId);
         } else if (authenticatedUser instanceof CompanyEntity) {
             log.info("It is Company Entity");
-            socketEntityHelper.checkCompanyReport(authenticatedUser, reportId);
+            messageInReportEntityHelper.checkCompanyReport(authenticatedUser, reportId);
         } else {
             throw new UnauthorizedException("User is neither Hacker nor Company!");
         }

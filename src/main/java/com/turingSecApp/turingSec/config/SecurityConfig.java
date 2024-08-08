@@ -129,7 +129,7 @@ public class SecurityConfig {
 
                     // Bug Bounty Report Controller
                     request
-                            .requestMatchers("/api/bug-bounty-reports/reports/company").hasRole("COMPANY")
+                            .requestMatchers("/api/bug-bounty-reports/reports/company").hasAnyRole("COMPANY")
                             .requestMatchers(HttpMethod.POST,"/api/bug-bounty-reports/**").hasRole("HACKER")
                             .requestMatchers(HttpMethod.PUT,"/api/bug-bounty-reports/**").hasRole("HACKER")
                             .requestMatchers("/api/bug-bounty-reports/submit").hasRole("HACKER")
@@ -144,8 +144,10 @@ public class SecurityConfig {
                     request
                             .requestMatchers("/api/messagesInReport").hasAnyRole("HACKER","COMPANY")
                             .requestMatchers("/api/messagesInReport/{id}").hasAnyRole("HACKER","COMPANY")
-                            .requestMatchers("/api/messagesInReport/{reportId}/admin").hasRole("ADMIN")
-                            .requestMatchers("/api/messagesInReport/{id}/admin/").hasRole("ADMIN");
+
+                            .requestMatchers("/api/messagesInReport/report/{id}/admin").hasRole("ADMIN")
+                            .requestMatchers("/api/messagesInReport/message/{id}/admin").hasRole("ADMIN");
+
 
                 })
                 .sessionManagement(sm->sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

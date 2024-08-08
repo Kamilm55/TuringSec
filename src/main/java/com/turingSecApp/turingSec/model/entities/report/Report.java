@@ -3,6 +3,8 @@ package com.turingSecApp.turingSec.model.entities.report;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.report.embedded.*;
+import com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORCOMPANY;
+import com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORUSER;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -69,6 +71,17 @@ public class Report {
 
     @OneToMany(mappedBy = "bugBountyReport", cascade = CascadeType.ALL/*,orphanRemoval = true*/)
     private List<CollaboratorEntity> collaborators = new ArrayList<>();
+
+    private REPORTSTATUSFORUSER statusForUser;// hacker hissesinde all( submitted underreview (accepted | rejected) -> assessed )
+
+    private REPORTSTATUSFORCOMPANY statusForCompany;//sirket hissesinde all(unreviewed,reviewed,assessed)
+
+    //  User - Company
+    // user report atannan sonra  ---> submitted - unreviewed
+    // company reporta tiklasa ----> underreview - reviewed
+    // company reportu deyerlendirir --->
+    // accepted - assessed
+    // rejected - assessed
 
 
     @PrePersist

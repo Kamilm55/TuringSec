@@ -22,6 +22,7 @@ public class SocketExceptionHandler {
     public Message<?> executeWithExceptionHandling(Runnable action, CustomHeaderAccessor accessor,Message<?> messageFromInterceptor) throws Exception  {
         String sessionId = accessor.getSessionId();
 
+        // Get singleton error obj
         SocketErrorMessage socketErrorMessage = SocketErrorMessageSingleton.getInstance();
 
         try {

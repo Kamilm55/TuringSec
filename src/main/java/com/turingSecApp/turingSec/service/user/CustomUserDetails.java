@@ -5,6 +5,7 @@ import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.role.Role;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,6 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data
+@Slf4j
 public class CustomUserDetails implements UserDetails {
 
     private final Object user;
@@ -24,6 +26,8 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+
+        log.info("USER TYPE: " + user);
         if (user instanceof UserEntity) {
             return getAuthoritiesFromRoles(((UserEntity) user).getRoles());
         } else if (user instanceof AdminEntity) {

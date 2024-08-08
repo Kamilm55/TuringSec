@@ -49,7 +49,6 @@ public class CsrfChannelInterceptor implements ChannelInterceptor {
             // Retrieve the CSRF token from the message headers
             String actualTokenValue = accessor.getFirstNativeHeader("X-CSRF-TOKEN");
 
-
             if (actualTokenValue == null) {
                 log.error("CSRF token is missing in CONNECT headers");
                 throw new IllegalArgumentException("CSRF Token is missing");
