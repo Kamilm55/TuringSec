@@ -49,7 +49,7 @@ public class UserManagementService {
         // Populate user entity and save as an inactive user
         UserEntity user = populateUserAndSave(registerPayload,false);
 
-        // Send activation email //todo: change to async event (kafka)
+        // Send activation email //todo: change to async event
         sendActivationEmail(user);
 
         // Generate token for the registered user
@@ -99,14 +99,18 @@ public class UserManagementService {
 
         // If user not found by email, try finding by username
         if (userEntity == null) {
+
+            System.out.println("works 1:" + userEntity);
             userEntity = userEntityHelper.findUserByUsername(loginRequest.getUsernameOrEmail());
+//                    userRepository.findByUsername(loginRequest.getUsernameOrEmail()).orElseThrow(()-> new UserNotFoundException("User not found with this username: " + loginRequest.getUsernameOrEmail()));
+
         }
 
          // Authenticate user if found
          checkUserFoundOrNot(userEntity);
 
          // Ensure password is correct
-        checkPassword(loginRequest, userEntity);
+         checkPassword(loginRequest, userEntity);
 
         //Check if the user is activated
          utilService.checkUserIsActivated(userEntity);
@@ -115,10 +119,10 @@ public class UserManagementService {
          String token = generateTokenForUser(userEntity);
 
          // Retrieve user and hacker details from the database
-         UserEntity userById = userEntityHelper.findUserById(userEntity.getId());
+//         UserEntity userById = userEntityHelper.findUserById(userEntity.getId());
 
          // Create and return authentication response
-         return buildAuthResponse(userById,token);
+         return buildAuthResponse(userEntity,token);
 
     }
 

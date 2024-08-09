@@ -95,7 +95,7 @@ public class SecurityConfig {
                     // User Controller
                     request
                             .requestMatchers("/api/auth/register/hacker").anonymous() // anonymous means , only unauthenticated users can send request
-                            .requestMatchers("/api/auth/login").anonymous() // Public endpoints for registration and login
+                            .requestMatchers("/api/auth/login").anonymous()
 
                             .requestMatchers("/api/auth/change-password").authenticated()
                             .requestMatchers("/api/auth/change-email").authenticated()

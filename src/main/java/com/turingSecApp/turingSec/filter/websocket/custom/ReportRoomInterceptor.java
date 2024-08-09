@@ -23,7 +23,7 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ReportRoomInterceptor  implements ChannelInterceptor {
+public class ReportRoomInterceptor  implements ChannelInterceptor,IReportRoomInterceptor {
     private final UtilService utilService;
     private final ICommonMessageInReportService commonMessageInReportService;
     private final ReportRepository reportRepository;
@@ -56,7 +56,8 @@ public class ReportRoomInterceptor  implements ChannelInterceptor {
         return messageFromHandler;
     }
 
-    private void handleSend(String destination, StompHeaderAccessor accessor, Object authenticatedUser) {
+    @Override
+    public void handleSend(String destination, StompHeaderAccessor accessor, Object authenticatedUser) {
         if (destination.contains("sendMessageInReport")) {
             String room = extractRoomFromSend(destination);
 
@@ -69,7 +70,8 @@ public class ReportRoomInterceptor  implements ChannelInterceptor {
         }
     }
 
-    private void handleSubscription(String destination, StompHeaderAccessor accessor, Object authenticatedUser) {
+    @Override
+    public void handleSubscription(String destination, StompHeaderAccessor accessor, Object authenticatedUser) {
         if (destination.contains("messagesInReport")) {
             String room = extractRoomFromSubscription(destination);
 
