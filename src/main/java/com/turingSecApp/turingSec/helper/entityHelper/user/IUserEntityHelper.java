@@ -24,7 +24,7 @@ public interface IUserEntityHelper {
 
     void validateCurrentPassword(ChangePasswordRequest request, UserEntity user);
 
-    public void validateCurrentPassword(ChangeEmailRequest request, UserEntity user);
+    void validateCurrentPassword(ChangeEmailRequest request, UserEntity user);
 
     void updatePassword(String newPassword, String confirmNewPassword, UserEntity user);
 

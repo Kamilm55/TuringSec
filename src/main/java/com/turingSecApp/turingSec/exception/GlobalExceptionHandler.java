@@ -208,6 +208,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponseMessages> generalExceptionHandler(Exception ex){
         System.out.println("For unhandled exceptions");
         System.out.println(ex.getClass());
+        ex.printStackTrace();
         return new ResponseEntity<>(
                 new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR) ,
                 HttpStatus.INTERNAL_SERVER_ERROR

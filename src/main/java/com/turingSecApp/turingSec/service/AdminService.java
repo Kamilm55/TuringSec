@@ -1,5 +1,6 @@
 package com.turingSecApp.turingSec.service;
 
+import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.role.Role;
@@ -41,7 +42,7 @@ public class AdminService implements IAdminService {
 
         // If the input is not an email, check if it's a username
         if (adminEntity == null) {
-            adminEntity = adminRepository.findByUsername(user.getUsernameOrEmail()).orElseThrow(()->new UsernameNotFoundException("Admin does not found with username:" + user.getUsernameOrEmail() ));
+            adminEntity = adminRepository.findByUsername(user.getUsernameOrEmail()).orElseThrow(()->new UserNotFoundException("Admin does not found with username:" + user.getUsernameOrEmail() ));
         }
 
         // Authenticate user if found

@@ -49,7 +49,7 @@ public class UserManagementService {
         // Populate user entity and save as an inactive user
         UserEntity user = populateUserAndSave(registerPayload,false);
 
-        // Send activation email //todo: change to async event (kafka)
+        // Send activation email //todo: change to async event
         sendActivationEmail(user);
 
         // Generate token for the registered user

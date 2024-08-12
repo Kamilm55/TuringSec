@@ -1,6 +1,7 @@
 package com.turingSecApp.turingSec.model.entities.role;
 
 
+import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import jakarta.persistence.*;
@@ -34,5 +35,7 @@ public class UserRoles {
     @JoinColumn(name = "company_id")
     private CompanyEntity company;
 
-
+    @ManyToOne
+    @JoinColumn(name = "admin_id")
+    private AdminEntity admin;
 }

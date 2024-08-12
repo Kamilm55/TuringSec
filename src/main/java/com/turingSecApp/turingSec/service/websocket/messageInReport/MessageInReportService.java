@@ -33,7 +33,8 @@ public class MessageInReportService implements IMessageInReportService {
     public List<StringMessageInReportDTO> getMessagesByRoom(String room) {
         Report report = reportRepository.findByRoom(room)
                 .orElseThrow(() -> new ResourceNotFoundException("Report not found with room: " + room));
-                // Is it user or company if authorized
+
+        // Is it user or company if authorized
         Object authenticatedUser = utilService.getAuthenticatedBaseUser();
         log.info("User/Company info: " + authenticatedUser);
 
@@ -41,8 +42,6 @@ public class MessageInReportService implements IMessageInReportService {
         commonMessageInReportService.checkUserOrCompanyReport(authenticatedUser, report.getId());
 
         List<StringMessageInReport> messages = stringMessageInReportRepository.findByReport_Id(report.getId());
-
-
 
         return messages.stream()
                 .map(commonMessageInReportService::toStringMessageInReportDTO)

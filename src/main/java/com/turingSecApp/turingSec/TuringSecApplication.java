@@ -84,9 +84,9 @@ public class TuringSecApplication implements CommandLineRunner {
         System.out.println(IBaseUser1.equals(hacker1) + " | " + IBaseUser2.equals(company) + " | " + IBaseUser3.equals(admin1.get()));
 
         NameBasedGenerator generator = Generators.nameBasedGenerator(NameBasedGenerator.NAMESPACE_DNS);
-        String name = "globalUserID";
+        String name = "baseUserID";
         UUID uuid = generator.generate(name);
-        System.out.println("Generated UUIDv5 for global user id: " + uuid.toString());
+        System.out.println("Generated UUIDv5 for base user id: " + uuid.toString());
 
     }
 

@@ -23,10 +23,11 @@ public class AdminEntity implements IBaseUser {
     private String email;
     private String password;
     private boolean activated; // active as default
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "user_role",
-            joinColumns = @JoinColumn(name = "user_id"),
+            name = "admin_role",
+            joinColumns = @JoinColumn(name = "admin_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     @JsonIgnore
