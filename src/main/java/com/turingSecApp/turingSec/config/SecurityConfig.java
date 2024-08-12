@@ -123,6 +123,7 @@ public class SecurityConfig {
                     // Admin Controller
                     request
                             .requestMatchers("/api/admin/login").anonymous()
+                            .requestMatchers("/api/admin/update").hasRole("ADMIN")
                             .requestMatchers("/api/admin/approve-company/{companyId}").hasRole("ADMIN");
 
 

@@ -1,6 +1,7 @@
 package com.turingSecApp.turingSec.service.user;
 
 
+import com.turingSecApp.turingSec.payload.company.UpdateCompanyPayload;
 import com.turingSecApp.turingSec.payload.user.*;
 import com.turingSecApp.turingSec.response.program.ProgramDTO;
 import com.turingSecApp.turingSec.response.user.AuthResponse;
@@ -92,5 +93,12 @@ public class UserService implements IUserService {
     }
 
 
+    public String generateCompanyNewToken(String username) {
+        return userManagementService.generateCompanyNewToken(username);
+    }
+
+    public String generateAdminNewToken(String username) {
+        return userManagementService.generateAdminNewToken(username);
+    }
 }
 

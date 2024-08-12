@@ -15,6 +15,7 @@ import java.util.Set;
 @Builder
 @Table(name = "admins")
 public class AdminEntity implements IBaseUser {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

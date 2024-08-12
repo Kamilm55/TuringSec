@@ -2,6 +2,7 @@ package com.turingSecApp.turingSec.service.interfaces;
 
 import com.turingSecApp.turingSec.payload.company.CompanyLoginPayload;
 import com.turingSecApp.turingSec.payload.company.RegisterCompanyPayload;
+import com.turingSecApp.turingSec.payload.company.UpdateCompanyPayload;
 import com.turingSecApp.turingSec.response.company.CompanyResponse;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,4 +18,6 @@ public interface ICompanyService {
     List<CompanyResponse> getAllCompanies();
     CompanyResponse getCompaniesById(@PathVariable Long id);
     CompanyResponse getCurrentUser();
+
+    CompanyResponse updateCompany(UpdateCompanyPayload updateCompanyPayload);
 }

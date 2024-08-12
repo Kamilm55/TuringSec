@@ -1,12 +1,18 @@
 package com.turingSecApp.turingSec.controller;
 
+import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.payload.company.CompanyLoginPayload;
 import com.turingSecApp.turingSec.payload.company.RegisterCompanyPayload;
+import com.turingSecApp.turingSec.payload.company.UpdateCompanyPayload;
 import com.turingSecApp.turingSec.response.company.CompanyResponse;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
+import com.turingSecApp.turingSec.response.user.UserHackerDTO;
 import com.turingSecApp.turingSec.service.interfaces.ICompanyService;
+import com.turingSecApp.turingSec.service.user.UserService;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,8 +22,11 @@ import java.util.Map;
 @RequestMapping("/api/companies")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CompanyController {
-    private final ICompanyService companyService;
+
+    final ICompanyService companyService;
+    final UserService userService;
 
     @PostMapping("/register")
     public BaseResponse<?> registerCompany(@RequestBody @Valid RegisterCompanyPayload registerCompanyPayload) {
@@ -46,6 +55,15 @@ public class CompanyController {
     @GetMapping("/current-user")
     public BaseResponse<CompanyResponse> getCurrentUser() {
        return BaseResponse.success(companyService.getCurrentUser());
+    }
+
+    @PutMapping(path = "/update")
+    public BaseResponse<CompanyResponse> updateCompany(@Valid @RequestBody UpdateCompanyPayload updateCompanyPayload){
+        CompanyResponse updateCompany = companyService.updateCompany(updateCompanyPayload);
+        String newToken = userService.generateCompanyNewToken(updateCompany.getEmail());
+        return BaseResponse.success(updateCompany,
+                "Company updated successfully. You must update Authorization header (Bearer token) , new token is: "  + newToken
+                );
     }
 
 

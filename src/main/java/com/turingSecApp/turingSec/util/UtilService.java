@@ -3,6 +3,7 @@ package com.turingSecApp.turingSec.util;
 import com.turingSecApp.turingSec.config.websocket.CustomWebsocketSecurityContext;
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.role.Role;
+import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
@@ -20,9 +21,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -96,6 +99,32 @@ public class UtilService {
                 throw  new CompanyNotFoundException("Company with email " + email + " not found , in getAuthenticatedCompany()");
             }
             return company;
+        } else {
+            throw new UnauthorizedException();
+        }
+    }
+
+    public AdminEntity getAuthenticatedAdminWithHTTP(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return getAuthenticatedAdmin(authentication);
+    }
+
+    public AdminEntity getAuthenticatedAdmin(Authentication authentication) {
+//        if (authentication != null && authentication.isAuthenticated()) {
+//            String username = authentication.getName();
+//
+//            return adminRepository.findByUsername(username)
+//                    .orElseThrow(() -> new ResourceNotFoundException("Company with email " + username + " not found , in getAuthenticatedCompany()"));
+//        } else {
+//            throw new UnauthorizedException();
+//        }
+        if (authentication != null && authentication.isAuthenticated()) {
+            String username = authentication.getName();
+            Optional<AdminEntity> adminEntity = adminRepository.findByUsername(username);
+            if(adminEntity.isEmpty()){
+                throw new UserNotFoundException("Admin with username " + username + " not found , in getAuthenticatedAdmin()");
+            }
+            return adminEntity.get();
         } else {
             throw new UnauthorizedException();
         }

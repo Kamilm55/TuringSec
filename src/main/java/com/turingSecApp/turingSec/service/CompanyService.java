@@ -11,9 +11,11 @@ import com.turingSecApp.turingSec.exception.custom.EmailAlreadyExistsException;
 import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.payload.company.CompanyLoginPayload;
 import com.turingSecApp.turingSec.payload.company.RegisterCompanyPayload;
+import com.turingSecApp.turingSec.payload.company.UpdateCompanyPayload;
 import com.turingSecApp.turingSec.response.company.CompanyResponse;
 import com.turingSecApp.turingSec.service.interfaces.ICompanyService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
+import com.turingSecApp.turingSec.service.user.UserManagementService;
 import com.turingSecApp.turingSec.service.user.UserService;
 import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.CompanyMapper;
@@ -32,13 +34,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class CompanyService implements ICompanyService {
+
     private final UserService userService;
     private final EmailNotificationService EmailNotificationService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtTokenProvider;
     private final UtilService utilService;
     private final CompanyRepository companyRepository;
-
+    private final UserManagementService userManagementService;
     private final RoleRepository roleRepository;
     private final AdminRepository adminRepository;
 
@@ -130,6 +133,7 @@ public class CompanyService implements ICompanyService {
         CompanyEntity company = findCompanyById(id);
         return CompanyMapper.INSTANCE.convertToResponse(company);
     }
+
     private CompanyEntity findCompanyById(Long id) {
         Optional<CompanyEntity> companyEntity = companyRepository.findById(id);
         return companyEntity.orElseThrow(() -> new ResourceNotFoundException("Company not found with id:" + id));
@@ -138,9 +142,26 @@ public class CompanyService implements ICompanyService {
     @Override
     public CompanyResponse getCurrentUser() {
         // Retrieve user details from the database
+
+
         CompanyEntity company = utilService.getAuthenticatedCompanyWithHTTP();
 
         return CompanyMapper.INSTANCE.convertToResponse(company);
+    }
+
+    @Override
+    public CompanyResponse updateCompany(UpdateCompanyPayload updateCompanyPayload) {
+        CompanyEntity authenticatedCompanyWithHTTP = utilService.getAuthenticatedCompanyWithHTTP();
+        CompanyEntity build = updateCompanyEntity(updateCompanyPayload,authenticatedCompanyWithHTTP);
+        return CompanyMapper.INSTANCE.convertToResponse(build);
+    }
+
+    private CompanyEntity updateCompanyEntity(UpdateCompanyPayload updateCompanyPayload, CompanyEntity authenticatedCompanyWithHTTP) {
+        authenticatedCompanyWithHTTP.setJob_title(updateCompanyPayload.getJobTitle());
+        authenticatedCompanyWithHTTP.setCompany_name(updateCompanyPayload.getCompanyName());
+        authenticatedCompanyWithHTTP.setFirst_name(updateCompanyPayload.getFirstName());
+        authenticatedCompanyWithHTTP.setLast_name(updateCompanyPayload.getLastName());
+        return companyRepository.save(authenticatedCompanyWithHTTP);
     }
 
 

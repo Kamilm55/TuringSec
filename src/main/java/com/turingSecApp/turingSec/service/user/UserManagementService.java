@@ -8,7 +8,9 @@ import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.HackerRepository;
 import com.turingSecApp.turingSec.model.repository.UserRepository;
+import com.turingSecApp.turingSec.payload.company.UpdateCompanyPayload;
 import com.turingSecApp.turingSec.payload.user.*;
+import com.turingSecApp.turingSec.response.company.CompanyResponse;
 import com.turingSecApp.turingSec.response.user.AuthResponse;
 import com.turingSecApp.turingSec.response.user.UserHackerDTO;
 import com.turingSecApp.turingSec.service.EmailNotificationService;
@@ -249,6 +251,17 @@ public class UserManagementService {
         utilService.isUserExistWithEmail(registerPayload.getEmail());
     }
 
+    public String generateCompanyNewToken(String email) {
+        UserDetails userDetailsFromDB = userDetailsService.loadUserByUsername(email);
 
+        // Assuming you have generated a new token here
+        return jwtTokenProvider.generateToken(userDetailsFromDB);
+    }
 
+    public String generateAdminNewToken(String username) {
+        UserDetails userDetailsFromDB = userDetailsService.loadUserByUsername(username);
+
+        // Assuming you have generated a new token here
+        return jwtTokenProvider.generateToken(userDetailsFromDB);
+    }
 }

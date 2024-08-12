@@ -1,5 +1,7 @@
 package com.turingSecApp.turingSec.service;
 
+import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
+import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.role.Role;
@@ -8,10 +10,15 @@ import com.turingSecApp.turingSec.model.repository.CompanyRepository;
 import com.turingSecApp.turingSec.model.repository.RoleRepository;
 import com.turingSecApp.turingSec.exception.custom.CompanyNotFoundException;
 import com.turingSecApp.turingSec.filter.JwtUtil;
+import com.turingSecApp.turingSec.payload.user.AdminUpdateRequest;
 import com.turingSecApp.turingSec.payload.user.LoginRequest;
 import com.turingSecApp.turingSec.response.admin.AdminAuthResponse;
+import com.turingSecApp.turingSec.response.admin.AdminDTO;
+import com.turingSecApp.turingSec.response.admin.AdminUpdateResponse;
 import com.turingSecApp.turingSec.service.interfaces.IAdminService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
+import com.turingSecApp.turingSec.service.user.UserManagementService;
+import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -30,9 +37,10 @@ public class AdminService implements IAdminService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtTokenProvider;
     private final AdminRepository adminRepository;
-
+    private final UserManagementService userManagementService;
     private final CompanyRepository companyRepository;
     private final RoleRepository roleRepository;
+    private final UtilService utilService;
 
     @Override
     public AdminAuthResponse loginAdmin(LoginRequest user) {
@@ -75,6 +83,19 @@ public class AdminService implements IAdminService {
         }
     }
 
+    @Override
+    public AdminDTO updateAdmin(AdminUpdateRequest adminUpdateRequest) {
+        AdminEntity check = utilService.getAuthenticatedAdminWithHTTP();
+        AdminEntity savedAdmin = updateAdminEntity(adminUpdateRequest, check);
+        return UserMapper.INSTANCE.convert(savedAdmin);
+    }
+
+    private AdminEntity updateAdminEntity(AdminUpdateRequest adminUpdateRequest, AdminEntity check) {
+        check.setFirst_name(adminUpdateRequest.getFirst_name());
+        check.setLast_name(adminUpdateRequest.getLast_name());
+        check.setUsername(adminUpdateRequest.getUsername());
+        return adminRepository.save(check);
+    }
 
 
     // Util
