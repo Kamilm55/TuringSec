@@ -97,6 +97,9 @@ public class TuringSecApplication implements CommandLineRunner {
         System.out.println("Generated UUIDv5 for base user id: " + uuid.toString());
 
 
+        //todo: https://stackoverflow.com/questions/45402742/git-merging-when-to-use-ours-strategy-ours-option-and-theirs-option
+        // change app to version abccfb2
+
         // TEST
         System.out.println("TEST");
         String username = "Username";
