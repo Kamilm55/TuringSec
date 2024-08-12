@@ -34,26 +34,23 @@ public class AuthorizationChannelInterceptor implements ChannelInterceptor {
     @SneakyThrows // It must be handled by native websocket exception handler
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
-     // Wrap the message to access its headers
-     StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-     StompHeaderAccessorAdapter accessorAdapter = new StompHeaderAccessorAdapter(accessor);
+        // Wrap the message to access its headers
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        StompHeaderAccessorAdapter accessorAdapter = new StompHeaderAccessorAdapter(accessor);
 
-        Message<?> messageFromHandler = socketExceptionHandler.executeWithExceptionHandling(() -> {
+        socketExceptionHandler.executeWithExceptionHandling(() -> {
+            // Check if the message command requires authorization
+            // CONNECT | SUBSCRIBE | SEND
+            if (isAuthorizationRequired(accessor.getCommand())) {
+                log.info("Message: {}", message);
+                log.info("Message Headers: {}", message.getHeaders());
+                log.info("Session id: {}", accessor.getSessionId());
 
-            // Check if the message is a CONNECT,SUBSCRIBE,SEND command -> it must be authorized to achieve this
-            if (StompCommand.CONNECT.equals(accessor.getCommand()) | StompCommand.SUBSCRIBE.equals(accessor.getCommand()) | StompCommand.SEND.equals(accessor.getCommand())) {
-                log.info("Message" + message);
-                log.info("Message Headers: " + message.getHeaders());
-                log.info("Session id:" + accessor.getSessionId());
+                // Extract and validate the Authorization header
+                validateAuthorizationHeader(message);
 
-                Map<String, Object> nativeHeaders = (Map<String, Object>) message.getHeaders().get("nativeHeaders");
-
-                // Get the Authorization header value, it is in List format -> In STOMP (Streaming Text Oriented Messaging Protocol) over WebSockets, headers can sometimes be represented as List<String> because STOMP allows for multiple values for a single header key. This is different from typical HTTP headers, where each header key usually has a single value.
-                List<String> authorizationHeaderList = (List<String>) nativeHeaders.get("Authorization");
-
-                String authorizationHeader = authorizationHeaderList.get(0);
-
-                // Set Auth if authorizationHeader is not null, if it is null throw unauthorized exception
+                // Set authentication based on the Authorization header
+                String authorizationHeader = extractAuthorizationHeader(message);
                 if (!setAuth(authorizationHeader, accessor)) {
                     throw new UnauthorizedException();
                 }
@@ -61,17 +58,18 @@ public class AuthorizationChannelInterceptor implements ChannelInterceptor {
 
         }, accessorAdapter, message);
 
-        // Return the original message if validation passes, if error occurs it sets message as exception message
-        return messageFromHandler;
+        // Return the original message if validation passes
+        return message;
+    }
+
+    private boolean isAuthorizationRequired(StompCommand command) {
+        return StompCommand.CONNECT.equals(command) ||
+                StompCommand.SUBSCRIBE.equals(command) ||
+                StompCommand.SEND.equals(command);
     }
 
     private boolean setAuth(String authorizationHeader, StompHeaderAccessor accessor) {
 //        log.info("Authorization Header: {}", authorizationHeader);
-
-        // If no authorization header is present, authentication fails
-        if (authorizationHeader == null) {
-            return false;
-        }
 
         // Extract and validate the token from the header
         String token = jwtTokenProvider.resolveToken(authorizationHeader);
@@ -98,5 +96,23 @@ public class AuthorizationChannelInterceptor implements ChannelInterceptor {
         customWebsocketSecurityContext.setAuthentication(auth); // Customize SecurityContextHolder.getContext() for websocket
 
         return true;
+    }
+
+
+    // Utils
+    private void validateAuthorizationHeader(Message<?> message) {
+        Map<String, Object> nativeHeaders = (Map<String, Object>) message.getHeaders().get("nativeHeaders");
+        if (nativeHeaders == null || nativeHeaders.get("Authorization") == null) {
+            throw new UnauthorizedException("There is no Authorization header");
+        }
+    }
+
+    private String extractAuthorizationHeader(Message<?> message) {
+        Map<String, Object> nativeHeaders = (Map<String, Object>) message.getHeaders().get("nativeHeaders");
+        List<String> authorizationHeaderList = (List<String>) nativeHeaders.get("Authorization");
+        if (authorizationHeaderList == null || authorizationHeaderList.isEmpty() || authorizationHeaderList.get(0) == null) {
+            throw new UnauthorizedException("Authorization header is empty or null");
+        }
+        return authorizationHeaderList.get(0);
     }
 }

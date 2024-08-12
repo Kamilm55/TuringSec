@@ -53,28 +53,26 @@ public class SocketExceptionHandler {
         throw new RuntimeException(ex.getMessage());
     }
 
-    //todo: For service methods
-    public void executeWithExceptionHandling(Runnable action, CustomHeaderAccessor accessor, SimpMessagingTemplate messagingTemplate) {
-        String sessionId = accessor.getSessionId();
+    // For service methods -> If it requires closing socket inside controller, I don't need yet in scope of controller
+//    public void executeWithExceptionHandling(Runnable action, CustomHeaderAccessor accessor, SimpMessagingTemplate messagingTemplate) {
+//        String sessionId = accessor.getSessionId();
 
-        try {
-            action.run();
-        }
-        catch (UserMustBeSameWithReportUserException | UnauthorizedException customEx){
+//        try {
+//            action.run();
+//        }
+//        catch (UserMustBeSameWithReportUserException | UnauthorizedException customEx){
 //            handleException(customEx,sessionId);
-
-            //todo: @MessageMapping("/{sessionId}/error") -> bura erroru gonder
 
 //            messagingTemplate.convertAndSend("topic/error");
             // Disconnect the client (direct disconnect is not possible in stomp)
 //            messagingTemplate.convertAndSend(String.format("/topic/%s/close",sessionId),"You must close socket with session id:" + sessionId);
 
-        }
-        catch (Exception ex) {
+//        }
+//        catch (Exception ex) {
 //            handleException(ex, sessionId);
-        }
+//        }
 
-    }
+//    }
 
     private void handleException(SocketErrorMessage socketErrorMessage,Exception ex, String sessionId,CustomHeaderAccessor accessor,Message<?> message) {
         // Populate error details before log and send as an event

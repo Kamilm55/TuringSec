@@ -12,6 +12,7 @@ import com.turingSecApp.turingSec.service.interfaces.IStompMessageInReportServic
 import com.turingSecApp.turingSec.exception.websocket.exceptionHandling.SocketExceptionHandler;
 import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -60,9 +61,10 @@ public class StompMessageInReportService implements IStompMessageInReportService
     public void sendTextMessageToReportRoom(String room, StringMessageInReportPayload strMessageInReportPayload, SimpMessageHeaderAccessor headerAccessor) {
         SimpHeaderAccessorAdapter accessorAdapter = new SimpHeaderAccessorAdapter(headerAccessor);
 
+        if (strMessageInReportPayload.getContent() == null || strMessageInReportPayload.getContent().isEmpty()) {
+            throw new IllegalArgumentException("Message content cannot be empty!");
+        }
 
-        // todo:  executeWithExceptionHandling for @Service (topic/baseUserId/error) , butun errorlari buna cevir
-//        socketExceptionHandler.executeWithExceptionHandling( () -> {
             Report reportOfMessage = reportRepository.findByRoom(room).orElseThrow(() -> new ResourceNotFoundException("Report not found with room: " + room));
 
             // Is it user or company if authorized
@@ -85,7 +87,6 @@ public class StompMessageInReportService implements IStompMessageInReportService
                     String.format("/topic/%s/messagesInReport", room), //  stompClient.subscribe('/topic/{room}/messages'...
                     msgDTO
             );
-//        }, accessorAdapter,messagingTemplate);
     }
 
 
