@@ -1,5 +1,6 @@
 package com.turingSecApp.turingSec.service.report;
 
+import com.turingSecApp.turingSec.exception.custom.ReportNotFoundException;
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.report.ReportCVSS;
@@ -188,6 +189,48 @@ public class ReportService implements IBugBountyReportService {
         return /*ReportMapper.INSTANCE.toDTO(savedReport)*/savedReport;
     }
 
+    @Override
+    public List<Report> getReportsByCompanyId(Long companyId) {
+        CompanyEntity company = companyRepository.findById(companyId)
+                .orElseThrow(() -> new ResourceNotFoundException("Company not found with id:" + companyId));
+
+        List<Report> reports = bugBountyReportRepository.findByBugBountyProgramCompany(company);
+
+        // Throw exception if it is empty
+        checkEmpty(companyId, reports);
+
+        return reports;
+    }
+    @Override
+    public List<Report> getReportsByUserId(Long userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id:" + userId));
+
+        List<Report> reports = bugBountyReportRepository.findByUser(user);
+
+        // Throw exception if it is empty
+        checkEmpty(userId, reports);
+
+        return reports;
+    }
+    public List<Report> getAllReports() {
+        List<Report> all = bugBountyReportRepository.findAll();
+
+        // Throw exception if it is empty
+        checkEmpty(all);
+
+        return all;
+    }
+    private void checkEmpty(Long userId, List<Report> reports) {
+        if (reports.isEmpty()) {
+            throw new ReportNotFoundException("There is no report with user/company id: " + userId);
+        }
+    }
+    private void checkEmpty(List<Report> reports) {
+        if (reports.isEmpty()) {
+            throw new ReportNotFoundException("There is no report");
+        }
+    }
 //    @Override
 //    public ReportCVSS updateCVSSReport(Long id, ReportCVSSPayload bugBountyReportUpdatePayload) {
 //        // Retrieve existing report from the repository

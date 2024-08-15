@@ -31,6 +31,13 @@ public interface IBugBountyReportService {
     // CVSSReport
     ReportCVSS submitCVSSReport(List<MultipartFile> files, UserDetails userDetails,ReportCVSSPayload reportPayload, Long bugBountyProgramId) throws IOException;
 
+    List<Report> getReportsByCompanyId(Long companyId);
+
+    List<Report> getReportsByUserId(Long userId);
+
+    List<Report> getAllReports();
+
+
 //    ReportCVSS updateCVSSReport(Long id, ReportCVSSPayload bugBountyReportUpdatePayload);
 
     //

@@ -1,19 +1,10 @@
 package com.turingSecApp.turingSec.controller;
 
 
-import com.turingSecApp.turingSec.model.entities.report.Report;
-import com.turingSecApp.turingSec.payload.message.StringMessageInReportPayload;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.response.message.StringMessageInReportDTO;
-import com.turingSecApp.turingSec.response.report.AllReportDTO;
-import com.turingSecApp.turingSec.response.report.ReportDTO;
 import com.turingSecApp.turingSec.service.interfaces.IMessageInReportService;
-import com.turingSecApp.turingSec.service.interfaces.IStompMessageInReportService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -90,18 +81,4 @@ public class MessageInReportController {
 
     // yerin deyisersen
 
-    @GetMapping("/company/{companyId}")
-    public BaseResponse<List<Report>> getAllReportsByCompanyId(@PathVariable Long companyId) {
-        return BaseResponse.success(messageInReportService.getReportsByCompanyId(companyId));
-    }
-    // Get all reports by user id
-    @GetMapping("/user/{userId}")
-    public BaseResponse<List<Report>> getAllReportsByUserId(@PathVariable Long userId) {
-        return BaseResponse.success(messageInReportService. getReportsByUserId(userId));
-    }
-
-    @GetMapping("/report/all")
-    public BaseResponse<List<Report>> getAllReport(){
-        return BaseResponse.success(messageInReportService.getAllReports());
-    }
 }

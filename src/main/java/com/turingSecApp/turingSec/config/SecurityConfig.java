@@ -138,17 +138,17 @@ public class SecurityConfig {
 
                             .requestMatchers(HttpMethod.GET , "/api/bug-bounty-reports/{id}").authenticated()
 
-                            .requestMatchers("/api/bug-bounty-reports/{id}").hasRole("HACKER");
+                            .requestMatchers("/api/bug-bounty-reports/{id}").hasRole("HACKER")
+                            .requestMatchers("/api/bug-bounty-reports/company/{id}").hasRole("ADMIN")
+                            .requestMatchers("/api/bug-bounty-reports/user/{id}").hasRole("ADMIN")
+                            .requestMatchers("/api/bug-bounty-reports/report/all").hasRole("ADMIN");
 
                     //message
                     request
                             .requestMatchers("/api/messagesInReport").hasAnyRole("HACKER","COMPANY")
                             .requestMatchers("/api/messagesInReport/{id}").hasAnyRole("HACKER","COMPANY")
                             .requestMatchers("/api/messagesInReport/report/{id}/admin").hasRole("ADMIN")
-                            .requestMatchers("/api/messagesInReport/message/{id}/admin").hasRole("ADMIN")
-                            .requestMatchers("/api/messagesInReport/company/{companyId}").hasRole("ADMIN")
-                            .requestMatchers("/api/messagesInReport/user/{userId}").hasRole("ADMIN")
-                            .requestMatchers("/api/messagesInReport/report/all").hasRole("ADMIN");
+                            .requestMatchers("/api/messagesInReport/message/{id}/admin").hasRole("ADMIN");
                 })
                 .sessionManagement(sm->sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 //                .httpBasic(Customizer.withDefaults());

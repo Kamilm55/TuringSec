@@ -30,6 +30,7 @@ public class ReportController {
 
     private final IBugBountyReportService bugBountyReportService;
 
+
     @GetMapping("/{id}")
     public BaseResponse<Report> getBugBountyReportById(@PathVariable Long id) {
         Report bugBountyReport = bugBountyReportService.getBugBountyReportById(id);
@@ -119,4 +120,20 @@ public class ReportController {
 //        List<ReportsEntity> bugBountyReports = bugBountyReportService.getAllBugBountyReports();
 //        return new ResponseEntity<>(bugBountyReports, HttpStatus.OK);
 //    }
+
+    @GetMapping("/company/{id}")
+    public BaseResponse<List<Report>> getAllReportsByCompanyId(@PathVariable Long id) {
+        return BaseResponse.success(bugBountyReportService.getReportsByCompanyId(id));
+    }
+
+    @GetMapping("/user/{id}")
+    public BaseResponse<List<Report>> getAllReportsByUserId(@PathVariable Long id) {
+        return BaseResponse.success(bugBountyReportService.getReportsByUserId(id));
+    }
+
+    @GetMapping("/report/all")
+    public BaseResponse<List<Report>> getAllReport(){
+        return BaseResponse.success(bugBountyReportService.getAllReports());
+    }
+
 }
