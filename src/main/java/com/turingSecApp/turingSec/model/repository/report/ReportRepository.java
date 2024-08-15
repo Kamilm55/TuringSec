@@ -2,6 +2,7 @@ package com.turingSecApp.turingSec.model.repository.report;
 
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.report.Report;
+import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -26,4 +27,5 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     Optional<Report> findByRoom(String room);
 
 
+    List<Report> findByBugBountyProgramCompany(CompanyEntity company);
 }

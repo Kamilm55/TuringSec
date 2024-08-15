@@ -1,9 +1,12 @@
 package com.turingSecApp.turingSec.controller;
 
 
+import com.turingSecApp.turingSec.model.entities.report.Report;
 import com.turingSecApp.turingSec.payload.message.StringMessageInReportPayload;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.response.message.StringMessageInReportDTO;
+import com.turingSecApp.turingSec.response.report.AllReportDTO;
+import com.turingSecApp.turingSec.response.report.ReportDTO;
 import com.turingSecApp.turingSec.service.interfaces.IMessageInReportService;
 import com.turingSecApp.turingSec.service.interfaces.IStompMessageInReportService;
 import jakarta.validation.Valid;
@@ -25,9 +28,9 @@ public class MessageInReportController {
     //TODO
     // -> tekce Admine icaze ver
     // get all reports
-    // get all reports by company id
-    //  get all reports by user id
-    // token istemeye ehtiyac yoxdu, payload hecne, dto -> BaseResponse<List<ReportDTO>> -> company id , program id , userId(hansi hackerdi) , username of user
+    // get all reports by company id +
+    //  get all reports by user id +
+    // token istemeye ehtiyac yoxdu, payload hecne, dto -> BaseResponse<List<ReportDTO>> -> company id , program id , userId(hansi hackerdi) , username of user +
 
     //1. user report atannan sonra  ---> submitted - unreviewed
     // POST submitManualReport-da statusu submitted - unreviewed set et
@@ -82,4 +85,20 @@ public class MessageInReportController {
         return BaseResponse.success(messageInReportService.getMessageWithId(id));
     }
 
+
+    @GetMapping("/company/{companyId}")
+    public BaseResponse<List<Report>> getAllReportsByCompanyId(@PathVariable Long companyId) {
+        return BaseResponse.success(messageInReportService.getReportsByCompanyId(companyId));
+
+    }
+    // Get all reports by user id
+    @GetMapping("/user/{userId}")
+    public BaseResponse<List<Report>> getAllReportsByUserId(@PathVariable Long userId) {
+        return BaseResponse.success(messageInReportService. getReportsByUserId(userId));
+    }
+
+    @GetMapping("/report/all")
+    public BaseResponse<List<AllReportDTO>> getAllReport(){
+        return BaseResponse.success(messageInReportService.getAllReports());
+    }
 }

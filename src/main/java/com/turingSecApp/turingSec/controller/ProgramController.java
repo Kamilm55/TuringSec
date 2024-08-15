@@ -44,5 +44,4 @@ public class ProgramController {
         bugBountyProgramService.deleteBugBountyProgram(id);
         return  BaseResponse.noContent();
     }
-
 }
