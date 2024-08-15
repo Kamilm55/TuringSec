@@ -22,7 +22,7 @@ public interface IMessageInReportService {
 
     List<Report> getReportsByUserId(Long userId);
 
-    List<AllReportDTO> getAllReports();
+    List<Report> getAllReports();
 
 
 //    List<AllReportDTO> getAllReports();

@@ -107,6 +107,9 @@ public class MessageInReportService implements IMessageInReportService {
 
         List<Report> reports = bugBountyReportRepository.findByBugBountyProgramCompany(company);
 
+        // Throw exception if it is empty
+        checkEmpty(companyId, reports);
+
         return reports;
     }
 
@@ -117,26 +120,30 @@ public class MessageInReportService implements IMessageInReportService {
 
         List<Report> reports = bugBountyReportRepository.findByUser(user);
 
-        if (userId == 1 || userId == 2) {
-            if (reports.isEmpty()) {
-                throw new ReportNotFoundException("Report not found");
-            } else {
-                return reports;
-            }
-        } else if (userId > 2) {
-            throw new ResourceNotFoundException("User not found with id:" + userId);
-        }
+        // Throw exception if it is empty
+        checkEmpty(userId, reports);
 
-        // Əslində, buraya çatmamalıdır, amma default olaraq boş siyahı qaytardim
         return new ArrayList<>();
     }
 
-    public List<AllReportDTO> getAllReports() {
-        List<Report> allReports = bugBountyReportRepository.findAll();
+    private void checkEmpty(Long userId, List<Report> reports) {
+        if (reports.isEmpty()) {
+            throw new ReportNotFoundException("There is no report with user/company id: " + userId);
+        }
+    }
+    private void checkEmpty(List<Report> reports) {
+        if (reports.isEmpty()) {
+            throw new ReportNotFoundException("There is no report");
+        }
+    }
 
-        return allReports.stream()
-                .map(this::mapToAllReportDTO)
-                .collect(Collectors.toList());
+    public List<Report> getAllReports() {
+        List<Report> all = bugBountyReportRepository.findAll();
+
+        // Throw exception if it is empty
+        checkEmpty(all);
+
+        return all;
     }
 
     private AllReportDTO mapToAllReportDTO(Report report) {

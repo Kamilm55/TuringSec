@@ -30,6 +30,9 @@ public class MessageInReportController {
     // get all reports
     // get all reports by company id +
     //  get all reports by user id +
+
+    // todo
+    // DTO cevirmek
     // token istemeye ehtiyac yoxdu, payload hecne, dto -> BaseResponse<List<ReportDTO>> -> company id , program id , userId(hansi hackerdi) , username of user +
 
     //1. user report atannan sonra  ---> submitted - unreviewed
@@ -85,11 +88,11 @@ public class MessageInReportController {
         return BaseResponse.success(messageInReportService.getMessageWithId(id));
     }
 
+    // yerin deyisersen
 
     @GetMapping("/company/{companyId}")
     public BaseResponse<List<Report>> getAllReportsByCompanyId(@PathVariable Long companyId) {
         return BaseResponse.success(messageInReportService.getReportsByCompanyId(companyId));
-
     }
     // Get all reports by user id
     @GetMapping("/user/{userId}")
@@ -98,7 +101,7 @@ public class MessageInReportController {
     }
 
     @GetMapping("/report/all")
-    public BaseResponse<List<AllReportDTO>> getAllReport(){
+    public BaseResponse<List<Report>> getAllReport(){
         return BaseResponse.success(messageInReportService.getAllReports());
     }
 }

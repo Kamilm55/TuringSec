@@ -29,7 +29,7 @@ public class AllReportDTO {
     private Double ownPercentage;
     private List<CollaboratorEntity> collaborators;
 
-    private /*ReportAssetDTO*/ ReportAsset reportAsset;
+    private ReportAsset reportAsset;
     private ReportWeakness weakness;
     private ProofOfConcept proofOfConcept;
     private DiscoveryDetails discoveryDetails;
