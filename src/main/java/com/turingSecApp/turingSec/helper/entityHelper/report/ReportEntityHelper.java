@@ -6,6 +6,8 @@ import com.turingSecApp.turingSec.model.entities.report.ReportCVSS;
 import com.turingSecApp.turingSec.model.entities.report.ReportManual;
 import com.turingSecApp.turingSec.model.entities.report.embedded.ReportAsset;
 import com.turingSecApp.turingSec.model.entities.report.Report;
+import com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORCOMPANY;
+import com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORUSER;
 import com.turingSecApp.turingSec.model.repository.*;
 import com.turingSecApp.turingSec.model.repository.program.ProgramRepository;
 import com.turingSecApp.turingSec.model.repository.report.ReportCVSSRepository;
@@ -21,6 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORCOMPANY.UNREVIEWED;
+import static com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORUSER.SUBMITTED;
 
 @Service
 @RequiredArgsConstructor
@@ -96,12 +101,14 @@ public class ReportEntityHelper implements IReportEntityHelper {
         report.setProofOfConcept(reportPayload.getProofOfConcept());
         report.setDiscoveryDetails(reportPayload.getDiscoveryDetails());
 
-//        report.setSeverity(reportPayload.getSeverity());
         report.setLastActivity(reportPayload.getLastActivity());
         report.setRewardsStatus(reportPayload.getRewardsStatus());
-        //report.setOwnPercentage(reportPayload.getOwnPercentage());
         report.setReportTemplate(reportPayload.getReportTemplate());
         report.setMethodName(reportPayload.getMethodName());
+
+        // Set Status for reports
+        report.setStatusForUser(SUBMITTED);
+        report.setStatusForCompany(UNREVIEWED);
     }
 
     @Override

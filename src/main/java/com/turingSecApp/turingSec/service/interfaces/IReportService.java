@@ -13,10 +13,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
-public interface IBugBountyReportService {
+public interface IReportService {
     Report getBugBountyReportById(Long id);
-//    ReportDTO submitBugBountyReport(BugBountyReportPayload reportPayload, Long bugBountyProgramId);
-//    ReportDTO updateBugBountyReport(Long id,BugBountyReportPayload bugBountyReportUpdatePayload);
     void deleteBugBountyReport(Long id);
     List<ReportsByUserWithCompDTO> getAllBugBountyReportsByUser();
 
@@ -26,19 +24,20 @@ public interface IBugBountyReportService {
     ReportManual submitManualReportForTest(List<MultipartFile> files,ReportManualPayload reportPayload, Long bugBountyProgramId) throws IOException;
 
     ReportManual submitManualReport(List<MultipartFile> files,UserDetails userDetails, ReportManualPayload reportPayload, Long bugBountyProgramId) throws IOException;
-//    ReportManual updateManualReport(Long id, ReportManualPayload reportPayload);
 
     // CVSSReport
     ReportCVSS submitCVSSReport(List<MultipartFile> files, UserDetails userDetails,ReportCVSSPayload reportPayload, Long bugBountyProgramId) throws IOException;
 
+    //
     List<Report> getReportsByCompanyId(Long companyId);
 
     List<Report> getReportsByUserId(Long userId);
 
     List<Report> getAllReports();
 
+    Report reviewReportByCompany(Long id);
 
-//    ReportCVSS updateCVSSReport(Long id, ReportCVSSPayload bugBountyReportUpdatePayload);
+    Report acceptReportByCompany(Long id);
 
-    //
+    Report rejectReportByCompany(Long id);
 }

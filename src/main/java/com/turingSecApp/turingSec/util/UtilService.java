@@ -2,6 +2,7 @@ package com.turingSecApp.turingSec.util;
 
 import com.turingSecApp.turingSec.config.websocket.security.CustomWebsocketSecurityContext;
 import com.turingSecApp.turingSec.model.entities.program.Program;
+import com.turingSecApp.turingSec.model.entities.report.Report;
 import com.turingSecApp.turingSec.model.entities.role.Role;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
@@ -12,8 +13,10 @@ import com.turingSecApp.turingSec.model.repository.RoleRepository;
 import com.turingSecApp.turingSec.model.repository.UserRepository;
 import com.turingSecApp.turingSec.exception.custom.*;
 import com.turingSecApp.turingSec.model.repository.program.ProgramRepository;
+import com.turingSecApp.turingSec.model.repository.report.ReportRepository;
 import com.turingSecApp.turingSec.response.program.BugBountyProgramWithAssetTypeDTO;
 import com.turingSecApp.turingSec.response.user.AuthResponse;
+import com.turingSecApp.turingSec.service.interfaces.IReportService;
 import com.turingSecApp.turingSec.util.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -30,6 +34,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class UtilService {
+    private final ReportRepository reportRepository;
     private final CompanyRepository companyRepository;
     private final AdminRepository adminRepository;
     private final ProgramRepository programRepository;
@@ -185,11 +190,35 @@ public class UtilService {
         }
         return hackerEntity.getId();
     }
+    //
+
     public Program findProgramById(Long id) {
         return programRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Bug Bounty Program not found with id:" + id));
+    }
+    public Report findReportById(Long id) {
+        return reportRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Bug Bounty Report not found with id:" + id));
     }
 
     public UserEntity findUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User not found with this id: " + userId));
+    }
+
+    @Transactional
+    public void checkUserReport(Object authenticatedUser, Long reportId) throws UserMustBeSameWithReportUserException {
+        Report reportOfMessage = findReportById(reportId);
+        UserEntity userOfReportMessage = reportOfMessage.getUser();
+        if (!authenticatedUser.equals(userOfReportMessage)) {
+            throw new UserMustBeSameWithReportUserException("Message of Hacker must be same with report's Hacker");
+        }
+    }
+
+    @Transactional
+    public void checkCompanyReport(Object authenticatedUser,  Long reportId) throws UserMustBeSameWithReportUserException {
+        Report reportOfMessage = findReportById(reportId);
+
+        CompanyEntity companyOfReportMessage = reportOfMessage.getBugBountyProgram().getCompany();
+        if (!authenticatedUser.equals(companyOfReportMessage)) {
+            throw new UserMustBeSameWithReportUserException("Message of Company must be same with report's Company");
+        }
     }
 }

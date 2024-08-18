@@ -75,7 +75,6 @@ public class Report {
     private REPORTSTATUSFORUSER statusForUser;// hacker hissesinde all( submitted underreview (accepted | rejected) -> assessed )
 
     private REPORTSTATUSFORCOMPANY statusForCompany;//sirket hissesinde all(unreviewed,reviewed,assessed)
-
     //  User - Company
     // user report atannan sonra  ---> submitted - unreviewed
     // company reporta tiklasa ----> underreview - reviewed

@@ -17,7 +17,7 @@ import com.turingSecApp.turingSec.payload.program.asset.ProgramAssetPayload;
 import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
 import com.turingSecApp.turingSec.payload.report.child.ReportAssetPayload;
 import com.turingSecApp.turingSec.payload.user.RegisterPayload;
-import com.turingSecApp.turingSec.service.interfaces.IBugBountyReportService;
+import com.turingSecApp.turingSec.service.interfaces.IReportService;
 import com.turingSecApp.turingSec.service.interfaces.IMockDataService;
 import com.turingSecApp.turingSec.service.interfaces.IUserService;
 import com.turingSecApp.turingSec.service.program.ProgramService;
@@ -41,7 +41,7 @@ public class MockDataService implements IMockDataService {
     private final ProgramService programService;
     private final UtilService utilService;
     private final PasswordEncoder passwordEncoder;
-    private final IBugBountyReportService reportService;
+    private final IReportService reportService;
 
     private final UserRepository userRepository;
     private final AdminRepository adminRepository;

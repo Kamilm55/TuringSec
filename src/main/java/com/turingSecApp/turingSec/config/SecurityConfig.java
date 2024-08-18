@@ -126,22 +126,24 @@ public class SecurityConfig {
                             .requestMatchers("/api/admin/approve-company/{companyId}").hasRole("ADMIN");
 
 
-
                     // Bug Bounty Report Controller
                     request
-                            .requestMatchers("/api/bug-bounty-reports/reports/company").hasRole("COMPANY")
+
                             .requestMatchers(HttpMethod.POST,"/api/bug-bounty-reports/**").hasRole("HACKER")
                             .requestMatchers(HttpMethod.PUT,"/api/bug-bounty-reports/**").hasRole("HACKER")
                             .requestMatchers("/api/bug-bounty-reports/submit").hasRole("HACKER")
                             .requestMatchers("/api/bug-bounty-reports/user").hasRole("HACKER")
 
-
-                            .requestMatchers(HttpMethod.GET , "/api/bug-bounty-reports/{id}").authenticated()
-
                             .requestMatchers("/api/bug-bounty-reports/{id}").hasRole("HACKER")
                             .requestMatchers("/api/bug-bounty-reports/company/{id}").hasRole("ADMIN")
                             .requestMatchers("/api/bug-bounty-reports/user/{id}").hasRole("ADMIN")
-                            .requestMatchers("/api/bug-bounty-reports/report/all").hasRole("ADMIN");
+                            .requestMatchers("/api/bug-bounty-reports").hasRole("ADMIN")
+
+                            .requestMatchers("/api/bug-bounty-reports/company/**").hasRole("COMPANY")
+                            .requestMatchers("/api/bug-bounty-reports/{id}/company/**").hasRole("COMPANY")
+
+                            .requestMatchers("/api/bug-bounty-reports/**").authenticated()
+                            ;
 
                     //message
                     request

@@ -8,12 +8,13 @@ import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
 import com.turingSecApp.turingSec.response.report.ReportsByUserDTO;
 import com.turingSecApp.turingSec.response.report.ReportsByUserWithCompDTO;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
-import com.turingSecApp.turingSec.service.interfaces.IBugBountyReportService;
+import com.turingSecApp.turingSec.service.interfaces.IReportService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +29,56 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReportController {
 
-    private final IBugBountyReportService bugBountyReportService;
+    // todo
+    //  DTO cevirmek
+    //  token istemeye ehtiyac yoxdu, payload hecne, dto -> BaseResponse<List<ReportDTO>> -> company id , program id , userId(hansi hackerdi) , username of user +
 
+    //1. user report atannan sonra  ---> submitted - unreviewed +
+    // POST submitManualReport-da statusu submitted - unreviewed set et +
+    // POST submitCVSS-da statusu submitted - unreviewed set et +
+
+    // hacker hissesinde all( submitted underreview (accepted | rejected) -> assessed )
+    // sirket hissesinde all(unreviewed,reviewed,assessed)
+
+    // get all reports for hacker -> var -> getAllBugBountyReportsByUser +
+    // get submitted reports for hacker
+    // get underreview reports for hacker
+    // get accepted reports for hacker
+    // get rejected reports for hacker
+    // get assessed reports for hacker -> if accepted | rejected return
+
+    // get all reports for company -> var -> getAllBugBountyReportsByCompany +
+    // get submitted reports for company
+    // get unreviewed reports for company
+    // get reviewed reports for company
+    // get assessed reports for company
+
+    // QUERY ILE ET -> EGER QUERY PARAM SEHVDISE ILLAGEAL ARGUMENT
+
+
+    //  User - Company  +
+    // user report atannan sonra  ---> submitted - unreviewed +
+    // company reporta tiklasa ----> underreview - reviewed +
+    // company reportu deyerlendirir --->
+    // accepted - assessed +
+    // rejected - assessed +
+
+
+    private final IReportService bugBountyReportService;
+
+    @PatchMapping("/{id}/company/review")
+    public BaseResponse<Report> reviewReportByCompany(@PathVariable Long id){
+        return BaseResponse.success(bugBountyReportService.reviewReportByCompany(id));
+    }
+
+    @PatchMapping("/{id}/company/accept")
+    public BaseResponse<Report> acceptReportByCompany(@PathVariable Long id){
+        return BaseResponse.success(bugBountyReportService.acceptReportByCompany(id));
+    }
+    @PatchMapping("/{id}/company/reject")
+    public BaseResponse<Report> rejectReportByCompany(@PathVariable Long id){
+        return BaseResponse.success(bugBountyReportService.rejectReportByCompany(id));
+    }
 
     @GetMapping("/{id}")
     public BaseResponse<Report> getBugBountyReportById(@PathVariable Long id) {
@@ -65,15 +114,6 @@ public class ReportController {
                 submittedBugBountyReport,
                 "Bug bounty report submitted successfully");
     }
-
-//    @PutMapping("/manualReport/{id}")
-//    public BaseResponse<ReportManual> updateManualReport(@PathVariable Long id,
-//                                                         @RequestBody @Valid ReportManualPayload bugBountyReportUpdatePayload) {
-//        ReportManual updatedReport = bugBountyReportService.updateManualReport(id, bugBountyReportUpdatePayload);
-//        return BaseResponse.success(updatedReport);
-//    }
-
-    //
     @PostMapping(value = "/CVSSReport",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public BaseResponse<ReportCVSS> submitCVSSReport(
             @RequestPart(value = "files",required = false) @Parameter(description = "File to upload") @Schema(type = "string", format = "binary") List<MultipartFile> files,
@@ -88,20 +128,10 @@ public class ReportController {
         }
         return BaseResponse.success(submittedBugBountyReport,"Bug bounty report submitted successfully");
     }
-
-//    @PutMapping("/CVSSReport/{id}")
-//    public BaseResponse<ReportCVSS> updateManualReport(@PathVariable Long id,
-//                                                         @RequestBody @Valid ReportCVSSPayload bugBountyReportUpdatePayload) {
-//        ReportCVSS updatedReport = bugBountyReportService.updateCVSSReport(id, bugBountyReportUpdatePayload);
-//        return BaseResponse.success(updatedReport);
-//    }
-
-
     @DeleteMapping("/{id}")
-    public BaseResponse<?> deleteBugBountyReport(@PathVariable Long id) {
+    public ResponseEntity<BaseResponse<Object>> deleteBugBountyReport(@PathVariable Long id) {
         bugBountyReportService.deleteBugBountyReport(id);
-        // refactorThis -> new ResponseEntity<>(HttpStatus.NO_CONTENT)
-        return BaseResponse.success();
+        return BaseResponse.noContent();
     }
 
     @GetMapping("/user")
@@ -110,16 +140,11 @@ public class ReportController {
         return BaseResponse.success(userReports);
     }
 
-    @GetMapping("/reports/company")
+    @GetMapping("/company")
     public BaseResponse<List<ReportsByUserDTO>> getBugBountyReportsForCompanyPrograms() {
         return BaseResponse.success(bugBountyReportService.getBugBountyReportsForCompanyPrograms());
     }
 
-    //    @GetMapping// No need , because every report belongs to specific hacker or company
-//    public ResponseEntity<List<ReportsEntity>> getAllBugBountyReports() {
-//        List<ReportsEntity> bugBountyReports = bugBountyReportService.getAllBugBountyReports();
-//        return new ResponseEntity<>(bugBountyReports, HttpStatus.OK);
-//    }
 
     @GetMapping("/company/{id}")
     public BaseResponse<List<Report>> getAllReportsByCompanyId(@PathVariable Long id) {
@@ -131,7 +156,7 @@ public class ReportController {
         return BaseResponse.success(bugBountyReportService.getReportsByUserId(id));
     }
 
-    @GetMapping("/report/all")
+    @GetMapping
     public BaseResponse<List<Report>> getAllReport(){
         return BaseResponse.success(bugBountyReportService.getAllReports());
     }
