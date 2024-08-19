@@ -123,6 +123,14 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ExceptionResponseMessages> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return new ResponseEntity<>(
+                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.BAD_REQUEST) ,
+                HttpStatus.BAD_REQUEST
+        );
+    }
+
     @ExceptionHandler(ReportNotFoundException.class)
     public ResponseEntity<ExceptionResponseMessages> handleReportNotFoundException(ReportNotFoundException ex) {
         return new ResponseEntity<>(

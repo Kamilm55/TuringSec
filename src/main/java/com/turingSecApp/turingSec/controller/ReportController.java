@@ -3,6 +3,8 @@ package com.turingSecApp.turingSec.controller;
 import com.turingSecApp.turingSec.model.entities.report.ReportCVSS;
 import com.turingSecApp.turingSec.model.entities.report.Report;
 import com.turingSecApp.turingSec.model.entities.report.ReportManual;
+import com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORCOMPANY;
+import com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORUSER;
 import com.turingSecApp.turingSec.payload.report.ReportCVSSPayload;
 import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
 import com.turingSecApp.turingSec.response.report.ReportsByUserDTO;
@@ -135,15 +137,20 @@ public class ReportController {
     }
 
     @GetMapping("/user")
-    public BaseResponse<List<ReportsByUserWithCompDTO>> getAllBugBountyReportsByUser() {
-        List<ReportsByUserWithCompDTO> userReports = bugBountyReportService.getAllBugBountyReportsByUser();
+    public BaseResponse<List<ReportsByUserWithCompDTO>> getReportsByUserWithStatus(@RequestParam(required = false,value = "status") REPORTSTATUSFORUSER status) {
+        List<ReportsByUserWithCompDTO> userReports = bugBountyReportService.getReportsByUserWithStatus(status);
+        return BaseResponse.success(userReports);
+    }
+    @GetMapping("/company")
+    public BaseResponse<List<ReportsByUserWithCompDTO>> getReportsByCompanyProgramWithStatus(@RequestParam(required = false,value = "status") REPORTSTATUSFORCOMPANY status) {
+        List<ReportsByUserWithCompDTO> userReports = bugBountyReportService.getReportsByCompanyProgramWithStatus(status);
         return BaseResponse.success(userReports);
     }
 
-    @GetMapping("/company")
-    public BaseResponse<List<ReportsByUserDTO>> getBugBountyReportsForCompanyPrograms() {
-        return BaseResponse.success(bugBountyReportService.getBugBountyReportsForCompanyPrograms());
-    }
+//    @GetMapping("/company")
+//    public BaseResponse<List<ReportsByUserDTO>> getBugBountyReportsForCompanyPrograms() {
+//        return BaseResponse.success(bugBountyReportService.getBugBountyReportsForCompanyPrograms());
+//    }
 
 
     @GetMapping("/company/{id}")

@@ -14,7 +14,6 @@ import com.turingSecApp.turingSec.model.repository.program.ProgramRepository;
 import com.turingSecApp.turingSec.model.repository.report.ReportCVSSRepository;
 import com.turingSecApp.turingSec.model.repository.report.ReportManualRepository;
 import com.turingSecApp.turingSec.model.repository.report.ReportRepository;
-import com.turingSecApp.turingSec.exception.custom.PermissionDeniedException;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.file_upload.service.ReportMediaService;
@@ -218,6 +217,46 @@ public class ReportService implements IReportService {
         return updateReportStatus(id, ASSESSED, REJECTED);
     }
 
+    @Override
+    public List<ReportsByUserWithCompDTO> getReportsByUserWithStatus(REPORTSTATUSFORUSER status) {
+        // Retrieve authenticated user
+        UserEntity user = utilService.getAuthenticatedHackerWithHTTP();
+
+        log.info("The status parameter provided: " + status);
+        List<Report> userReports = null;
+
+        if (status == null) {
+            // Handle the case where the status parameter is not provided
+            // It returns all without filtering the status if param is not provided
+            userReports = bugBountyReportRepository.findByUser(user);
+        }else{
+            // Validate the status
+            if (!(status.name().equalsIgnoreCase(REPORTSTATUSFORUSER.SUBMITTED.name()) ||
+                    status.name().equalsIgnoreCase(REPORTSTATUSFORUSER.UNDER_REVIEW.name()) ||
+                    status.name().equalsIgnoreCase(REPORTSTATUSFORUSER.ACCEPTED.name()) ||
+                    status.name().equalsIgnoreCase(REPORTSTATUSFORUSER.REJECTED.name()))) {
+                throw new IllegalArgumentException("Report status for user must be SUBMITTED or UNDER_REVIEW or ACCEPTED or REJECTED");
+            }
+
+            // Get all reports associated with the user and the status of report for user
+            userReports = bugBountyReportRepository.findByUserAndStatusForUser(user,status);
+        }
+
+        // Group reports by user
+        Map<UserDTO, List<Report>> reportsByUser = groupReportsByUser(userReports);
+
+        // Create ReportsByUserDTO objects for each user and add them to the list
+        return createReportsByUserWithCompDTO(reportsByUser);
+    }
+
+    @Override
+    public List<ReportsByUserWithCompDTO> getReportsByCompanyProgramWithStatus(REPORTSTATUSFORCOMPANY status) {
+
+        //todo:
+        return  null;
+    }
+
+
     private Report updateReportStatus(Long id, REPORTSTATUSFORCOMPANY companyStatus, REPORTSTATUSFORUSER userStatus) {
         Report report = getBugBountyReportById(id);
 
@@ -260,25 +299,6 @@ public class ReportService implements IReportService {
 
         bugBountyReportRepository.delete(updatedReport);
     }
-    @Override
-    public List<ReportsByUserWithCompDTO> getAllBugBountyReportsByUser() {
-        // Retrieve the username of the authenticated user
-        String username = getUsernameFromToken();
-
-        // Find the user by username
-        UserEntity user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User with username " + username + " not found"));
-
-        // Get all reports associated with the user
-        List<Report> userReports = bugBountyReportRepository.findByUser(user);
-
-        // Group reports by user
-        Map<UserDTO, List<Report>> reportsByUser = groupReportsByUser(userReports);
-
-        // Create ReportsByUserDTO objects for each user and add them to the list
-        return createReportsByUserWithCompDTO(reportsByUser);
-    }
-
     private Map<UserDTO, List<Report>> groupReportsByUser(List<Report> userReports) {
         return userReports.stream()
                 .collect(Collectors.groupingBy(report ->

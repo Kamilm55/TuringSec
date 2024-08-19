@@ -2,6 +2,7 @@ package com.turingSecApp.turingSec.model.repository.report;
 
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.report.Report;
+import com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORUSER;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,6 +17,7 @@ import java.util.Optional;
 //This repository can handle common operations related to ReportEntity, such as CRUD operations or any other queries that apply to all types of reports.
 public interface ReportRepository extends JpaRepository<Report, Long> {
     List<Report> findByUser(UserEntity user);
+    List<Report> findByUserAndStatusForUser(UserEntity user, REPORTSTATUSFORUSER reportstatusforuser);
 
     List<Report> findByBugBountyProgram(Program program);
     @Query("SELECT r FROM Report r WHERE r.bugBountyProgram IN :programs")

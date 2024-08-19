@@ -3,6 +3,8 @@ package com.turingSecApp.turingSec.service.interfaces;
 import com.turingSecApp.turingSec.model.entities.report.ReportCVSS;
 import com.turingSecApp.turingSec.model.entities.report.Report;
 import com.turingSecApp.turingSec.model.entities.report.ReportManual;
+import com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORCOMPANY;
+import com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORUSER;
 import com.turingSecApp.turingSec.payload.report.ReportCVSSPayload;
 import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
 import com.turingSecApp.turingSec.response.report.ReportsByUserDTO;
@@ -16,7 +18,6 @@ import java.util.List;
 public interface IReportService {
     Report getBugBountyReportById(Long id);
     void deleteBugBountyReport(Long id);
-    List<ReportsByUserWithCompDTO> getAllBugBountyReportsByUser();
 
     List<ReportsByUserDTO> getBugBountyReportsForCompanyPrograms();
 
@@ -40,4 +41,8 @@ public interface IReportService {
     Report acceptReportByCompany(Long id);
 
     Report rejectReportByCompany(Long id);
+
+    List<ReportsByUserWithCompDTO> getReportsByUserWithStatus(REPORTSTATUSFORUSER status);
+
+    List<ReportsByUserWithCompDTO> getReportsByCompanyProgramWithStatus(REPORTSTATUSFORCOMPANY status);
 }
