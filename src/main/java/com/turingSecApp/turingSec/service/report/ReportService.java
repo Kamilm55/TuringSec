@@ -217,6 +217,18 @@ public class ReportService implements IReportService {
         return updateReportStatus(id, ASSESSED, REJECTED);
     }
 
+    private Report updateReportStatus(Long id, REPORTSTATUSFORCOMPANY companyStatus, REPORTSTATUSFORUSER userStatus) {
+        Report report = getBugBountyReportById(id);
+
+        // Check report belongs to this company
+        CompanyEntity authenticatedCompany = utilService.getAuthenticatedCompanyWithHTTP();
+        reportUtilService.checkUserOrCompanyReport(authenticatedCompany, report.getId());
+
+        report.setStatusForCompany(companyStatus);
+        report.setStatusForUser(userStatus);
+
+        return bugBountyReportRepository.save(report);
+    }
     @Override
     public List<ReportsByUserWithCompDTO> getReportsByUserWithStatus(REPORTSTATUSFORUSER status) {
         log.info("Provided status parameter: " + status);
@@ -304,20 +316,6 @@ public class ReportService implements IReportService {
         if (!(validStatusForCompany.contains(status.name().toUpperCase()))) {
             throw new IllegalArgumentException("Report status for company must be REVIEWED, ASSESSED, or UNREVIEWED.");
         }
-    }
-
-
-    private Report updateReportStatus(Long id, REPORTSTATUSFORCOMPANY companyStatus, REPORTSTATUSFORUSER userStatus) {
-        Report report = getBugBountyReportById(id);
-
-        // Check report belongs to this company
-        CompanyEntity authenticatedCompany = utilService.getAuthenticatedCompanyWithHTTP();
-        reportUtilService.checkUserOrCompanyReport(authenticatedCompany, report.getId());
-
-        report.setStatusForCompany(companyStatus);
-        report.setStatusForUser(userStatus);
-
-        return bugBountyReportRepository.save(report);
     }
 
 
