@@ -19,8 +19,6 @@ public interface IReportService {
     Report getBugBountyReportById(Long id);
     void deleteBugBountyReport(Long id);
 
-    List<ReportsByUserDTO> getBugBountyReportsForCompanyPrograms();
-
     // Manual
     ReportManual submitManualReportForTest(List<MultipartFile> files,ReportManualPayload reportPayload, Long bugBountyProgramId) throws IOException;
 
@@ -44,5 +42,5 @@ public interface IReportService {
 
     List<ReportsByUserWithCompDTO> getReportsByUserWithStatus(REPORTSTATUSFORUSER status);
 
-    List<ReportsByUserWithCompDTO> getReportsByCompanyProgramWithStatus(REPORTSTATUSFORCOMPANY status);
+    List<ReportsByUserDTO> getReportsByCompanyProgramWithStatus(REPORTSTATUSFORCOMPANY status);
 }

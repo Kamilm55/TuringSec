@@ -40,9 +40,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORCOMPANY.ASSESSED;
-import static com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORCOMPANY.REVIEWED;
+import static com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORCOMPANY.*;
 import static com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORUSER.*;
 
 
@@ -219,41 +219,91 @@ public class ReportService implements IReportService {
 
     @Override
     public List<ReportsByUserWithCompDTO> getReportsByUserWithStatus(REPORTSTATUSFORUSER status) {
-        // Retrieve authenticated user
+        log.info("Provided status parameter: " + status);
+
+        // Retrieve the authenticated user
         UserEntity user = utilService.getAuthenticatedHackerWithHTTP();
 
-        log.info("The status parameter provided: " + status);
-        List<Report> userReports = null;
+        // Retrieve all reports for the user if no status is provided or filtered reports for user
+        List<Report> userReports = getReportsForStatus(status, user);
 
-        if (status == null) {
-            // Handle the case where the status parameter is not provided
-            // It returns all without filtering the status if param is not provided
-            userReports = bugBountyReportRepository.findByUser(user);
-        }else{
-            // Validate the status
-            if (!(status.name().equalsIgnoreCase(REPORTSTATUSFORUSER.SUBMITTED.name()) ||
-                    status.name().equalsIgnoreCase(REPORTSTATUSFORUSER.UNDER_REVIEW.name()) ||
-                    status.name().equalsIgnoreCase(REPORTSTATUSFORUSER.ACCEPTED.name()) ||
-                    status.name().equalsIgnoreCase(REPORTSTATUSFORUSER.REJECTED.name()))) {
-                throw new IllegalArgumentException("Report status for user must be SUBMITTED or UNDER_REVIEW or ACCEPTED or REJECTED");
-            }
-
-            // Get all reports associated with the user and the status of report for user
-            userReports = bugBountyReportRepository.findByUserAndStatusForUser(user,status);
-        }
-
-        // Group reports by user
-        Map<UserDTO, List<Report>> reportsByUser = groupReportsByUser(userReports);
-
-        // Create ReportsByUserDTO objects for each user and add them to the list
-        return createReportsByUserWithCompDTO(reportsByUser);
+        // Group reports by user and create DTOs
+        return createReportsByUserWithCompDTO(groupReportsByUser(userReports));
     }
 
     @Override
-    public List<ReportsByUserWithCompDTO> getReportsByCompanyProgramWithStatus(REPORTSTATUSFORCOMPANY status) {
+    public List<ReportsByUserDTO> getReportsByCompanyProgramWithStatus(REPORTSTATUSFORCOMPANY status) {
+        log.info("Provided status parameter: " + status);
 
-        //todo:
-        return  null;
+        // Retrieve the authenticated company
+        CompanyEntity company = utilService.getAuthenticatedCompanyWithHTTP();
+
+        // Retrieve all reports for the user if no status is provided or filtered reports for user
+        List<Report> userReports = getReportsForStatus(status, company);
+
+        // Group reports by user, fetch image URLs, and create DTOs
+        return createReportsByUserDTOList(groupReportsByUser(userReports), fetchUserImgUrls(groupReportsByUser(userReports)));
+    }
+
+    private List<Report> getReportsForStatus(REPORTSTATUSFORUSER status, UserEntity user) {
+        List<Report> userReports;
+        if (status == null) {
+            // Retrieve all reports for the user if no status is provided
+            userReports = bugBountyReportRepository.findByUser(user);
+        } else {
+            // Get filtered reports for user
+            userReports = getReports(status, user);
+        }
+        return userReports;
+    }
+    private List<Report> getReportsForStatus(REPORTSTATUSFORCOMPANY status, CompanyEntity company) {
+        List<Report> userReports;
+        if (status == null) {
+            // Retrieve all reports for the company if no status is provided
+            userReports = bugBountyReportRepository.findByBugBountyProgramCompany(company);
+        } else {
+            // Get filtered reports for company
+            userReports = getReports(status, company);
+        }
+        return userReports;
+    }
+
+    // Get filtered reports for user
+    private List<Report> getReports(REPORTSTATUSFORUSER status, UserEntity user) {
+        // Validate the status and throw an exception for invalid values
+        validateReportStatus(status);
+        // Retrieve reports filtered by status
+        return bugBountyReportRepository.findByUserAndStatusForUser(user, status);
+    }
+
+    // Get filtered reports for company
+    private List<Report> getReports(REPORTSTATUSFORCOMPANY status, CompanyEntity company) {
+        // Validate the status and throw an exception for invalid values
+        validateReportStatus(status);
+        // Retrieve reports filtered by status
+        return bugBountyReportRepository.findByBugBountyProgramCompanyAndStatusForCompany(company, status);
+    }
+
+    // Validate user report status for acceptable values
+    private void validateReportStatus(REPORTSTATUSFORUSER status) {
+        Set<String> validStatusForUser = Stream.of(SUBMITTED, UNDER_REVIEW, ACCEPTED, REJECTED)
+                .map(Enum::name)
+                .collect(Collectors.toSet());
+
+        if (!(validStatusForUser.contains(status.name().toUpperCase()))) {
+            throw new IllegalArgumentException("Report status for user must be SUBMITTED, UNDER_REVIEW, ACCEPTED, or REJECTED.");
+        }
+    }
+
+    // Validate company report status for acceptable values
+    private void validateReportStatus(REPORTSTATUSFORCOMPANY status) {
+        Set<String> validStatusForCompany = Stream.of(UNREVIEWED, REVIEWED, ASSESSED)
+                .map(Enum::name)
+                .collect(Collectors.toSet());
+
+        if (!(validStatusForCompany.contains(status.name().toUpperCase()))) {
+            throw new IllegalArgumentException("Report status for company must be REVIEWED, ASSESSED, or UNREVIEWED.");
+        }
     }
 
 
@@ -322,57 +372,7 @@ public class ReportService implements IReportService {
                 .collect(Collectors.toList());
     }
 
-   //
-   @Override
-   public List<ReportsByUserDTO> getBugBountyReportsForCompanyPrograms() {
-       // Retrieve the authenticated user details
-       Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-       CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-       // Extract the company from the authenticated user details
-       CompanyEntity company = extractCompanyFromUserDetails(userDetails);
-
-       // Retrieve bug bounty reports submitted for the company's programs
-       return getReportsForCompanyPrograms(company);
-   }
-
-
-
-
-    private CompanyEntity extractCompanyFromUserDetails(CustomUserDetails userDetails) {
-        Object user = userDetails.getUser();
-        if (!(user instanceof CompanyEntity)) {
-            throw new IllegalStateException("Authenticated user is not a company");
-        }
-        return (CompanyEntity) user;
-    }
-
-    private List<ReportsByUserDTO> getReportsForCompanyPrograms(CompanyEntity company) {
-        // Fetch the company entity along with its bug bounty programs within an active Hibernate session
-        company = companyRepository.findById(company.getId()).orElse(null);
-        if (company == null) {
-            log.info("Company is not found , in getReportsForCompanyPrograms method ");
-            return Collections.emptyList();
-        }
-
-        // Retrieve bug bounty programs associated with the company
-        Set<Program> bugBountyPrograms = company.getBugBountyPrograms();
-
-        // Retrieve bug bounty reports submitted for the company's programs
-        List<Report> reports = fetchReportsForPrograms(bugBountyPrograms);
-
-        // Group reports by user
-        Map<UserDTO, List<Report>> reportsByUser = groupReportsByUser(reports);
-
-        // Fetch image URL for each user
-        Map<Long, String> userImgUrls = fetchUserImgUrls(reportsByUser);
-
-        return createReportsByUserDTOList(reportsByUser, userImgUrls);
-    }
-
-    private List<Report> fetchReportsForPrograms(Set<Program> bugBountyPrograms) {
-        return bugBountyReportRepository.findByBugBountyProgramIn(bugBountyPrograms);
-    }
 
     private Map<Long, String> fetchUserImgUrls(Map<UserDTO, List<Report>> reportsByUser) {
         return reportsByUser.keySet().stream()
@@ -403,12 +403,5 @@ public class ReportService implements IReportService {
         return globalConstants.ROOT_LINK + "/api/background-image-for-hacker/download/" + userDTO.getHackerId();
     }
 
-    private String getUsernameFromToken() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            return ((UserDetails) authentication.getPrincipal()).getUsername();
-        }
-        throw new RuntimeException("Unable to extract username from JWT token");
-    }
 
 }

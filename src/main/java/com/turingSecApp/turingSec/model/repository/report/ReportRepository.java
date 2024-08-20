@@ -2,6 +2,7 @@ package com.turingSecApp.turingSec.model.repository.report;
 
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.report.Report;
+import com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORCOMPANY;
 import com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORUSER;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
@@ -30,4 +31,5 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 
 
     List<Report> findByBugBountyProgramCompany(CompanyEntity company);
+    List<Report> findByBugBountyProgramCompanyAndStatusForCompany(CompanyEntity company, REPORTSTATUSFORCOMPANY reportstatusforcompany);
 }

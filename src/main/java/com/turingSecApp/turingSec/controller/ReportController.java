@@ -142,16 +142,10 @@ public class ReportController {
         return BaseResponse.success(userReports);
     }
     @GetMapping("/company")
-    public BaseResponse<List<ReportsByUserWithCompDTO>> getReportsByCompanyProgramWithStatus(@RequestParam(required = false,value = "status") REPORTSTATUSFORCOMPANY status) {
-        List<ReportsByUserWithCompDTO> userReports = bugBountyReportService.getReportsByCompanyProgramWithStatus(status);
+    public BaseResponse<List<ReportsByUserDTO>> getReportsByCompanyProgramWithStatus(@RequestParam(required = false,value = "status") REPORTSTATUSFORCOMPANY status) {
+        List<ReportsByUserDTO> userReports = bugBountyReportService.getReportsByCompanyProgramWithStatus(status);
         return BaseResponse.success(userReports);
     }
-
-//    @GetMapping("/company")
-//    public BaseResponse<List<ReportsByUserDTO>> getBugBountyReportsForCompanyPrograms() {
-//        return BaseResponse.success(bugBountyReportService.getBugBountyReportsForCompanyPrograms());
-//    }
-
 
     @GetMapping("/company/{id}")
     public BaseResponse<List<Report>> getAllReportsByCompanyId(@PathVariable Long id) {

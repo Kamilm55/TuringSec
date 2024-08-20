@@ -131,21 +131,20 @@ public class SecurityConfig {
 
                             .requestMatchers(HttpMethod.POST,"/api/bug-bounty-reports/**").hasRole("HACKER")
                             .requestMatchers(HttpMethod.PUT,"/api/bug-bounty-reports/**").hasRole("HACKER")
-                            .requestMatchers("/api/bug-bounty-reports/submit").hasRole("HACKER")
-                            .requestMatchers("/api/bug-bounty-reports/user").hasRole("HACKER")
 
-                            .requestMatchers("/api/bug-bounty-reports/{id}").hasRole("HACKER")
+                            .requestMatchers("/api/bug-bounty-reports/user").hasRole("HACKER")
+                            .requestMatchers("/api/bug-bounty-reports/company").hasRole("COMPANY")
+                            .requestMatchers("/api/bug-bounty-reports/{id}/company/**").hasRole("COMPANY")
+
                             .requestMatchers("/api/bug-bounty-reports/company/{id}").hasRole("ADMIN")
                             .requestMatchers("/api/bug-bounty-reports/user/{id}").hasRole("ADMIN")
                             .requestMatchers("/api/bug-bounty-reports").hasRole("ADMIN")
 
-                            .requestMatchers("/api/bug-bounty-reports/company/**").hasRole("COMPANY")
-                            .requestMatchers("/api/bug-bounty-reports/{id}/company/**").hasRole("COMPANY")
-
+                            .requestMatchers("/api/bug-bounty-reports/{id}").hasRole("HACKER")
                             .requestMatchers("/api/bug-bounty-reports/**").authenticated()
                             ;
 
-                    //message
+                    // Message in Report Controller
                     request
                             .requestMatchers("/api/messagesInReport").hasAnyRole("HACKER","COMPANY")
                             .requestMatchers("/api/messagesInReport/{id}").hasAnyRole("HACKER","COMPANY")
