@@ -3,22 +3,24 @@ server:
   ssl:
     enabled: true
     key-store-type: JKS
-    key-store: /home/ec2-user/api.turingsec.xyz.jks
-    key-store-password: turingsec_keystore
-    key-alias: my-ssl-key
-    key-password: turingsec_keystore
+    key-store: ${SERVER_SSL_KEY_STORE}
+    key-store-password: ${SERVER_SSL_KEY_STORE_PASSWORD}
+    key-alias: ${SERVER_SSL_KEY_ALIAS}
+    key-password: ${SERVER_SSL_KEY_PASSWORD}
     trust-store-type: JKS
-    trust-store: /home/ec2-user/api.turingsec.xyz.jks
-    trust-store-password: turingsec_keystore
+    trust-store: ${SERVER_SSL_TRUST_STORE}
+    trust-store-password: ${SERVER_SSL_TRUST_STORE_PASSWORD}
+
 app:
-  root_url: ${APP_URL}
+  root_url: ${APP_ROOT_URL}
 
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
-    driverClassName: org.postgresql.Driver
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    url: ${SPRING_DATASOURCE_URL}
+    driverClassName: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
 
 #server:
 #  port: 8080
