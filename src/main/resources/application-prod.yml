@@ -2,15 +2,14 @@ server:
   port: 8080
   ssl:
     enabled: true
-    key-store: file:/etc/ssl/certs/fullchain.pem
-    key-store-password: ${KEY_STORE_PASSWORD}
-    key-store-type: PEM
+    key-store-type: JKS
+    key-store: /home/ec2-user/api.turingsec.xyz.jks
+    key-store-password: turingsec_keystore
     key-alias: my-ssl-key
-    key-password: ${KEY_STORE_PASSWORD}
-    trust-store: file:/etc/ssl/certs/privkey.pem
-    trust-store-password: ${KEY_STORE_PASSWORD}
-    trust-store-type: PEM
-
+    key-password: turingsec_keystore
+    trust-store-type: JKS
+    trust-store: /home/ec2-user/api.turingsec.xyz.jks
+    trust-store-password: turingsec_keystore
 app:
   root_url: ${APP_URL}
 
