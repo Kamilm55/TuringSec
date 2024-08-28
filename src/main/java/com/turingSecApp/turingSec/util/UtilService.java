@@ -1,21 +1,20 @@
 package com.turingSecApp.turingSec.util;
 
 import com.turingSecApp.turingSec.config.websocket.security.CustomWebsocketSecurityContext;
+import com.turingSecApp.turingSec.model.entities.MockData;
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.report.Report;
 import com.turingSecApp.turingSec.model.entities.role.Role;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
-import com.turingSecApp.turingSec.model.repository.AdminRepository;
-import com.turingSecApp.turingSec.model.repository.CompanyRepository;
-import com.turingSecApp.turingSec.model.repository.RoleRepository;
-import com.turingSecApp.turingSec.model.repository.UserRepository;
+import com.turingSecApp.turingSec.model.repository.*;
 import com.turingSecApp.turingSec.exception.custom.*;
 import com.turingSecApp.turingSec.model.repository.program.ProgramRepository;
 import com.turingSecApp.turingSec.model.repository.report.ReportRepository;
 import com.turingSecApp.turingSec.response.program.BugBountyProgramWithAssetTypeDTO;
 import com.turingSecApp.turingSec.response.user.AuthResponse;
+import com.turingSecApp.turingSec.service.MockDataService;
 import com.turingSecApp.turingSec.service.interfaces.IReportService;
 import com.turingSecApp.turingSec.util.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
