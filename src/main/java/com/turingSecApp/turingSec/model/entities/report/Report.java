@@ -10,7 +10,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
 import jakarta.persistence.*;
+import org.springframework.data.annotation.CreatedDate;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,6 +24,7 @@ import java.util.stream.DoubleStream;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
 @EqualsAndHashCode(exclude = {"user", "bugBountyProgram", "collaborators","asset","weakness"})
 @ToString(exclude = {"user", "bugBountyProgram", "collaborators","asset","weakness"})
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -55,6 +58,8 @@ public class Report {
     private Date lastActivity;
     private String rewardsStatus;
     private String reportTemplate;
+    @CreatedDate
+    private LocalDate createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

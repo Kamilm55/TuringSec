@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORCOMPANY.UNREVIEWED;
@@ -92,6 +93,7 @@ public class ReportEntityHelper implements IReportEntityHelper {
         reportCVSS.setIntegrity(reportPayload.getIntegrity());
         reportCVSS.setAvailability(reportPayload.getAvailability());
         reportCVSS.setScore(reportPayload.getScore());
+        reportCVSS.setCreatedAt(LocalDate.now());
     }
     @Override
     public void setCommonReportProperties(Report report, BugBountyReportPayload reportPayload) {
@@ -105,6 +107,7 @@ public class ReportEntityHelper implements IReportEntityHelper {
         report.setRewardsStatus(reportPayload.getRewardsStatus());
         report.setReportTemplate(reportPayload.getReportTemplate());
         report.setMethodName(reportPayload.getMethodName());
+        report.setCreatedAt(LocalDate.now());
 
         // Set Status for reports
         report.setStatusForUser(SUBMITTED);
