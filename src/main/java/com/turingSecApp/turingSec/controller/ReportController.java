@@ -6,6 +6,7 @@ import com.turingSecApp.turingSec.model.entities.report.ReportManual;
 import com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORCOMPANY;
 import com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORUSER;
 import com.turingSecApp.turingSec.payload.report.ReportCVSSPayload;
+import com.turingSecApp.turingSec.payload.report.ReportDateRangeRequest;
 import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
 import com.turingSecApp.turingSec.response.report.ReportsByUserDTO;
 import com.turingSecApp.turingSec.response.report.ReportsByUserWithCompDTO;
@@ -15,6 +16,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,12 +26,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/bug-bounty-reports")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
+@Slf4j
 public class ReportController {
 
     // todo
@@ -161,5 +166,13 @@ public class ReportController {
     public BaseResponse<List<Report>> getAllReport(){
         return BaseResponse.success(bugBountyReportService.getAllReports());
     }
+
+    @GetMapping(path = "/date-range")
+    public BaseResponse<List<Report>> getReportDateRange(@RequestParam("startDate") LocalDate createdAt,
+                                                         @RequestParam("endDate")LocalDate endDate){
+        return BaseResponse.success(bugBountyReportService.getReportDateRange(createdAt,endDate));
+    }
+
+
 
 }

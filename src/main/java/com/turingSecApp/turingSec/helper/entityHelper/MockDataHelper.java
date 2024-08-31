@@ -2,6 +2,7 @@ package com.turingSecApp.turingSec.helper.entityHelper;
 
 import com.turingSecApp.turingSec.exception.custom.CompanyNotFoundException;
 import com.turingSecApp.turingSec.model.entities.MockData;
+import com.turingSecApp.turingSec.model.entities.report.Report;
 import com.turingSecApp.turingSec.model.entities.report.embedded.ProofOfConcept;
 import com.turingSecApp.turingSec.model.entities.report.embedded.ReportWeakness;
 import com.turingSecApp.turingSec.model.entities.role.Role;
@@ -87,6 +88,7 @@ public class MockDataHelper {
             throw new RuntimeException(e);
         }
     }
+
 
     public void insertRoles() {
         // Check if roles already exist to avoid duplication

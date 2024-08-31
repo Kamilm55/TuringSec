@@ -19,6 +19,7 @@ import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.file_upload.service.ReportMediaService;
 import com.turingSecApp.turingSec.helper.entityHelper.report.IReportEntityHelper;
 import com.turingSecApp.turingSec.payload.report.ReportCVSSPayload;
+import com.turingSecApp.turingSec.payload.report.ReportDateRangeRequest;
 import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
 import com.turingSecApp.turingSec.response.report.ReportsByUserDTO;
 import com.turingSecApp.turingSec.response.report.ReportsByUserWithCompDTO;
@@ -38,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -255,6 +257,13 @@ public class ReportService implements IReportService {
 
         // Group reports by user, fetch image URLs, and create DTOs
         return createReportsByUserDTOList(groupReportsByUser(userReports), fetchUserImgUrls(groupReportsByUser(userReports)));
+    }
+
+    @Override
+    public List<Report> getReportDateRange(LocalDate startDate,LocalDate endDate) {
+        return getAllReports().stream()
+                .filter(report -> !report.getCreatedAt().isBefore(startDate) && !report.getCreatedAt().isAfter(endDate))
+                .collect(Collectors.toList());
     }
 
     private List<Report> getReportsForStatus(REPORTSTATUSFORUSER status, UserEntity user) {
