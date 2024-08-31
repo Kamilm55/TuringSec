@@ -177,32 +177,17 @@ public class ReportService implements IReportService {
         CompanyEntity company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Company not found with id:" + companyId));
 
-        List<Report> reports = bugBountyReportRepository.findByBugBountyProgramCompany(company);
-
-        // Throw exception if it is empty
-        checkEmpty(companyId, reports);
-
-        return reports;
+        return bugBountyReportRepository.findByBugBountyProgramCompany(company);
     }
     @Override
     public List<Report> getReportsByUserId(Long userId) {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id:" + userId));
 
-        List<Report> reports = bugBountyReportRepository.findByUser(user);
-
-        // Throw exception if it is empty
-        checkEmpty(userId, reports);
-
-        return reports;
+        return bugBountyReportRepository.findByUser(user);
     }
     public List<Report> getAllReports() {
-        List<Report> all = bugBountyReportRepository.findAll();
-
-        // Throw exception if it is empty
-        checkEmpty(all);
-
-        return all;
+       return bugBountyReportRepository.findAll();
     }
     @Override
     public Report reviewReportByCompany(Long id) {
@@ -260,7 +245,7 @@ public class ReportService implements IReportService {
     }
 
     @Override
-    public List<Report> getReportDateRange(LocalDate startDate,LocalDate endDate) {
+    public List<Report> getReportByDateRange(LocalDate startDate,LocalDate endDate) {
         return getAllReports().stream()
                 .filter(report -> !report.getCreatedAt().isBefore(startDate) && !report.getCreatedAt().isAfter(endDate))
                 .collect(Collectors.toList());
@@ -328,16 +313,16 @@ public class ReportService implements IReportService {
     }
 
 
-    private void checkEmpty(Long userId, List<Report> reports) {
-        if (reports.isEmpty()) {
-            throw new ReportNotFoundException("There is no report with user/company id: " + userId);
-        }
-    }
-    private void checkEmpty(List<Report> reports) {
-        if (reports.isEmpty()) {
-            throw new ReportNotFoundException("There is no report");
-        }
-    }
+//    private void checkEmpty(Long userId, List<Report> reports) {
+//        if (reports.isEmpty()) {
+//            throw new ReportNotFoundException("There is no report with user/company id: " + userId);
+//        }
+//    }
+//    private void checkEmpty(List<Report> reports) {
+//        if (reports.isEmpty()) {
+//            throw new ReportNotFoundException("There is no report");
+//        }
+//    }
     @Override
     @Transactional
     public void deleteBugBountyReport(Long id) {

@@ -170,7 +170,7 @@ public class ReportController {
     @GetMapping(path = "/date-range")
     public BaseResponse<List<Report>> getReportDateRange(@RequestParam("startDate") LocalDate createdAt,
                                                          @RequestParam("endDate")LocalDate endDate){
-        return BaseResponse.success(bugBountyReportService.getReportDateRange(createdAt,endDate));
+        return BaseResponse.success(bugBountyReportService.getReportByDateRange( .createdAt,endDate));
     }
 
 
