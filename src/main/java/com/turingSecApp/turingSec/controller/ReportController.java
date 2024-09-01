@@ -168,9 +168,23 @@ public class ReportController {
     }
 
     @GetMapping(path = "/date-range")
-    public BaseResponse<List<Report>> getReportDateRange(@RequestParam("startDate") LocalDate createdAt,
+    public BaseResponse<List<Report>> getReportDateRange(@RequestParam("startDate") LocalDate startDate,
                                                          @RequestParam("endDate")LocalDate endDate){
-        return BaseResponse.success(bugBountyReportService.getReportDateRange(createdAt,endDate));
+        return BaseResponse.success(bugBountyReportService.getReportDateRange(startDate,endDate));
+    }
+
+    @GetMapping(path = "/date-range/{companyId}")
+    public BaseResponse<List<Report>> getReportDateRangeCompany(@PathVariable Long companyId,
+                                                         @RequestParam("startDate") LocalDate startDate,
+                                                         @RequestParam("endDate")LocalDate endDate){
+        return BaseResponse.success(bugBountyReportService.getReportDateRangeCompanyId(companyId,startDate,endDate));
+    }
+
+    @GetMapping(path = "/date-range/user/{userId}")
+    public BaseResponse<List<Report>> getReportDateRangeUser(@PathVariable Long userId,
+                                                         @RequestParam("startDate") LocalDate startDate,
+                                                         @RequestParam("endDate")LocalDate endDate){
+        return BaseResponse.success(bugBountyReportService.getReportDateRangeUserId(userId,startDate,endDate));
     }
 
 

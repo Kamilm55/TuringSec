@@ -260,11 +260,26 @@ public class ReportService implements IReportService {
     }
 
     @Override
-    public List<Report> getReportDateRange(LocalDate startDate,LocalDate endDate) {
-        return getAllReports().stream()
+    public List<Report> getReportDateRange(LocalDate startDate, LocalDate endDate) {
+        return filterReportsByDate(getAllReports(), startDate, endDate);
+    }
+
+    @Override
+    public List<Report> getReportDateRangeCompanyId(Long id, LocalDate startDate, LocalDate endDate) {
+        return filterReportsByDate(getReportsByCompanyId(id), startDate, endDate);
+    }
+
+    @Override
+    public List<Report> getReportDateRangeUserId(Long userId, LocalDate startDate, LocalDate endDate) {
+        return filterReportsByDate(getReportsByUserId(userId), startDate, endDate);
+    }
+
+    private List<Report> filterReportsByDate(List<Report> reports, LocalDate startDate, LocalDate endDate) {
+        return reports.stream()
                 .filter(report -> !report.getCreatedAt().isBefore(startDate) && !report.getCreatedAt().isAfter(endDate))
                 .collect(Collectors.toList());
     }
+
 
     private List<Report> getReportsForStatus(REPORTSTATUSFORUSER status, UserEntity user) {
         List<Report> userReports;
