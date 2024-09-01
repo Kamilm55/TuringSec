@@ -244,7 +244,7 @@ public class ReportService implements IReportService {
         return createReportsByUserDTOList(groupReportsByUser(userReports), fetchUserImgUrls(groupReportsByUser(userReports)));
     }
 
-    @Override
+    @Override // For admin -> it returns all report by any hackers or company
     public List<Report> getReportByDateRange(LocalDate startDate,LocalDate endDate) {
         return getAllReports().stream()
                 .filter(report -> !report.getCreatedAt().isBefore(startDate) && !report.getCreatedAt().isAfter(endDate))

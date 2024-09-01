@@ -140,7 +140,7 @@ public class MockDataHelper {
                 .first_name("Admin2")
                 .last_name("Admin2Last")
                 .username("admin2_username")
-                .password(passwordEncoder.encode("adminPass "))
+                .password(passwordEncoder.encode("adminPass"))
                 .email("elnarzulfuqarli2001@gmail.com")
                 .activated(true)
                 .build();

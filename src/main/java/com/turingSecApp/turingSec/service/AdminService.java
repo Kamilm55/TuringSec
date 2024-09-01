@@ -15,6 +15,7 @@ import com.turingSecApp.turingSec.service.interfaces.IAdminService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import com.turingSecApp.turingSec.util.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,6 +27,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AdminService implements IAdminService {
     private final EmailNotificationService EmailNotificationService;
     private final PasswordEncoder passwordEncoder;
@@ -36,17 +38,18 @@ public class AdminService implements IAdminService {
     private final RoleRepository roleRepository;
 
     @Override
-    public AdminAuthResponse loginAdmin(LoginRequest user) {
+    public AdminAuthResponse loginAdmin(LoginRequest loginRequest) {
         // Check if the input is an email
-        AdminEntity adminEntity = adminRepository.findByEmail(user.getUsernameOrEmail());
+        AdminEntity adminEntity = adminRepository.findByEmail(loginRequest.getUsernameOrEmail());
+        log.info("Login Payload for admin: " + loginRequest);
 
         // If the input is not an email, check if it's a username
         if (adminEntity == null) {
-            adminEntity = adminRepository.findByUsername(user.getUsernameOrEmail()).orElseThrow(()->new UserNotFoundException("Admin does not found with username:" + user.getUsernameOrEmail() ));
+            adminEntity = adminRepository.findByUsername(loginRequest.getUsernameOrEmail()).orElseThrow(()->new UserNotFoundException("Admin does not found with username:" + loginRequest.getUsernameOrEmail() ));
         }
 
         // Authenticate user if found
-        if (adminEntity != null && passwordEncoder.matches(user.getPassword(), adminEntity.getPassword())) {
+        if (adminEntity != null && passwordEncoder.matches(loginRequest.getPassword(), adminEntity.getPassword())) {
             // Generate token using the user details
             UserDetails userDetails = new CustomUserDetails(adminEntity);
             String token = jwtTokenProvider.generateToken(userDetails);
