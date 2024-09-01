@@ -140,7 +140,7 @@ public class SecurityConfig {
                             .requestMatchers("/api/bug-bounty-reports/user/{id}").hasRole("ADMIN")
                             .requestMatchers("/api/bug-bounty-reports").hasRole("ADMIN")
                             .requestMatchers("/api/bug-bounty-reports/date-range").hasRole("ADMIN")
-                            .requestMatchers("/api/bug-bounty-reports/{id}").hasRole("HACKER")
+                            .requestMatchers("/api/bug-bounty-reports/{id}").authenticated()
                             .requestMatchers("/api/bug-bounty-reports/**").authenticated()
                             ;
 
