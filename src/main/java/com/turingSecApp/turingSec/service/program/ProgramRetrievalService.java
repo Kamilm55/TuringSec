@@ -9,6 +9,7 @@ import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.repository.program.ProgramRepository;
 import com.turingSecApp.turingSec.model.repository.program.asset.ProgramAssetRepository;
 import com.turingSecApp.turingSec.response.program.ProgramDTO;
+import com.turingSecApp.turingSec.service.user.factory.UserFactory;
 import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.ProgramMapper;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class ProgramRetrievalService {
 
+    private final UserFactory userFactory;
     private final ProgramRepository programRepository;
     private final UtilService utilService;
     private final ProgramAssetRepository programAssetRepository;
@@ -29,7 +31,7 @@ public class ProgramRetrievalService {
 
     public List<ProgramDTO> getCompanyAllBugBountyPrograms() {
         // Retrieve the company associated with the authenticated user
-        CompanyEntity company = utilService.getAuthenticatedCompanyWithHTTP();
+        CompanyEntity company = (CompanyEntity) userFactory.getAuthenticatedBaseUser();
 
         // Get programs belonging to the company
         List<Program> programList = programRepository.findByCompany(company);

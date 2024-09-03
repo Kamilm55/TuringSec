@@ -2,10 +2,8 @@ package com.turingSecApp.turingSec.helper.entityHelper;
 
 import com.turingSecApp.turingSec.exception.custom.CompanyNotFoundException;
 import com.turingSecApp.turingSec.model.entities.MockData;
-import com.turingSecApp.turingSec.model.entities.report.Report;
 import com.turingSecApp.turingSec.model.entities.report.embedded.ProofOfConcept;
 import com.turingSecApp.turingSec.model.entities.report.embedded.ReportWeakness;
-import com.turingSecApp.turingSec.model.entities.role.Role;
 import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.repository.*;
@@ -32,6 +30,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 
+import static com.turingSecApp.turingSec.model.enums.Role.ROLE_ADMIN;
+import static com.turingSecApp.turingSec.model.enums.Role.ROLE_COMPANY;
+
 @Service
 @RequiredArgsConstructor
 public class MockDataHelper {
@@ -44,13 +45,12 @@ public class MockDataHelper {
 
     private final UserRepository userRepository;
     private final AdminRepository adminRepository;
-    private final RoleRepository roleRepository;
     private final CompanyRepository companyRepository;
     private final ReportRepository reportRepository;
 
     @Transactional // to achieve transaction we call this method from outside
     public void insertAllTransactionally(MockData mockData) {
-        insertRoles(); // todo:change role structure
+
         insertUsersAndHackers();
         insertCompany();
         insertAdmins();
@@ -61,26 +61,21 @@ public class MockDataHelper {
         mockData.setInsertedMockNumber(1);
         mockDataRepository.save(mockData); // save mock data in table with value 1
     }
-    public void insertReports() {
+    private void insertReports() {
         // Insert 1 mock manual report
-
         // Populate payload
         ReportManualPayload reportManualPayload = new ReportManualPayload();
         reportManualPayload.setLastActivity(Date.from(Instant.now()));
         reportManualPayload.setRewardsStatus("200$");
         reportManualPayload.setReportTemplate("report template");
         reportManualPayload.setCollaboratorPayload(new ArrayList<>());
-
         ReportAssetPayload reportAssetPayload = new ReportAssetPayload("domain","y.com");
         reportManualPayload.setReportAssetPayload(reportAssetPayload);
-
         ReportWeakness reportWeakness = new ReportWeakness("Weakness type","Weaknes name");
         reportManualPayload.setWeakness(reportWeakness);
-
         ProofOfConcept proofOfConcept = new ProofOfConcept("Title","Example.com","DESCRIPTION");
         reportManualPayload.setProofOfConcept(proofOfConcept);
         reportManualPayload.setSeverity("SEVERITY");
-
         // Submit
         try {
             reportService.submitManualReportForTest(new ArrayList<>(),reportManualPayload,1L);
@@ -89,17 +84,6 @@ public class MockDataHelper {
         }
     }
 
-
-    public void insertRoles() {
-        // Check if roles already exist to avoid duplication
-        if (roleRepository.count() == 0) {
-            roleRepository.save(new Role("HACKER"));
-            roleRepository.save(new Role("COMPANY"));
-            roleRepository.save(new Role("ADMIN"));
-        }
-    }
-
-
     public void insertUsersAndHackers() {
         // Insert 1st user
         RegisterPayload registerPayload1 = RegisterPayload.builder()
@@ -107,9 +91,11 @@ public class MockDataHelper {
                 .lastName("Memmedov")
                 .country("Azerbaijan")
                 .username("Username")
-                .email("kamilmdov2905@gmail.com")
+                .email("mockhacker1@gmail.com")
                 .password("userPass") // encode inside service
                 .build();
+
+
         userService.insertActiveHacker(registerPayload1); // activated true
 
         // Insert 2nd user
@@ -118,13 +104,11 @@ public class MockDataHelper {
                 .lastName("Lastname")
                 .country("Azerbaijan")
                 .username("Hacker_2")
-                .email("kamilmmmdov2905@gmail.com")
+                .email("mockhacker2@gmail.com")
                 .password("userPass") // encode inside service
                 .build();
         userService.insertActiveHacker(registerPayload2);
     }
-
-
     public void insertAdmins() {
         // Insert 2 admins
         AdminEntity admin1 = AdminEntity.builder()
@@ -135,7 +119,6 @@ public class MockDataHelper {
                 .email("kamilmmmdov2905@gmail.com")
                 .activated(true)
                 .build();
-
         AdminEntity admin2 = AdminEntity.builder()
                 .first_name("Admin2")
                 .last_name("Admin2Last")
@@ -146,21 +129,21 @@ public class MockDataHelper {
                 .build();
 
         // Set admin roles
-        Set<Role> roles = utilService.getAdminRoles();
-        admin1.setRoles(roles);
-        admin2.setRoles(roles);
+//        Set<Role> roles = utilService.getAdminRoles();
+        admin1.setRoles(Collections.singleton(ROLE_ADMIN));
+        admin2.setRoles(Collections.singleton(ROLE_ADMIN));
 
+        // Set uuid explicitly
+        utilService.setStaticUUIDForUsers(admin1);
+        utilService.setStaticUUIDForUsers(admin2);
+
+        // Save admins
         adminRepository.save(admin1);
         adminRepository.save(admin2);
     }
 
-
     public void insertCompany() {
         // Insert 1 company
-        Role companyRole = roleRepository.findByName("COMPANY");
-        if (companyRole == null) {
-            throw new CompanyNotFoundException("Company role not found.");
-        }
 
         CompanyEntity company1 = CompanyEntity.builder()
                 .first_name("Kenan")
@@ -170,35 +153,31 @@ public class MockDataHelper {
                 .job_title("CEO")
                 .message("I want to build company")
                 .activated(true)
-                .password(passwordEncoder.encode("string"))
+                .password(passwordEncoder.encode("companyPass"))
                 .build();
 
-        company1.setRoles(Collections.singleton(companyRole));
+        // Set uuid explicitly
+        utilService.setStaticUUIDForUsers(company1);
+
+        company1.setRoles(Collections.singleton(ROLE_COMPANY));
         companyRepository.save(company1);
     }
 
     public void insertProgram() {
         // Create a new BugBountyProgramWithAssetTypePayload instance
         ProgramPayload programPayload = new ProgramPayload();
-
         // Set data into the payload
         programPayload.setFromDate(LocalDate.of(2024, 4, 15));
         programPayload.setToDate(LocalDate.of(2024, 5, 15));
         programPayload.setPolicy("Responsible Disclosure Policy");
         programPayload.setNotes("Bug Bounty program for ExampleCompany's web assets.");
-
-
         // Create and set prohibits payloads
         ProhibitPayload prohibitPayload = new ProhibitPayload();
         prohibitPayload.setProhibitAdded("Prohibits the use of automated scanners without prior permission.");
         programPayload.setProhibits(Arrays.asList(prohibitPayload));
-
         CompanyEntity company = companyRepository.findByEmail("string@gmail.com");
-
         ProgramAssetPayload programAssetPayload = new ProgramAssetPayload();
         BaseProgramAssetPayload lowProgramAsset = new BaseProgramAssetPayload();
-
-
         Set<AssetPayload> assets = new HashSet<>();
         AssetPayload asset = new AssetPayload();
         asset.setType("domain");
@@ -206,60 +185,44 @@ public class MockDataHelper {
         Set<String> assetNames = new HashSet<>(Set.of("x.com", "y.com"));
         asset.setNames(assetNames);
         assets.add(asset);
-
-
         lowProgramAsset.setAssets(assets);
-
-
         // Create and set payloads for Medium, High, and Critical assets
         BaseProgramAssetPayload mediumProgramAssetPayload = new BaseProgramAssetPayload();
-
         BaseProgramAssetPayload highProgramAssetPayload = new BaseProgramAssetPayload();
-
         BaseProgramAssetPayload criticalProgramAssetPayload = new BaseProgramAssetPayload();
-
         // Populate asset sets for Medium, High, and Critical assets
         Set<AssetPayload> highAssets = new HashSet<>();
         Set<AssetPayload> criticalAssets = new HashSet<>();
-
         // Populate asset sets
         AssetPayload mediumAsset = new AssetPayload();
         mediumAsset.setType("domain");
         mediumAsset.setPrice(68.0);
         mediumAsset.setNames(new HashSet<>(Arrays.asList("z.com", "w.com"))); // Example asset names for Medium asset
-
         AssetPayload mediumAsset2 = new AssetPayload();
         mediumAsset2.setType("mobile");
         mediumAsset2.setPrice(85.5);
         mediumAsset2.setNames(new HashSet<>(Arrays.asList("mob1", "mob2"))); // Example asset names for Medium asset
-
         Set<AssetPayload> mediumAssets = new HashSet<>(Set.of(mediumAsset,mediumAsset2)); // add 2 assets to set of assets for test
-
         AssetPayload highAsset = new AssetPayload();
         highAsset.setType("domain");
         highAsset.setPrice(149.8);
         highAsset.setNames(new HashSet<>(Arrays.asList("p.com", "q.com"))); // Example asset names for High asset
         highAssets.add(highAsset);
-
         AssetPayload criticalAsset = new AssetPayload();
         criticalAsset.setType("domain");
         criticalAsset.setPrice(560.0);
         criticalAsset.setNames(new HashSet<>(Arrays.asList("m.com", "n.com"))); // Example asset names for Critical asset
         criticalAssets.add(criticalAsset);
-
         // Set asset sets to their respective payloads
         mediumProgramAssetPayload.setAssets(mediumAssets);
         highProgramAssetPayload.setAssets(highAssets);
         criticalProgramAssetPayload.setAssets(criticalAssets);
-
         // Set payloads to the main program asset payload
         programAssetPayload.setLowAsset(lowProgramAsset);
         programAssetPayload.setMediumAsset(mediumProgramAssetPayload);
         programAssetPayload.setHighAsset(highProgramAssetPayload);
         programAssetPayload.setCriticalAsset(criticalProgramAssetPayload);
-
         programPayload.setAsset(programAssetPayload);
-
         programService.createBugBountyProgramForTest(programPayload,company);
     }
 }

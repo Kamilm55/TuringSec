@@ -4,12 +4,14 @@ import com.turingSecApp.turingSec.config.websocket.headerAccessorAdapter.SimpHea
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.model.entities.message.StringMessageInReport;
 import com.turingSecApp.turingSec.model.entities.report.Report;
+import com.turingSecApp.turingSec.model.entities.user.BaseUser;
 import com.turingSecApp.turingSec.model.repository.report.ReportRepository;
 import com.turingSecApp.turingSec.model.repository.reportMessage.StringMessageInReportRepository;
 import com.turingSecApp.turingSec.payload.message.StringMessageInReportPayload;
 import com.turingSecApp.turingSec.response.message.StringMessageInReportDTO;
 import com.turingSecApp.turingSec.service.interfaces.IStompMessageInReportService;
 import com.turingSecApp.turingSec.exception.websocket.exceptionHandling.SocketExceptionHandler;
+import com.turingSecApp.turingSec.service.user.factory.UserFactory;
 import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -26,8 +28,8 @@ public class StompMessageInReportService implements IStompMessageInReportService
     private final ReportRepository reportRepository;
     private final StringMessageInReportRepository stringMessageInReportRepository;
     private final UtilService utilService;
-    private final SocketExceptionHandler socketExceptionHandler;
     private final CommonMessageInReportService commonMessageInReportService;
+    private final UserFactory userFactory;
 
 
 
@@ -64,14 +66,13 @@ public class StompMessageInReportService implements IStompMessageInReportService
         if (strMessageInReportPayload.getContent() == null || strMessageInReportPayload.getContent().isEmpty()) {
             throw new IllegalArgumentException("Message content cannot be empty!");
         }
-
             Report reportOfMessage = reportRepository.findByRoom(room).orElseThrow(() -> new ResourceNotFoundException("Report not found with room: " + room));
 
             // Is it user or company if authorized
-            Object authenticatedUser = utilService.getAuthenticatedBaseUserForWebsocket();
+            BaseUser authenticatedUser = userFactory.getAuthenticatedBaseUser();
             log.info("User/Company info: " + authenticatedUser);
-//
-//        // Create message from payload
+
+            // Create message from payload
             StringMessageInReport strMessage = commonMessageInReportService.createStringMessageInReport(strMessageInReportPayload,authenticatedUser,reportOfMessage);
 
             // Save created strMessage obj

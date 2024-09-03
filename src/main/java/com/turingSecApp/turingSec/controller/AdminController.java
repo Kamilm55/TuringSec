@@ -4,6 +4,7 @@ import com.turingSecApp.turingSec.payload.user.LoginRequest;
 import com.turingSecApp.turingSec.response.admin.AdminAuthResponse;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.interfaces.IAdminService;
+import com.turingSecApp.turingSec.util.UtilService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +17,7 @@ public class AdminController {
     private final IAdminService adminService;
 
     @PostMapping("/approve-company/{companyId}")
-    public BaseResponse<?> approveCompanyRegistration(@PathVariable Long companyId) {
+    public BaseResponse<?> approveCompanyRegistration(@PathVariable String companyId) {
         return BaseResponse.success("Company registration approved successfully. Generated password: " + adminService.approveCompanyRegistration(companyId));
     }
 

@@ -3,27 +3,26 @@ package com.turingSecApp.turingSec.service;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
-import com.turingSecApp.turingSec.model.entities.role.Role;
 import com.turingSecApp.turingSec.model.repository.AdminRepository;
 import com.turingSecApp.turingSec.model.repository.CompanyRepository;
-import com.turingSecApp.turingSec.model.repository.RoleRepository;
 import com.turingSecApp.turingSec.exception.custom.CompanyNotFoundException;
 import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.payload.user.LoginRequest;
 import com.turingSecApp.turingSec.response.admin.AdminAuthResponse;
 import com.turingSecApp.turingSec.service.interfaces.IAdminService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
+import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -33,9 +32,9 @@ public class AdminService implements IAdminService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtTokenProvider;
     private final AdminRepository adminRepository;
+    private final UtilService utilService;
 
     private final CompanyRepository companyRepository;
-    private final RoleRepository roleRepository;
 
     @Override
     public AdminAuthResponse loginAdmin(LoginRequest loginRequest) {
@@ -65,12 +64,12 @@ public class AdminService implements IAdminService {
         }
     }
     @Override
-    public String approveCompanyRegistration(Long companyId) {
+    public String approveCompanyRegistration(String companyId) {
         // Assuming you have a method in the CompanyService to approve company registration
         String generatedPassword = approveCompanyAndGeneratePass(companyId);
 
         if (generatedPassword != null) {
-            CompanyEntity company = companyRepository.findById(companyId).orElseThrow(()-> new CompanyNotFoundException("Company not found with id:" + companyId));
+            CompanyEntity company = companyRepository.findById(utilService.convertToUUID(companyId)).orElseThrow(()-> new CompanyNotFoundException("Company not found with id:" + companyId));
             notifyCompanyForApproval(company,generatedPassword);
 
             return  generatedPassword;
@@ -82,32 +81,26 @@ public class AdminService implements IAdminService {
 
 
     // Util
-    public String approveCompanyAndGeneratePass(Long companyId) {
-        Optional<CompanyEntity> companyOptional = companyRepository.findById(companyId);
-        if (companyOptional.isPresent()) {
-            CompanyEntity company = companyOptional.get();
+    public String approveCompanyAndGeneratePass(String companyId) {
+        Optional<CompanyEntity> companyOptional = companyRepository.findById(utilService.convertToUUID(companyId));
+            if (companyOptional.isPresent()) {
+                CompanyEntity company = companyOptional.get();
 
-            // Generate a random password for the company
-            String generatedPassword = generateRandomPassword();
-            company.setPassword(passwordEncoder.encode(generatedPassword));
+                // Generate a random password for the company
+                String generatedPassword = generateRandomPassword();
+                company.setPassword(passwordEncoder.encode(generatedPassword));
 
-            // Set the approval status to true
-            company.setActivated(true);
+                // Set the approval status to true
+                company.setActivated(true);
 
-            // Retrieve the "COMPANY" role
-            Role companyRole = roleRepository.findByName("COMPANY");
-            if (companyRole == null) {
-                throw new CompanyNotFoundException("Company role not found.");
+                // Save the company
+                companyRepository.save(company);
+
+                // Return the generated password
+                return generatedPassword;
+            } else {
+                throw new CompanyNotFoundException("Company with the given ID not found.");
             }
-
-            // Save the company
-            companyRepository.save(company);
-
-            // Return the generated password
-            return generatedPassword;
-        } else {
-            throw new CompanyNotFoundException("Company with the given ID not found.");
-        }
     }
 
 

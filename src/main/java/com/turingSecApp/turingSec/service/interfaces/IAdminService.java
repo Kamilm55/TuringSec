@@ -5,5 +5,5 @@ import com.turingSecApp.turingSec.response.admin.AdminAuthResponse;
 
 public interface IAdminService {
     AdminAuthResponse loginAdmin(LoginRequest user);
-    String approveCompanyRegistration(Long companyId);
+    String approveCompanyRegistration(String companyId);
 }

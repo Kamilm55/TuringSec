@@ -23,7 +23,7 @@ public class ReportDTO {
     private String rewardsStatus;
     private String reportTemplate;
 
-    private Long userId;
+    private String userId;
     private Long bugBountyProgramId;
 
     private Double ownPercentage;

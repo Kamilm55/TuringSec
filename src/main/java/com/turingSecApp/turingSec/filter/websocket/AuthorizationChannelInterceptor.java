@@ -16,6 +16,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -26,7 +27,7 @@ import java.util.Map;
 @Slf4j
 public class AuthorizationChannelInterceptor implements ChannelInterceptor {
     private final JwtUtil jwtTokenProvider;
-    private final UserDetailsServiceImpl userDetailsService;
+    private final UserDetailsService userDetailsService;
     private final CustomWebsocketSecurityContext customWebsocketSecurityContext;
 
     private final SocketExceptionHandler socketExceptionHandler;
@@ -78,7 +79,7 @@ public class AuthorizationChannelInterceptor implements ChannelInterceptor {
         }
 
         // Extract the username from the token
-        String username = jwtTokenProvider.getUsernameFromToken(token);
+        String username = jwtTokenProvider.getUserIdAsUsernameFromToken(token);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
         // If user details cannot be loaded, authentication fails

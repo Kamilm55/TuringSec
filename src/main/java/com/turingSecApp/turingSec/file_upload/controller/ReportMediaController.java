@@ -3,6 +3,7 @@ package com.turingSecApp.turingSec.file_upload.controller;
 import com.turingSecApp.turingSec.model.entities.report.Media;
 import com.turingSecApp.turingSec.file_upload.response.FileResponse;
 import com.turingSecApp.turingSec.file_upload.service.ReportMediaService;
+import com.turingSecApp.turingSec.util.MediaUtilService;
 import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,13 +22,11 @@ import java.util.List;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ReportMediaController {
     private final ReportMediaService reportMediaService;
-    private final UtilService utilService;
+    private final MediaUtilService mediaUtilService;
 
     @PostMapping("/{reportId}/upload")
     public List<FileResponse> uploadMedia(@RequestParam("file") List<MultipartFile> files, @AuthenticationPrincipal UserDetails userDetails,@PathVariable Long reportId) throws IOException {
-        Long hackerId = utilService.validateHacker(userDetails);
-
-        //todo: check report belongs to this user? do in saveVideoOrImg
+        Long hackerId = mediaUtilService.validateHacker(userDetails);
 
         // Call the service method to save the video
         return reportMediaService.saveFiles(files, reportId);

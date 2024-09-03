@@ -62,14 +62,11 @@ public class UserController {
     public BaseResponse<UserHackerDTO> updateProfile(@RequestBody @Valid UserUpdateRequest profileUpdateRequest) {
         UserHackerDTO updateProfile = userService.updateProfile(profileUpdateRequest);
 
-        String newToken = userService.generateNewToken(updateProfile);
-
-        return BaseResponse.success(updateProfile,
-                "Profile updated successfully. You must update Authorization header (Bearer token) , new token is: "  + newToken);
+        return BaseResponse.success(updateProfile);
     }
 
     @GetMapping("/users/{userId}")
-    public BaseResponse<UserDTO> getUserById(@PathVariable Long userId) {
+    public BaseResponse<UserDTO> getUserById(@PathVariable String userId) {
         return BaseResponse.success(userService.getUserById(userId));
     }
 
@@ -88,11 +85,7 @@ public class UserController {
         return BaseResponse.success(userService.getAllActiveUsers());
     }
 
-    @DeleteMapping("/delete-user")
-    public BaseResponse<?> deleteUser() {
-        userService.deleteUser();
-        return BaseResponse.success(null,"User deleted successfully. You must delete Authorization header (Bearer token)");
-    }
+
 
     // All bug bounty programs for user(hacker)
     @GetMapping("/programs")

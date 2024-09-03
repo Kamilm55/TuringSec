@@ -56,12 +56,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public String generateNewToken(UserHackerDTO updatedUser) {
-        return userManagementService.generateNewToken(updatedUser);
-    }
-
-    @Override
-    public UserDTO getUserById(Long userId) {
+    public UserDTO getUserById(String userId) {
         return userRetrievalService.getUserById(userId);
     }
 
@@ -80,11 +75,6 @@ public class UserService implements IUserService {
         return userRetrievalService.getAllBugBountyPrograms();
     }
 
-    @Override
-    @Transactional// This annotation ensures that the method is executed within a transactional context, allowing database operations like deletion to be performed reliably.
-    public void deleteUser() {
-        userManagementService.deleteUser();
-    }
 
     @Override
     public ProgramDTO getBugBountyProgramById(Long id) {

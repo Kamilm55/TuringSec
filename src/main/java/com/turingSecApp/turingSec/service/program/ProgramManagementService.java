@@ -7,6 +7,7 @@ import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.repository.program.ProgramRepository;
 import com.turingSecApp.turingSec.payload.program.ProgramPayload;
 import com.turingSecApp.turingSec.response.program.ProgramDTO;
+import com.turingSecApp.turingSec.service.user.factory.UserFactory;
 import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.ProgramMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class ProgramManagementService  {
+    private final UserFactory userFactory;
     private final ProgramRepository programRepository;
     private final UtilService utilService;
     private final IProgramEntityHelper programEntityHelper;
 
     @Transactional
     public ProgramDTO createBugBountyProgram(ProgramPayload programPayload) {
-        CompanyEntity company = utilService.getAuthenticatedCompanyWithHTTP();
+        CompanyEntity company = (CompanyEntity) userFactory.getAuthenticatedBaseUser();
 
         return convertToProgramEntityAndSave(programPayload, company);
     }
@@ -62,7 +64,7 @@ public class ProgramManagementService  {
     @Transactional
     public void deleteBugBountyProgram(Long id) {
         // Get the company associated with the authenticated user
-        CompanyEntity company = utilService.getAuthenticatedCompanyWithHTTP();
+        CompanyEntity company = (CompanyEntity) userFactory.getAuthenticatedBaseUser();
 
         // Retrieve the bug bounty program by ID
         Program program = utilService.findProgramById(id);

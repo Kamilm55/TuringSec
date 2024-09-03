@@ -20,9 +20,7 @@ public interface CompanyMapper {
     CompanyDTO toDto(CompanyEntity companyEntity);
 
     @Mappings({
-            @Mapping(source = "bugBountyPrograms", target = "bugBountyPrograms"),
-          //  @Mapping(source = "roles", target = "roles", ignore = true), // Exclude roles
-            @Mapping(source = "userRoles", target = "userRoles", ignore = true) // Exclude userRoles
+            @Mapping(source = "bugBountyPrograms", target = "bugBountyPrograms")
     })
     CompanyResponse convertToResponse(CompanyEntity companyEntity);
 

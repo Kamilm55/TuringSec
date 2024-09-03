@@ -10,8 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class ReportsByUserDTO {
-   // private Long id;
-    private Long userId;
+    private String userId;
     private UserDTO user;
     private boolean has_hacker_profile_pic;
     //private String userImgUrl; // Add image URL field

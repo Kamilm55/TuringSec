@@ -17,7 +17,7 @@ import java.util.List;
 public class ProgramDTO {
 
     // Company entity fields
-    private Long companyId;
+    private String companyId;
     private String companyName;
 
     // Program entity fields

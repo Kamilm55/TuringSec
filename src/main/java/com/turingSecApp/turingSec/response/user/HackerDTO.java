@@ -17,7 +17,7 @@ public class HackerDTO {
     private String twitter;
     private String github;
     private String city;
-    private Long userId;
+    private String userId;
 
     private Long backgroundImageId;
     private Long imageId;

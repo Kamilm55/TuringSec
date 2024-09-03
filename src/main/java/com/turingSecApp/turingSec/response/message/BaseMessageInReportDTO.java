@@ -31,8 +31,8 @@ public class BaseMessageInReportDTO {
     @JsonProperty(value = "isHacker")
     private boolean isHacker;
 
-    private Long userId;
-    private Long companyId; // change to CompanyEntity
+    private String userId;
+    private String companyId; // change to CompanyEntity
     private Long programId;// change to Program entity
 
     // user img,bck img
