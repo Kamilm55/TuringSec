@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -126,12 +127,12 @@ public class ReportController {
         return BaseResponse.success(userReports);
     }
 
-    @GetMapping("/company/{id}")
+    @GetMapping("/company/{id}/admin")
     public BaseResponse<List<Report>> getAllReportsByCompanyId(@PathVariable String id) {
         return BaseResponse.success(bugBountyReportService.getReportsByCompanyId(id));
     }
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/user/{id}/admin")
     public BaseResponse<List<Report>> getAllReportsByUserId(@PathVariable String id) {
         return BaseResponse.success(bugBountyReportService.getReportsByUserId(id));
     }
@@ -142,8 +143,11 @@ public class ReportController {
     }
 
     @GetMapping(path = "/date-range")
-    public BaseResponse<List<Report>> getReportDateRange(@RequestParam("startDate") LocalDate createdAt,
-                                                         @RequestParam("endDate")LocalDate endDate){
+    public BaseResponse<List<Report>> getReportDateRange(
+            @RequestParam("startDate")
+            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate createdAt,
+            @RequestParam("endDate")
+            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate){
         return BaseResponse.success(bugBountyReportService.getReportByDateRange(createdAt,endDate));
     }
 

@@ -155,8 +155,8 @@ public class SecurityConfig {
                             .requestMatchers("/api/bug-bounty-reports/company").hasRole("COMPANY")
                             .requestMatchers("/api/bug-bounty-reports/{id}/company/**").hasRole("COMPANY")
 
-                            .requestMatchers("/api/bug-bounty-reports/company/{id}").hasRole("ADMIN")
-                            .requestMatchers("/api/bug-bounty-reports/user/{id}").hasRole("ADMIN")
+                            .requestMatchers("/api/bug-bounty-reports/company/{id}/admin").hasRole("ADMIN")
+                            .requestMatchers("/api/bug-bounty-reports/user/{id}/admin").hasRole("ADMIN")
                             .requestMatchers("/api/bug-bounty-reports/admin").hasRole("ADMIN")
                             .requestMatchers("/api/bug-bounty-reports/date-range").hasRole("ADMIN")
                             .requestMatchers("/api/bug-bounty-reports/{id}").authenticated()
