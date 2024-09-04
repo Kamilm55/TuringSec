@@ -14,6 +14,7 @@ public class CompanyLoginPayload {
     @Pattern(regexp = "\\S+", message = "Email cannot contain spaces")
     private String email;
 
+    @Schema(example = "companyPass")
     @NotBlank(message = "Password is required")
     private String password;
 }

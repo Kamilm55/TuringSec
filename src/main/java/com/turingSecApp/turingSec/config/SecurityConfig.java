@@ -4,6 +4,7 @@ package com.turingSecApp.turingSec.config;
 import com.turingSecApp.turingSec.exception.CustomAuthenticationEntryPoint;
 import com.turingSecApp.turingSec.filter.JwtAuthenticationFilter;
 import com.turingSecApp.turingSec.filter.JwtUtil;
+import com.turingSecApp.turingSec.model.enums.Role;
 import com.turingSecApp.turingSec.service.user.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -159,6 +160,8 @@ public class SecurityConfig {
                             .requestMatchers("/api/bug-bounty-reports/user/{id}/admin").hasRole("ADMIN")
                             .requestMatchers("/api/bug-bounty-reports/admin").hasRole("ADMIN")
                             .requestMatchers("/api/bug-bounty-reports/date-range").hasRole("ADMIN")
+                            .requestMatchers("/api/bug-bounty-reports/date-range/company").hasRole(Role.ROLE_COMPANY.getValue())
+                            .requestMatchers("/api/bug-bounty-reports/date-range/user").hasRole(Role.ROLE_HACKER.getValue())
                             .requestMatchers("/api/bug-bounty-reports/{id}").authenticated()
                             .requestMatchers("/api/bug-bounty-reports/**").authenticated()
                             ;

@@ -174,15 +174,15 @@ public class ReportService implements IReportService {
         return /*ReportMapper.INSTANCE.toDTO(savedReport)*/savedReport;
     }
 
-    @Override
+    @Override // it is for admin finding by company with id -> not for current company
     public List<Report> getReportsByCompanyId(String companyId) {
         CompanyEntity company = utilService.findCompanyById(companyId);
 
         return bugBountyReportRepository.findByBugBountyProgramCompany(company);
     }
-    @Override
+    @Override // // it is for admin finding by user with id -> not for current user
     public List<Report> getReportsByUserId(String userId) {
-        UserEntity user = utilService.findUserById(userId);
+        UserEntity user =  utilService.findUserById(userId);
 
         return bugBountyReportRepository.findByUser(user);
     }
@@ -250,13 +250,17 @@ public class ReportService implements IReportService {
     }
 
     @Override
-    public List<Report> getReportDateRangeCompanyId(Long id, LocalDate startDate, LocalDate endDate) {
-        return filterReportsByDate(getReportsByCompanyId(id), startDate, endDate);
+    public List<Report> getReportDateRangeCompanyId(LocalDate startDate, LocalDate endDate) {
+        CompanyEntity company = (CompanyEntity) userFactory.getAuthenticatedBaseUser();
+
+        return filterReportsByDate(getReportsForStatus(null,company), startDate, endDate);
     }
 
     @Override
-    public List<Report> getReportDateRangeUserId(Long userId, LocalDate startDate, LocalDate endDate) {
-        return filterReportsByDate(getReportsByUserId(userId), startDate, endDate);
+    public List<Report> getReportDateRangeUserId(LocalDate startDate, LocalDate endDate) {
+        UserEntity user = (UserEntity) userFactory.getAuthenticatedBaseUser();
+
+        return filterReportsByDate(getReportsForStatus(null,user), startDate, endDate);
     }
 
     private List<Report> filterReportsByDate(List<Report> reports, LocalDate startDate, LocalDate endDate) {
