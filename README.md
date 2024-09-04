@@ -22,8 +22,10 @@ In every request I send 2 images, one updates latest version, the other one spec
 - Spring Boot
 - Spring Security
 - Spring Data JPA
-- Docker
-- H2 db
+- Websocket(STOMP)
+- Docker -> For local development
+- AWS(ec2,rds) -> For api deploy
+- H2, Postgres
 - CI
 - Maven
 - Mapstruct
