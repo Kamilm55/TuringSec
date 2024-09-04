@@ -61,11 +61,17 @@ public class Report {
     @CreatedDate
     private LocalDate createdAt;
 
+    @OneToMany(mappedBy = "bugBountyReport", cascade = CascadeType.ALL/*,orphanRemoval = true*/)
+    private List<CollaboratorEntity> collaborators = new ArrayList<>();
+
+    private REPORTSTATUSFORUSER statusForUser;
+
+    private REPORTSTATUSFORCOMPANY statusForCompany;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private UserEntity user;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bug_bounty_program_id")
@@ -73,19 +79,6 @@ public class Report {
     private Program bugBountyProgram;
 
  //   private Double ownPercentage = 100.0; // Default own percentage is 100%
-
-    @OneToMany(mappedBy = "bugBountyReport", cascade = CascadeType.ALL/*,orphanRemoval = true*/)
-    private List<CollaboratorEntity> collaborators = new ArrayList<>();
-
-    private REPORTSTATUSFORUSER statusForUser;// hacker hissesinde all( submitted underreview (accepted | rejected) -> assessed )
-
-    private REPORTSTATUSFORCOMPANY statusForCompany;//sirket hissesinde all(unreviewed,reviewed,assessed)
-    //  User - Company
-    // user report atannan sonra  ---> submitted - unreviewed
-    // company reporta tiklasa ----> underreview - reviewed
-    // company reportu deyerlendirir --->
-    // accepted - assessed
-    // rejected - assessed
 
     @PrePersist
     public void prePersist() {

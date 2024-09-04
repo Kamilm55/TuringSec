@@ -16,8 +16,6 @@ import java.util.List;
 public class MessageInReportController {
 
 
-
-    // Socket service 116-dan baxa bilersen
     // room (Report, reportdan da mesaji) -> StringMessageInReport (entity) -> StringMessageInReportDTO
     //  TODO:
     //   3. get all Deleted mesaj yeni entity yarat deletedAt,-> getAll, getById -> ancaq Admin

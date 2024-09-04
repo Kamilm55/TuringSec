@@ -2,9 +2,11 @@ package com.turingSecApp.turingSec.service;
 
 import com.turingSecApp.turingSec.model.entities.user.BaseUser;
 import com.turingSecApp.turingSec.model.repository.BaseUserRepository;
+import com.turingSecApp.turingSec.response.BaseUserDTO;
 import com.turingSecApp.turingSec.service.interfaces.IBaseUserService;
 import com.turingSecApp.turingSec.service.user.factory.UserFactory;
 import com.turingSecApp.turingSec.util.UtilService;
+import com.turingSecApp.turingSec.util.mapper.BaseUserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,13 +21,13 @@ public class BaseUserService implements IBaseUserService {
     private final BaseUserRepository baseUserRepository;
 
     @Override
-    public BaseUser getCurrentUser() {
-        return userFactory.getAuthenticatedBaseUser();
+    public BaseUserDTO getCurrentUser() {
+        return BaseUserMapper.INSTANCE.toDTO(userFactory.getAuthenticatedBaseUser());
     }
 
     @Override
-    public BaseUser getBaseUserById(String baseUserId) {
-       return utilService.findBaseUserById(baseUserId);
+    public BaseUserDTO getBaseUserById(String baseUserId) {
+       return BaseUserMapper.INSTANCE.toDTO(utilService.findBaseUserById(baseUserId));
     }
 
     @Override

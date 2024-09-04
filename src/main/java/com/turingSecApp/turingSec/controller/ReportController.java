@@ -36,10 +36,6 @@ import java.util.List;
 @Slf4j
 public class ReportController {
 
-    // todo
-    //  DTO cevirmek
-    //  token istemeye ehtiyac yoxdu, payload hecne, dto -> BaseResponse<List<ReportDTO>> -> company id , program id , userId(hansi hackerdi) , username of user +
-
     private final IReportService bugBountyReportService;
 
     @PatchMapping("/{id}/company/review")

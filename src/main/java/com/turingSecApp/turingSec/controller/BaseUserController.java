@@ -1,6 +1,7 @@
 package com.turingSecApp.turingSec.controller;
 
 import com.turingSecApp.turingSec.model.entities.user.BaseUser;
+import com.turingSecApp.turingSec.response.BaseUserDTO;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.interfaces.IBaseUserService;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +16,12 @@ public class BaseUserController {
 
     // todo: change to base user dto
     @GetMapping("/current-user")
-    public BaseResponse<BaseUser> getCurrentUser() {
+    public BaseResponse<BaseUserDTO> getCurrentUser() {
         return BaseResponse.success(baseUserService.getCurrentUser());
     }
 
     @GetMapping("/{baseUserId}")
-    public BaseResponse<BaseUser> getUserById(@PathVariable String baseUserId) {
+    public BaseResponse<BaseUserDTO> getUserById(@PathVariable String baseUserId) {
         return BaseResponse.success(baseUserService.getBaseUserById(baseUserId));
     }
 
