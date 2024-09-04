@@ -46,5 +46,10 @@ public interface IReportService {
 
     List<ReportsByUserDTO> getReportsByCompanyProgramWithStatus(REPORTSTATUSFORCOMPANY status);
 
-    List<Report> getReportByDateRange(LocalDate startDate,LocalDate endDate);
+    List<Report> getReportDateRange(LocalDate startDate,LocalDate endDate);
+
+    List<Report> getReportDateRangeCompanyId(Long id, LocalDate startDate, LocalDate endDate);
+
+    List<Report> getReportDateRangeUserId(Long userId, LocalDate startDate, LocalDate endDate);
+
 }
