@@ -15,6 +15,6 @@ public interface ICompanyService {
     void registerCompany(RegisterCompanyPayload registerCompanyPayload);
     Map<String, String> loginCompany(@RequestBody @Valid CompanyLoginPayload companyLoginPayload);
     List<CompanyResponse> getAllCompanies();
-    CompanyResponse getCompaniesById(@PathVariable Long id);
+    CompanyResponse getCompaniesById(@PathVariable String id);
     CompanyResponse getCurrentUser();
 }

@@ -3,9 +3,11 @@ package com.turingSecApp.turingSec.filter.websocket.custom;
 import com.turingSecApp.turingSec.config.websocket.headerAccessorAdapter.StompHeaderAccessorAdapter;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.model.entities.report.Report;
+import com.turingSecApp.turingSec.model.entities.user.BaseUser;
 import com.turingSecApp.turingSec.model.repository.report.ReportRepository;
 import com.turingSecApp.turingSec.service.interfaces.ICommonMessageInReportService;
 import com.turingSecApp.turingSec.exception.websocket.exceptionHandling.SocketExceptionHandler;
+import com.turingSecApp.turingSec.service.user.factory.UserFactory;
 import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -25,6 +27,7 @@ import java.util.Map;
 @Slf4j
 public class ReportRoomInterceptor  implements ChannelInterceptor,IReportRoomInterceptor {
     private final UtilService utilService;
+    private final UserFactory userFactory;
     private final ICommonMessageInReportService commonMessageInReportService;
     private final ReportRepository reportRepository;
     private final SocketExceptionHandler socketExceptionHandler;
@@ -36,7 +39,7 @@ public class ReportRoomInterceptor  implements ChannelInterceptor,IReportRoomInt
         StompHeaderAccessorAdapter accessorAdapter = new StompHeaderAccessorAdapter(accessor);
 
         Message<?> messageFromHandler = socketExceptionHandler.executeWithExceptionHandling(() -> {
-            Object authenticatedUser = utilService.getAuthenticatedBaseUserForWebsocket();
+            BaseUser authenticatedUser = userFactory.getAuthenticatedBaseUser();
 
             // Check if the message is a SUBSCRIBE | SEND
             if (StompCommand.SUBSCRIBE.equals(accessor.getCommand()) | StompCommand.SEND.equals(accessor.getCommand())) {

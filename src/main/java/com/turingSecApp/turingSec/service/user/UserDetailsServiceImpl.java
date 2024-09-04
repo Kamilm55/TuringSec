@@ -1,15 +1,18 @@
 package com.turingSecApp.turingSec.service.user;
 
+import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
+import com.turingSecApp.turingSec.model.entities.user.BaseUser;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
-import com.turingSecApp.turingSec.model.entities.role.Role;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.AdminRepository;
+import com.turingSecApp.turingSec.model.repository.BaseUserRepository;
 import com.turingSecApp.turingSec.model.repository.CompanyRepository;
-import com.turingSecApp.turingSec.model.repository.RoleRepository;
 import com.turingSecApp.turingSec.model.repository.UserRepository;
 import com.turingSecApp.turingSec.exception.custom.CompanyNotFoundException;
+import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,46 +20,25 @@ import org.springframework.stereotype.Service;
 
 import javax.ws.rs.NotFoundException;
 import java.util.Collections;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserDetailsServiceImpl implements UserDetailsService {
-    private final UserRepository userRepository;
-    private final AdminRepository adminRepository;
-    private final CompanyRepository companyRepository;
-    private final RoleRepository roleRepository;
-
-
+    private final BaseUserRepository baseUserRepository;
+    private final UtilService utilService;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity user = userRepository.findByUsername(username).orElse(null);
-        System.out.println("(loadUserByUsername) -> username: " + username);
-        System.out.println("(loadUserByUsername) -> user: " + user);
-        if (user != null) {
-            return new CustomUserDetails(user);
-        }
+        String uuidOfBaseUserAsUsername = username;
+        log.info("Username/uuid of baseUser from jwt token: " + uuidOfBaseUserAsUsername);
 
-        AdminEntity admin = adminRepository.findByUsername(username).orElse(null);
-        if (admin != null) {
-                // Set the "ADMIN" role for the admin
-                Role adminRole = roleRepository.findByName("ADMIN");
-                if (adminRole == null) {
-                    throw new NotFoundException("Admin role not found.");
-                }
+        // todo: check error if parsing throw error  -> InvalidUUIDFormatException
+        // Use UUID(string format) as username for all entities , in jwt contains user id instead of username
+        BaseUser baseUser = baseUserRepository.findById(utilService.convertToUUID(uuidOfBaseUserAsUsername)).orElseThrow(()-> new UserNotFoundException("Base User not found with id: " + username + " ,from jwt token"));
 
-                admin.setRoles(Collections.singleton(adminRole));
+        log.info("(loadUserByUsername) -> user: " + baseUser);
 
-            return new CustomUserDetails(admin);
-        }
-
-        CompanyEntity companyEntity = companyRepository.findByEmail(username);
-        if (companyEntity != null) {
-            System.out.println("Company entity exists , Works in loadUserbyUsername");
-            return new CustomUserDetails(companyEntity);
-        }else {
-            throw new CompanyNotFoundException("Company does not found in UserDetailsServiceImpl.");
-        }
-
-
+        return new CustomUserDetails(baseUser);
     }
 }

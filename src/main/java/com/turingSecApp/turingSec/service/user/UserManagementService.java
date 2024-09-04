@@ -4,6 +4,7 @@ import com.turingSecApp.turingSec.exception.custom.BadCredentialsException;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.helper.entityHelper.user.IUserEntityHelper;
+import com.turingSecApp.turingSec.model.entities.user.BaseUser;
 import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.HackerRepository;
@@ -12,6 +13,7 @@ import com.turingSecApp.turingSec.payload.user.*;
 import com.turingSecApp.turingSec.response.user.AuthResponse;
 import com.turingSecApp.turingSec.response.user.UserHackerDTO;
 import com.turingSecApp.turingSec.service.EmailNotificationService;
+import com.turingSecApp.turingSec.service.user.factory.UserFactory;
 import com.turingSecApp.turingSec.util.GlobalConstants;
 import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.UserMapper;
@@ -28,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class UserManagementService {
 
+    private final UserFactory userFactory;
     private final UtilService utilService;
     private final UserRepository userRepository;
     private final HackerRepository hackerRepository;
@@ -36,10 +39,7 @@ public class UserManagementService {
     private final JwtUtil jwtTokenProvider;
 
     private final IUserEntityHelper userEntityHelper;
-
     private final PasswordEncoder passwordEncoder;
-
-    private final UserDetailsService userDetailsService;
 
     @Transactional
     public AuthResponse registerHacker(RegisterPayload registerPayload) {
@@ -47,15 +47,15 @@ public class UserManagementService {
         checkUserDoesNotExist(registerPayload);
 
         // Populate user entity and save as an inactive user
-        UserEntity user = populateUserAndSave(registerPayload,false);
+        UserEntity savedUser = populateUserAndSave(registerPayload,false);
 
         // Send activation email //todo: change to async event
-        sendActivationEmail(user);
+        sendActivationEmail(savedUser);
 
         // Generate token for the registered user
-        String token = generateTokenForUser(user);
+        String token = generateTokenForUser(savedUser);
 
-        return buildAuthResponse(user, token);
+        return buildAuthResponse(savedUser, token);
     }
 
     @Transactional
@@ -71,9 +71,12 @@ public class UserManagementService {
         // Create the user entity
         UserEntity user = userEntityHelper.createUserEntity(registerPayload,activated);
 
-        // todo: save in one place
+        // Static mock uuid for mock users ->  if it is mock
+        utilService.setStaticUUIDForUsers(user);
 
-        // Save the user
+        log.info("Before save: " + user);
+
+        // Save the user, in the next step for populating hacker we use stored user entity
         userRepository.save(user);
 
         // Create the hacker entity
@@ -86,10 +89,8 @@ public class UserManagementService {
         HackerEntity savedHacker = hackerRepository.save(hackerEntity);
 
         // Set hacker in user
-        userEntityHelper.setHackerInUserEntity(user,savedHacker);
+        userEntityHelper.setHackerInUserEntity(user,savedHacker);//  -> no need to save the user again for @Transactional
 
-        // Update the user
-        userRepository.save(user);
         return user;
     }
 
@@ -137,7 +138,7 @@ public class UserManagementService {
 
     public void changePassword(ChangePasswordRequest request) {
         // Retrieve authenticated user
-        UserEntity user = utilService.getAuthenticatedHackerWithHTTP();
+        UserEntity user = (UserEntity) userFactory.getAuthenticatedBaseUser();
 
         // Validate current password
         userEntityHelper.validateCurrentPassword(request, user);
@@ -146,10 +147,10 @@ public class UserManagementService {
         userEntityHelper.updatePassword(request.getNewPassword(), request.getConfirmNewPassword(), user);
     }
 
-
+    // todo: move this into base user controller
     public void changeEmail(ChangeEmailRequest request) {
         // Retrieve authenticated user
-        UserEntity user = utilService.getAuthenticatedHackerWithHTTP();
+        UserEntity user = (UserEntity) userFactory.getAuthenticatedBaseUser();
 
         // Validate current password
         userEntityHelper.validateCurrentPassword(request, user);
@@ -167,11 +168,10 @@ public class UserManagementService {
     }
 
     public UserHackerDTO updateProfile(UserUpdateRequest userUpdateRequest) {
-        UserEntity userEntity = utilService.getAuthenticatedHackerWithHTTP();
-        log.info(String.format("User with id: %s , username: %s updated info. User info before update: %s",userEntity.getId().toString(),userEntity.getUsername(),userEntity));
+        UserEntity userEntity = (UserEntity) userFactory.getAuthenticatedBaseUser();
+        log.info(String.format("User with id: %s , username: %s updated info. User info before update: %s, \n  hacker info before update: %s",userEntity.getId().toString(),userEntity.getUsername(),userEntity,userEntity.getHacker()));
 
         userEntityHelper.updateUserProfile(userEntity, userUpdateRequest);
-        userRepository.save(userEntity); // todo: save in one place
 
         HackerEntity hackerEntity = hackerRepository.findByUser(userEntity);
 
@@ -180,33 +180,11 @@ public class UserManagementService {
             hackerRepository.save(hackerEntity);
         }
 
-
         UserEntity savedUser = userRepository.save(userEntity);
 
-        log.info(String.format("User with id: %s , username: %s updated info. New user info after update: %s",savedUser.getId().toString(),savedUser.getUsername(),savedUser));
+        log.info(String.format("User with id: %s , username: %s updated info. New user info after update: %s , \n New hacker info after update: %s",savedUser.getId().toString(),savedUser.getUsername(),savedUser,savedUser.getHacker()));
 
         return UserMapper.INSTANCE.toDto(savedUser, hackerEntity);
-    }
-
-    public String generateNewToken(UserHackerDTO updatedUser) {
-        UserDetails userDetailsFromDB = userDetailsService.loadUserByUsername(updatedUser.getUsername());
-
-        // Assuming you have generated a new token here
-        return jwtTokenProvider.generateToken(userDetailsFromDB);
-    }
-
-    public void deleteUser() {
-        // Get the authenticated user's username from the security context
-        UserEntity authenticatedUser = utilService.getAuthenticatedHackerWithHTTP();
-
-        // Find the user by username
-        UserEntity user = userEntityHelper.findUserByUsername(authenticatedUser.getUsername());
-
-        // Delete the user
-        userRepository.delete(user);
-
-        // Clear the authorization header
-//        request.removeAttribute("Authorization"); // Do this (clear auth header) in client side
     }
 
 
@@ -214,8 +192,7 @@ public class UserManagementService {
     public void sendActivationEmail(UserEntity user) {
         // Generate activation token and save it to the user entity
         String activationToken = utilService.generateActivationToken();
-        user.setActivationToken(activationToken);
-        userRepository.save(user);
+        user.setActivationToken(activationToken);// no need to save user again for @transactional
 
         // Send activation email
         String activationLink = globalConstants.ROOT_LINK + "/api/auth/activate?token=" + activationToken;

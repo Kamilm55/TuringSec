@@ -30,8 +30,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = jwtTokenProvider.resolveToken(request);
 
         if (token != null && jwtTokenProvider.validateToken(token)) {
-            String username = jwtTokenProvider.getUsernameFromToken(token);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            String userIdAsUsername = jwtTokenProvider.getUserIdAsUsernameFromToken(token);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(userIdAsUsername);
 
             if (userDetails != null/* && utilService.getCurrentUserByEmailForAllRole(email).isActivated()*/) {
                 System.out.println("UserDetails of current user: " + userDetails);

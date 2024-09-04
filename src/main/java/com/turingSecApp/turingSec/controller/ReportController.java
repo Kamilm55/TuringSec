@@ -6,7 +6,6 @@ import com.turingSecApp.turingSec.model.entities.report.ReportManual;
 import com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORCOMPANY;
 import com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORUSER;
 import com.turingSecApp.turingSec.payload.report.ReportCVSSPayload;
-import com.turingSecApp.turingSec.payload.report.ReportDateRangeRequest;
 import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
 import com.turingSecApp.turingSec.response.report.ReportsByUserDTO;
 import com.turingSecApp.turingSec.response.report.ReportsByUserWithCompDTO;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -39,37 +39,6 @@ public class ReportController {
     // todo
     //  DTO cevirmek
     //  token istemeye ehtiyac yoxdu, payload hecne, dto -> BaseResponse<List<ReportDTO>> -> company id , program id , userId(hansi hackerdi) , username of user +
-
-    //1. user report atannan sonra  ---> submitted - unreviewed +
-    // POST submitManualReport-da statusu submitted - unreviewed set et +
-    // POST submitCVSS-da statusu submitted - unreviewed set et +
-
-    // hacker hissesinde all( submitted underreview (accepted | rejected) -> assessed )
-    // sirket hissesinde all(unreviewed,reviewed,assessed)
-
-    // get all reports for hacker -> var -> getAllBugBountyReportsByUser +
-    // get submitted reports for hacker
-    // get underreview reports for hacker
-    // get accepted reports for hacker
-    // get rejected reports for hacker
-    // get assessed reports for hacker -> if accepted | rejected return
-
-    // get all reports for company -> var -> getAllBugBountyReportsByCompany +
-    // get submitted reports for company
-    // get unreviewed reports for company
-    // get reviewed reports for company
-    // get assessed reports for company
-
-    // QUERY ILE ET -> EGER QUERY PARAM SEHVDISE ILLAGEAL ARGUMENT
-
-
-    //  User - Company  +
-    // user report atannan sonra  ---> submitted - unreviewed +
-    // company reporta tiklasa ----> underreview - reviewed +
-    // company reportu deyerlendirir --->
-    // accepted - assessed +
-    // rejected - assessed +
-
 
     private final IReportService bugBountyReportService;
 
@@ -98,12 +67,12 @@ public class ReportController {
     //  Purpose: Used to bind a part of a "multipart/form-data" request to a method parameter.
     //  Typical Usage: When you need to handle file uploads along with other form fields or JSON data in a multipart request.
 
-//    https://github.com/swagger-api/swagger-core/issues/3050
-//ResponseEntity<Void> doSomething(MyMultipartRequest request) {...}
+    //    https://github.com/swagger-api/swagger-core/issues/3050
+    //ResponseEntity<Void> doSomething(MyMultipartRequest request) {...}
 
-    // Handle big videos -> https://stackoverflow.com/questions/2689989/how-to-handle-maxuploadsizeexceededexception
+    // Handle big file  videos -> https://stackoverflow.com/questions/2689989/how-to-handle-maxuploadsizeexceededexception
     @PostMapping(value = "/manualReport",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public BaseResponse<ReportManual> submitManualReport(
+    public ResponseEntity<BaseResponse<ReportManual>> submitManualReport(
             @RequestPart(value = "files",required = false) @Parameter(description = "File to upload") @Schema(type = "string", format = "binary") List<MultipartFile> files,
             @RequestPart("reportPayload") @Valid ReportManualPayload reportPayload,
             @AuthenticationPrincipal UserDetails userDetails,
@@ -117,12 +86,14 @@ public class ReportController {
             throw new RuntimeException(e);
         }
 
-        return BaseResponse.success(
+        return BaseResponse.created(
                 submittedBugBountyReport,
-                "Bug bounty report submitted successfully");
+                URI.create("/api/bug-bounty-reports/" + submittedBugBountyReport.getId()),
+                "Bug bounty report submitted successfully"
+        );
     }
     @PostMapping(value = "/CVSSReport",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public BaseResponse<ReportCVSS> submitCVSSReport(
+    public ResponseEntity<BaseResponse<ReportCVSS>> submitCVSSReport(
             @RequestPart(value = "files",required = false) @Parameter(description = "File to upload") @Schema(type = "string", format = "binary") List<MultipartFile> files,
             @RequestPart("reportPayload") @Valid ReportCVSSPayload reportPayload,
             @AuthenticationPrincipal UserDetails userDetails,
@@ -133,7 +104,11 @@ public class ReportController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return BaseResponse.success(submittedBugBountyReport,"Bug bounty report submitted successfully");
+        return BaseResponse.created(
+                submittedBugBountyReport,
+                URI.create("/api/bug-bounty-reports/" + submittedBugBountyReport.getId()),
+                "Bug bounty report submitted successfully"
+        );
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<BaseResponse<Object>> deleteBugBountyReport(@PathVariable Long id) {
@@ -152,17 +127,17 @@ public class ReportController {
         return BaseResponse.success(userReports);
     }
 
-    @GetMapping("/company/{id}")
-    public BaseResponse<List<Report>> getAllReportsByCompanyId(@PathVariable Long id) {
+    @GetMapping("/company/{id}/admin")
+    public BaseResponse<List<Report>> getAllReportsByCompanyId(@PathVariable String id) {
         return BaseResponse.success(bugBountyReportService.getReportsByCompanyId(id));
     }
 
-    @GetMapping("/user/{id}")
-    public BaseResponse<List<Report>> getAllReportsByUserId(@PathVariable Long id) {
+    @GetMapping("/user/{id}/admin")
+    public BaseResponse<List<Report>> getAllReportsByUserId(@PathVariable String id) {
         return BaseResponse.success(bugBountyReportService.getReportsByUserId(id));
     }
 
-    @GetMapping
+    @GetMapping("/admin")
     public BaseResponse<List<Report>> getAllReport(){
         return BaseResponse.success(bugBountyReportService.getAllReports());
     }
@@ -185,6 +160,7 @@ public class ReportController {
                                                          @RequestParam("startDate") LocalDate startDate,
                                                          @RequestParam("endDate")LocalDate endDate){
         return BaseResponse.success(bugBountyReportService.getReportDateRangeUserId(userId,startDate,endDate));
+
     }
 
 

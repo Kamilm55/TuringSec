@@ -3,6 +3,7 @@ package com.turingSecApp.turingSec.service.websocket.messageInReport;
 import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.model.entities.message.StringMessageInReport;
 import com.turingSecApp.turingSec.model.entities.report.Report;
+import com.turingSecApp.turingSec.model.entities.user.BaseUser;
 import com.turingSecApp.turingSec.model.repository.CompanyRepository;
 import com.turingSecApp.turingSec.model.repository.UserRepository;
 import com.turingSecApp.turingSec.model.repository.report.ReportRepository;
@@ -10,6 +11,7 @@ import com.turingSecApp.turingSec.model.repository.reportMessage.StringMessageIn
 import com.turingSecApp.turingSec.response.message.StringMessageInReportDTO;
 import com.turingSecApp.turingSec.service.interfaces.IMessageInReportService;
 import com.turingSecApp.turingSec.helper.entityHelper.messageInReport.IMessageInReportEntityHelper;
+import com.turingSecApp.turingSec.service.user.factory.UserFactory;
 import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.StringMessageInReportMapper;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MessageInReportService implements IMessageInReportService {
 
+    private final UserFactory userFactory;
     private final ReportRepository reportRepository;
     private final StringMessageInReportRepository stringMessageInReportRepository;
     private final UtilService utilService;
@@ -41,11 +44,11 @@ public class MessageInReportService implements IMessageInReportService {
                 .orElseThrow(() -> new ResourceNotFoundException("Report not found with room: " + room));
 
         // Is it user or company if authorized
-        Object authenticatedUser = utilService.getAuthenticatedBaseUser();
-        log.info("User/Company info: " + authenticatedUser);
+        BaseUser authenticatedBaseUser = userFactory.getAuthenticatedBaseUser();
+        log.info("User/Company info: " + authenticatedBaseUser);
 
         // Validate the hacker/company and set Hacker
-        commonMessageInReportService.checkUserOrCompanyReport(authenticatedUser, report.getId());
+        commonMessageInReportService.checkUserOrCompanyReport(authenticatedBaseUser, report.getId());
 
         List<StringMessageInReport> messages = stringMessageInReportRepository.findByReport_Id(report.getId());
 
@@ -62,11 +65,11 @@ public class MessageInReportService implements IMessageInReportService {
         Report report = message.getReport();
 
         // Is it user or company if authorized
-        Object authenticatedUser = utilService.getAuthenticatedBaseUser();
-        log.info("User/Company info: " + authenticatedUser);
+        Object authenticatedBaseUser = userFactory.getAuthenticatedBaseUser();;
+        log.info("User/Company info: " + authenticatedBaseUser);
 
         // Validate the hacker/company and set Hacker
-        commonMessageInReportService.checkUserOrCompanyReport(authenticatedUser, report.getId());
+        commonMessageInReportService.checkUserOrCompanyReport(authenticatedBaseUser, report.getId());
 
         return commonMessageInReportService.toStringMessageInReportDTO(message);
     }

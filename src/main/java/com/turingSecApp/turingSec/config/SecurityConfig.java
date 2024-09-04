@@ -69,12 +69,22 @@ public class SecurityConfig {
                         exception.authenticationEntryPoint(authenticationEntryPoint())
                 )
                 .authorizeHttpRequests(request -> {
+
+                    // Spring Security evaluates matchers in the order they are defined,
+                    // whichever matcher appears first will take precedence.
+                    // Therefore, if the authenticated() matcher comes first, the permitAll() matcher for specific paths will be ignored
+
+                    // More specific path -> to general path (order of security config)
+
+                    // Spring Security uses Ant-style path matching, where "/api/base-users/{baseUserId}" is treated as a pattern with a placeholder ({baseUserId}), often matching any single segment within that path (e.g., /api/base-users/123).
+                    // The pattern "/api/base-users/current-user" is a specific literal match. It matches exactly and only /api/base-users/current-user
+
                     request.requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll();
 
                     // CSRF controller
                     request.requestMatchers("/api/csrf/**").authenticated();
 
-                    // Socket //todo
+                    // Socket
                     request.requestMatchers("/ws/**").permitAll();
 
                     // Media controller
@@ -91,6 +101,15 @@ public class SecurityConfig {
                             .requestMatchers("/api/bug-bounty-programs").hasRole("COMPANY")
                             .requestMatchers(HttpMethod.DELETE,"/api/bug-bounty-programs/**").hasRole("COMPANY")
                             .requestMatchers("/api/bug-bounty-programs/**").permitAll();
+
+
+                    // Base User Controller
+                    request
+                            .requestMatchers("/api/base-users/current-user").authenticated()
+                            .requestMatchers("/api/base-users/{baseUserId}").permitAll()
+                            .requestMatchers("/api/base-users/**").authenticated()
+                    ;
+
 
                     // User Controller
                     request
@@ -136,11 +155,11 @@ public class SecurityConfig {
                             .requestMatchers("/api/bug-bounty-reports/company").hasRole("COMPANY")
                             .requestMatchers("/api/bug-bounty-reports/{id}/company/**").hasRole("COMPANY")
 
-                            .requestMatchers("/api/bug-bounty-reports/company/{id}").hasRole("ADMIN")
-                            .requestMatchers("/api/bug-bounty-reports/user/{id}").hasRole("ADMIN")
-                            .requestMatchers("/api/bug-bounty-reports").hasRole("ADMIN")
+                            .requestMatchers("/api/bug-bounty-reports/company/{id}/admin").hasRole("ADMIN")
+                            .requestMatchers("/api/bug-bounty-reports/user/{id}/admin").hasRole("ADMIN")
+                            .requestMatchers("/api/bug-bounty-reports/admin").hasRole("ADMIN")
                             .requestMatchers("/api/bug-bounty-reports/date-range").hasRole("ADMIN")
-                            .requestMatchers("/api/bug-bounty-reports/{id}").hasRole("HACKER")
+                            .requestMatchers("/api/bug-bounty-reports/{id}").authenticated()
                             .requestMatchers("/api/bug-bounty-reports/**").authenticated()
                             ;
 

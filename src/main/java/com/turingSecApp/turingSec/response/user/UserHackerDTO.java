@@ -21,7 +21,7 @@ public class UserHackerDTO {
     private String github;
     private String city;
 
-    private Long userId;
+    private String userId;
     private Long hackerId;
 
 }

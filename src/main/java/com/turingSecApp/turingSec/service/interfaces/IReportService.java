@@ -30,9 +30,9 @@ public interface IReportService {
     ReportCVSS submitCVSSReport(List<MultipartFile> files, UserDetails userDetails,ReportCVSSPayload reportPayload, Long bugBountyProgramId) throws IOException;
 
     //
-    List<Report> getReportsByCompanyId(Long companyId);
+    List<Report> getReportsByCompanyId(String companyId);
 
-    List<Report> getReportsByUserId(Long userId);
+    List<Report> getReportsByUserId(String userId);
 
     List<Report> getAllReports();
 
@@ -51,4 +51,5 @@ public interface IReportService {
     List<Report> getReportDateRangeCompanyId(Long id, LocalDate startDate, LocalDate endDate);
 
     List<Report> getReportDateRangeUserId(Long userId, LocalDate startDate, LocalDate endDate);
+
 }

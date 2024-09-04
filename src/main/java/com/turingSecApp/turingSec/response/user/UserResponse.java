@@ -1,6 +1,7 @@
 package com.turingSecApp.turingSec.response.user;
 
-import com.turingSecApp.turingSec.model.entities.role.Role;
+
+import com.turingSecApp.turingSec.model.enums.Role;
 
 import java.util.Set;
 

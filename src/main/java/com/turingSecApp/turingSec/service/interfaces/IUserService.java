@@ -16,14 +16,12 @@ public interface IUserService {
     void changePassword(ChangePasswordRequest request);
     void changeEmail(ChangeEmailRequest request);
     UserHackerDTO updateProfile(UserUpdateRequest userUpdateRequest);
-    UserDTO getUserById(Long userId);
+    UserDTO getUserById(String userId);
     UserDTO getCurrentUser();
     List<UserHackerDTO> getAllActiveUsers();
-    void deleteUser();
 
     // Programs for users
     List<ProgramDTO> getAllBugBountyPrograms();
     ProgramDTO getBugBountyProgramById(Long id);
 
-    String generateNewToken(UserHackerDTO updateProfile);
 }

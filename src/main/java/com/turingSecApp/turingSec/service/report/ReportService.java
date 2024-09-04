@@ -4,6 +4,7 @@ import com.turingSecApp.turingSec.exception.custom.ReportNotFoundException;
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORCOMPANY;
 import com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORUSER;
+import com.turingSecApp.turingSec.model.entities.user.BaseUser;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.report.ReportCVSS;
 import com.turingSecApp.turingSec.model.entities.report.Report;
@@ -26,6 +27,7 @@ import com.turingSecApp.turingSec.response.report.ReportsByUserWithCompDTO;
 import com.turingSecApp.turingSec.response.user.UserDTO;
 import com.turingSecApp.turingSec.service.interfaces.IReportService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
+import com.turingSecApp.turingSec.service.user.factory.UserFactory;
 import com.turingSecApp.turingSec.util.GlobalConstants;
 import com.turingSecApp.turingSec.util.ReportUtilService;
 import com.turingSecApp.turingSec.util.UtilService;
@@ -52,6 +54,7 @@ import static com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATU
 @RequiredArgsConstructor
 @Slf4j
 public class ReportService implements IReportService {
+    private final UserFactory userFactory;
     private final ReportRepository bugBountyReportRepository;
     private final ReportManualRepository reportManualRepository;
     private final ReportCVSSRepository reportCVSSRepository;
@@ -79,7 +82,7 @@ public class ReportService implements IReportService {
         ReportManual report = reportEntityHelper.createReportManualFromPayload(reportPayload);
 
         // Set the user for the bug bounty report
-        setAuthenticatedUserToReport(1L, report);
+        setAuthenticatedUserToReport("191ded5d-148b-446d-8069-e8a8bd8c7ec7"/*mock uuid for "Username"*/, report);
 
         // Set room explicitly
         report.setRoom("191ded5d-148b-446d-8069-e8a8bd8c7ec6");
@@ -98,7 +101,7 @@ public class ReportService implements IReportService {
     @Override
     public ReportManual submitManualReport(List<MultipartFile> files, UserDetails userDetails, ReportManualPayload reportPayload, Long bugBountyProgramId) throws IOException {
         // Check the authenticated hacker
-        UserEntity authenticatedUser = utilService.getAuthenticatedHackerWithHTTP();
+        UserEntity authenticatedUser = (UserEntity) userFactory.getAuthenticatedBaseUser();
 
         // Fetch the BugBountyProgramEntity from the repository
         Program program = programRepository.findById(bugBountyProgramId)
@@ -107,7 +110,6 @@ public class ReportService implements IReportService {
         // Create a new report entity -> for basic type fields or embeddable
         ReportManual report = reportEntityHelper.createReportManualFromPayload(reportPayload);
 
-        // refactorThis: Set related entities (user and program)
         // Set the user for the bug bounty report
         setAuthenticatedUserToReport(authenticatedUser.getId(), report);
 
@@ -116,7 +118,7 @@ public class ReportService implements IReportService {
         Report savedReport1 = reportManualRepository.save(report);
 
         // Set Attachments
-        setAttachmentsToReportIfFilesExist(files, userDetails, savedReport1);
+        setAttachmentsToReportIfFilesExist(files, savedReport1);
         ///
         // Set child reference type fields with the relation
         ReportManual savedReport = (ReportManual) reportEntityHelper.setChildReferenceFieldsFromPayload(reportPayload,savedReport1);
@@ -125,27 +127,29 @@ public class ReportService implements IReportService {
 
     }
 
-    private void setAttachmentsToReportIfFilesExist(List<MultipartFile> files, UserDetails userDetails, Report report) throws IOException {
-        Long hackerId = utilService.validateHacker(userDetails);
-        //todo: check report belongs to this user?
+    private void setAttachmentsToReportIfFilesExist(List<MultipartFile> files, Report report) throws IOException {
+        log.info("Files: " + files);
 
         // Call the service method to save the video
         if (files!=null){
-            if(!files.isEmpty())
+            if(!files.isEmpty()){
                 reportMediaService.saveFiles(files, report.getId());
+            }
+            else {
+                log.info("Files are empty");
+            }
         }
     }
 
-    private void setAuthenticatedUserToReport(Long authenticatedUserID, Report report) {
-        UserEntity userFromDB = userRepository.findById(authenticatedUserID)
-                .orElseThrow(() -> new UserNotFoundException("User with id " + authenticatedUserID + " not found"));
+    private void setAuthenticatedUserToReport(String authenticatedUserID, Report report) {
+        UserEntity userFromDB = utilService.findUserById(authenticatedUserID);
         report.setUser(userFromDB);
     }
 
     @Override
     public ReportCVSS submitCVSSReport(List<MultipartFile> files, UserDetails userDetails,ReportCVSSPayload reportPayload, Long bugBountyProgramId) throws IOException {
         // Check the authenticated hacker
-        UserEntity authenticatedUser = utilService.getAuthenticatedHackerWithHTTP();
+        UserEntity authenticatedUser = (UserEntity) userFactory.getAuthenticatedBaseUser();
 
         // Fetch the BugBountyProgramEntity from the repository
         Program program = programRepository.findById(bugBountyProgramId)
@@ -153,8 +157,6 @@ public class ReportService implements IReportService {
 
         // Create a new report entity -> for basic type fields or embeddable
         ReportCVSS report = reportEntityHelper.createReportCVSSFromPayload(reportPayload);
-
-        // refactorThis: Set related entities (user and program)
 
         // Set the user for the bug bounty report
         setAuthenticatedUserToReport(authenticatedUser.getId(), report);
@@ -164,7 +166,7 @@ public class ReportService implements IReportService {
         Report savedReport1 = reportCVSSRepository.save(report);
 
         // Set Attachments
-        setAttachmentsToReportIfFilesExist(files, userDetails, savedReport1);
+        setAttachmentsToReportIfFilesExist(files, savedReport1);
         ///
         // Set child reference type fields with the relation
         ReportCVSS savedReport = (ReportCVSS) reportEntityHelper.setChildReferenceFieldsFromPayload(reportPayload,savedReport1);
@@ -173,36 +175,19 @@ public class ReportService implements IReportService {
     }
 
     @Override
-    public List<Report> getReportsByCompanyId(Long companyId) {
-        CompanyEntity company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new ResourceNotFoundException("Company not found with id:" + companyId));
+    public List<Report> getReportsByCompanyId(String companyId) {
+        CompanyEntity company = utilService.findCompanyById(companyId);
 
-        List<Report> reports = bugBountyReportRepository.findByBugBountyProgramCompany(company);
-
-        // Throw exception if it is empty
-        checkEmpty(companyId, reports);
-
-        return reports;
+        return bugBountyReportRepository.findByBugBountyProgramCompany(company);
     }
     @Override
-    public List<Report> getReportsByUserId(Long userId) {
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id:" + userId));
+    public List<Report> getReportsByUserId(String userId) {
+        UserEntity user = utilService.findUserById(userId);
 
-        List<Report> reports = bugBountyReportRepository.findByUser(user);
-
-        // Throw exception if it is empty
-        checkEmpty(userId, reports);
-
-        return reports;
+        return bugBountyReportRepository.findByUser(user);
     }
     public List<Report> getAllReports() {
-        List<Report> all = bugBountyReportRepository.findAll();
-
-        // Throw exception if it is empty
-        checkEmpty(all);
-
-        return all;
+       return bugBountyReportRepository.findAll();
     }
     @Override
     public Report reviewReportByCompany(Long id) {
@@ -223,7 +208,7 @@ public class ReportService implements IReportService {
         Report report = getBugBountyReportById(id);
 
         // Check report belongs to this company
-        CompanyEntity authenticatedCompany = utilService.getAuthenticatedCompanyWithHTTP();
+        CompanyEntity authenticatedCompany = (CompanyEntity) userFactory.getAuthenticatedBaseUser();
         reportUtilService.checkUserOrCompanyReport(authenticatedCompany, report.getId());
 
         report.setStatusForCompany(companyStatus);
@@ -236,7 +221,7 @@ public class ReportService implements IReportService {
         log.info("Provided status parameter: " + status);
 
         // Retrieve the authenticated user
-        UserEntity user = utilService.getAuthenticatedHackerWithHTTP();
+        UserEntity user = (UserEntity) userFactory.getAuthenticatedBaseUser();
 
         // Retrieve all reports for the user if no status is provided or filtered reports for user
         List<Report> userReports = getReportsForStatus(status, user);
@@ -250,7 +235,7 @@ public class ReportService implements IReportService {
         log.info("Provided status parameter: " + status);
 
         // Retrieve the authenticated company
-        CompanyEntity company = utilService.getAuthenticatedCompanyWithHTTP();
+        CompanyEntity company = (CompanyEntity) userFactory.getAuthenticatedBaseUser();
 
         // Retrieve all reports for the user if no status is provided or filtered reports for user
         List<Report> userReports = getReportsForStatus(status, company);
@@ -258,8 +243,8 @@ public class ReportService implements IReportService {
         // Group reports by user, fetch image URLs, and create DTOs
         return createReportsByUserDTOList(groupReportsByUser(userReports), fetchUserImgUrls(groupReportsByUser(userReports)));
     }
-
-    @Override
+  
+    @Override // For admin -> it returns all report by any hackers or company
     public List<Report> getReportDateRange(LocalDate startDate, LocalDate endDate) {
         return filterReportsByDate(getAllReports(), startDate, endDate);
     }
@@ -342,17 +327,6 @@ public class ReportService implements IReportService {
         }
     }
 
-
-    private void checkEmpty(Long userId, List<Report> reports) {
-        if (reports.isEmpty()) {
-            throw new ReportNotFoundException("There is no report with user/company id: " + userId);
-        }
-    }
-    private void checkEmpty(List<Report> reports) {
-        if (reports.isEmpty()) {
-            throw new ReportNotFoundException("There is no report");
-        }
-    }
     @Override
     @Transactional
     public void deleteBugBountyReport(Long id) {
@@ -360,7 +334,7 @@ public class ReportService implements IReportService {
         Report report = bugBountyReportRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Report not found with id:" + id));
 
         //  Check report ownership
-        Object authenticatedBaseUser = utilService.getAuthenticatedBaseUser();
+        BaseUser authenticatedBaseUser = userFactory.getAuthenticatedBaseUser();
         reportUtilService.checkUserOrCompanyReport(authenticatedBaseUser, report.getId());
 
         // Find related program then remove from list<ReportEntity>, then you can delete

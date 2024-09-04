@@ -18,7 +18,7 @@ public interface IUserEntityHelper {
 
     UserEntity findUserByUsername(String usernameOrEmail);
 
-    UserEntity findUserById(Long id);
+    UserEntity findUserById(String id);
 
     HackerEntity findHackerByUser(UserEntity userById);
 

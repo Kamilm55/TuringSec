@@ -7,6 +7,7 @@ import com.turingSecApp.turingSec.response.program.ProgramDTO;
 import com.turingSecApp.turingSec.response.user.UserDTO;
 import com.turingSecApp.turingSec.response.user.UserHackerDTO;
 import com.turingSecApp.turingSec.service.program.ProgramService;
+import com.turingSecApp.turingSec.service.user.factory.UserFactory;
 import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 public class UserRetrievalService {
 
     private final UserRepository userRepository;
+    private final UserFactory userFactory;
 
     private final IUserEntityHelper userEntityHelper;
     private final UtilService utilService;
@@ -41,13 +43,14 @@ public class UserRetrievalService {
         return false;
     }
 
-    public UserDTO getUserById(Long userId) {
+    public UserDTO getUserById(String userId) {
         UserEntity user = userEntityHelper.findUserById(userId);
         return UserMapper.INSTANCE.convert(user);
     }
 
     public UserDTO getCurrentUser() {
-        return UserMapper.INSTANCE.convert(utilService.getAuthenticatedHackerWithHTTP());
+        UserEntity authenticatedUser = (UserEntity) userFactory.getAuthenticatedBaseUser();
+        return UserMapper.INSTANCE.convert(authenticatedUser);
     }
 
     public List<UserHackerDTO> getAllActiveUsers() {

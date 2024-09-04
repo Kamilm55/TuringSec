@@ -3,6 +3,7 @@ package com.turingSecApp.turingSec.file_upload.controller;
 import com.turingSecApp.turingSec.file_upload.entity.BackgroundImageForHacker;
 import com.turingSecApp.turingSec.file_upload.response.FileResponse;
 import com.turingSecApp.turingSec.file_upload.service.BackgroundImageForHackerService;
+import com.turingSecApp.turingSec.util.MediaUtilService;
 import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,11 +21,11 @@ import java.io.IOException;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class BackgroundImageForHackerController {
     private final BackgroundImageForHackerService fileService;
-    private final UtilService utilService;
+    private final MediaUtilService mediaUtilService;
 
     @PostMapping("/upload")
     public FileResponse uploadVideo(@RequestParam("file") MultipartFile file, @AuthenticationPrincipal UserDetails userDetails) throws IOException {
-        Long hackerId = utilService.validateHacker(userDetails);
+        Long hackerId = mediaUtilService.validateHacker(userDetails);
 
         // Call the service method to save the video
         return fileService.saveVideoOrImg(file, hackerId);

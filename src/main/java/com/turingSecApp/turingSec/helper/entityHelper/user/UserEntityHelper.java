@@ -4,9 +4,10 @@ package com.turingSecApp.turingSec.helper.entityHelper.user;
 import com.turingSecApp.turingSec.exception.custom.BadCredentialsException;
 import com.turingSecApp.turingSec.exception.custom.EmailAlreadyExistsException;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
-import com.turingSecApp.turingSec.model.entities.role.Role;
+import com.turingSecApp.turingSec.model.entities.user.BaseUser;
 import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
+import com.turingSecApp.turingSec.model.repository.BaseUserRepository;
 import com.turingSecApp.turingSec.model.repository.HackerRepository;
 import com.turingSecApp.turingSec.model.repository.UserRepository;
 import com.turingSecApp.turingSec.payload.user.ChangeEmailRequest;
@@ -18,12 +19,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
+import java.util.Collections;
+
+import static com.turingSecApp.turingSec.model.enums.Role.ROLE_HACKER;
 
 @Service
 @RequiredArgsConstructor
 public class UserEntityHelper implements IUserEntityHelper{
 
+    private final BaseUserRepository baseUserRepository;
     private final UtilService utilService;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
@@ -46,8 +50,7 @@ public class UserEntityHelper implements IUserEntityHelper{
         }
 
         // Set user roles
-        Set<Role> roles = utilService.getHackerRoles();
-        user.setRoles(roles);
+        user.setRoles(Collections.singleton(ROLE_HACKER));
 
        return user;
     }
@@ -77,9 +80,8 @@ public class UserEntityHelper implements IUserEntityHelper{
     }
 
     @Override
-    public UserEntity findUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(()-> new UserNotFoundException("User not found with this id: " + userId));
-
+    public UserEntity findUserById(String userId) {
+        return userRepository.findById(utilService.convertToUUID(userId)).orElseThrow(()-> new UserNotFoundException("User not found with this id: " + userId));
     }
 
     @Override
@@ -115,7 +117,7 @@ public class UserEntityHelper implements IUserEntityHelper{
 
     @Override
     public void checkIfEmailExists(String newEmail) {
-        if (userRepository.findByEmail(newEmail) != null) {
+        if (baseUserRepository.findByEmail(newEmail) != null) {
             throw new EmailAlreadyExistsException("Email " + newEmail + " is already in use");
         }
     }

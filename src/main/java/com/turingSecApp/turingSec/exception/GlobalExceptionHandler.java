@@ -4,6 +4,8 @@ import com.turingSecApp.turingSec.exception.custom.*;
 import com.turingSecApp.turingSec.response.base.ExceptionResponseMessages;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -12,16 +14,27 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 @ControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final Environment environment;
+
+    // Helper method to print stack trace if 'dev' profile is active
+    private void printStackTraceIfDevProfileActive(Exception ex) {
+        if (Arrays.asList(environment.getActiveProfiles()).contains("dev")) {
+            ex.printStackTrace();
+        }
+    }
     // User Controller
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<ExceptionResponseMessages> handleUserAlreadyExistsException(UserAlreadyExistsException ex) {
-
+        printStackTraceIfDevProfileActive(ex);
         return new ResponseEntity<>(
                 new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.CONFLICT) ,
                 HttpStatus.CONFLICT
@@ -31,7 +44,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserMustBeSameWithReportUserException.class)
     public ResponseEntity<ExceptionResponseMessages> handleUserMustBeSameWithReportUserException(UserMustBeSameWithReportUserException ex) {
-
+        printStackTraceIfDevProfileActive(ex);
         return new ResponseEntity<>(
                 new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.CONFLICT) ,
                 HttpStatus.CONFLICT
@@ -41,7 +54,7 @@ public class GlobalExceptionHandler {
     //org.springframework.mail.MailSendException
     @ExceptionHandler(org.springframework.mail.MailSendException.class)
     public ResponseEntity<ExceptionResponseMessages> handleMailSendException(org.springframework.mail.MailSendException ex) {
-
+        printStackTraceIfDevProfileActive(ex);
         return new ResponseEntity<>(
                 new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.BAD_REQUEST) ,
                 HttpStatus.BAD_REQUEST
@@ -51,6 +64,16 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidTokenException.class)
     public ResponseEntity<ExceptionResponseMessages> handleInvalidTokenException(InvalidTokenException ex) {
+        printStackTraceIfDevProfileActive(ex);
+        return new ResponseEntity<>(
+                new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.BAD_REQUEST) ,
+                HttpStatus.BAD_REQUEST
+        );
+    }
+    @ExceptionHandler(InvalidUUIDFormatException.class)
+    public ResponseEntity<ExceptionResponseMessages> handleInvalidUUIDFormatException(InvalidUUIDFormatException ex) {
+        printStackTraceIfDevProfileActive(ex);
+
         return new ResponseEntity<>(
                 new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.BAD_REQUEST) ,
                 HttpStatus.BAD_REQUEST
@@ -59,24 +82,26 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<ExceptionResponseMessages> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex) {
+        printStackTraceIfDevProfileActive(ex);
         return new ResponseEntity<>(
                 new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.BAD_REQUEST) ,
                 HttpStatus.BAD_REQUEST
         );
     }
-    //TODO
 
     @ExceptionHandler(PermissionDeniedException.class)
     public ResponseEntity<ExceptionResponseMessages> handleEPermissionDeniedException(PermissionDeniedException ex) {
+        printStackTraceIfDevProfileActive(ex);
         return new ResponseEntity<>(
                 new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.FORBIDDEN) ,
                 HttpStatus.FORBIDDEN
         );
     }
 
-    // todo: remove this, from security layer of spring is enough
+    //  this is not from security layer of spring, it ios custom bad credentials
     @ExceptionHandler(com.turingSecApp.turingSec.exception.custom.BadCredentialsException.class)
     public ResponseEntity<ExceptionResponseMessages> handleBadCredentials(com.turingSecApp.turingSec.exception.custom.BadCredentialsException ex) {
+        printStackTraceIfDevProfileActive(ex);
         return new ResponseEntity<>(
                 new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.UNAUTHORIZED) ,
                 HttpStatus.UNAUTHORIZED
@@ -84,15 +109,16 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
     public ResponseEntity<ExceptionResponseMessages> handleBadCredentials(org.springframework.security.authentication.BadCredentialsException ex) {
+        printStackTraceIfDevProfileActive(ex);
         return new ResponseEntity<>(
                 new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.UNAUTHORIZED) ,
                 HttpStatus.UNAUTHORIZED
         );
     }
 
-
     @ExceptionHandler(UserNotActivatedException.class)
     public ResponseEntity<ExceptionResponseMessages> handleUserNotActivatedException(UserNotActivatedException ex) {
+        printStackTraceIfDevProfileActive(ex);
         return new ResponseEntity<>(
                 new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.CONFLICT) ,
                 HttpStatus.CONFLICT
@@ -100,6 +126,7 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(CollaboratorException.class)
     public ResponseEntity<ExceptionResponseMessages> handleCollaboratorException(CollaboratorException ex) {
+        printStackTraceIfDevProfileActive(ex);
         return new ResponseEntity<>(
                 new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.CONFLICT) ,
                 HttpStatus.CONFLICT
@@ -109,6 +136,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ExceptionResponseMessages> handleUserNotFoundException(UserNotFoundException ex) {
+        printStackTraceIfDevProfileActive(ex);
         return new ResponseEntity<>(
                 new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.NOT_FOUND) ,
                 HttpStatus.NOT_FOUND
@@ -117,6 +145,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ExceptionResponseMessages> handleUnauthorizedException(UnauthorizedException ex) {
+        printStackTraceIfDevProfileActive(ex);
         return new ResponseEntity<>(
                 new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.UNAUTHORIZED) ,
                 HttpStatus.UNAUTHORIZED
@@ -133,6 +162,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ReportNotFoundException.class)
     public ResponseEntity<ExceptionResponseMessages> handleReportNotFoundException(ReportNotFoundException ex) {
+        printStackTraceIfDevProfileActive(ex);
         return new ResponseEntity<>(
                 new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.NOT_FOUND) ,
                 HttpStatus.NOT_FOUND
@@ -140,6 +170,7 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ExceptionResponseMessages> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        printStackTraceIfDevProfileActive(ex);
         return new ResponseEntity<>(
                 new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.NOT_FOUND) ,
                 HttpStatus.NOT_FOUND
@@ -148,6 +179,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(FileNotFoundException.class)
     public ResponseEntity<ExceptionResponseMessages> handleFileNotFndException(FileNotFoundException ex) {
+        printStackTraceIfDevProfileActive(ex);
         return new ResponseEntity<>(
                 new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.NOT_FOUND) ,
                 HttpStatus.NOT_FOUND
@@ -156,7 +188,8 @@ public class GlobalExceptionHandler {
     // BackgroundImageForHackerController
     @ExceptionHandler(com.turingSecApp.turingSec.file_upload.exception.FileNotFoundException.class)
     public ResponseEntity<ExceptionResponseMessages> handleFileNotFoundException(com.turingSecApp.turingSec.file_upload.exception.FileNotFoundException ex) {
-         return new ResponseEntity<>(
+        printStackTraceIfDevProfileActive(ex);
+        return new ResponseEntity<>(
                 new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.NOT_FOUND) ,
                 HttpStatus.NOT_FOUND
         );
@@ -165,6 +198,7 @@ public class GlobalExceptionHandler {
     // Company Controller
     @ExceptionHandler(CompanyNotFoundException.class)
     public ResponseEntity<ExceptionResponseMessages> handleCompanyNotFoundException(CompanyNotFoundException ex) {
+        printStackTraceIfDevProfileActive(ex);
         return new ResponseEntity<>(
                 new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.NOT_FOUND) ,
                 HttpStatus.NOT_FOUND
@@ -178,6 +212,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public ResponseEntity<?> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+        printStackTraceIfDevProfileActive(ex);
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
@@ -193,6 +228,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public ResponseEntity<?> handleConstraintViolationException(ConstraintViolationException ex) {
+        printStackTraceIfDevProfileActive(ex);
         Set<ConstraintViolation<?>> violations = ex.getConstraintViolations();
         Map<String, String> errors = new HashMap<>();
         for (ConstraintViolation<?> violation : violations) {
@@ -205,9 +241,8 @@ public class GlobalExceptionHandler {
     // For unhandled exceptions:
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ExceptionResponseMessages> generalExceptionHandler(Exception ex){
+        printStackTraceIfDevProfileActive(ex);
         System.out.println("For unhandled exceptions");
-        System.out.println(ex.getClass());
-        ex.printStackTrace();
         return new ResponseEntity<>(
                 new ExceptionResponseMessages(ex.getClass().getName(), ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR) ,
                 HttpStatus.INTERNAL_SERVER_ERROR

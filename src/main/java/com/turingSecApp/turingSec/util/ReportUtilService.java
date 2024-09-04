@@ -1,6 +1,7 @@
 package com.turingSecApp.turingSec.util;
 
 import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
+import com.turingSecApp.turingSec.model.entities.user.BaseUser;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Component;
 public class ReportUtilService {
     private final UtilService utilService;
 
-    public void checkUserOrCompanyReport(Object authenticatedUser, Long reportId) {
+    public void checkUserOrCompanyReport(BaseUser authenticatedUser, Long reportId) {
         if (authenticatedUser instanceof UserEntity) {
             log.info("It is User Entity");
             utilService.checkUserReport(authenticatedUser, reportId);
