@@ -10,47 +10,90 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout the code from the repository
       - name: Checkout Repository
         uses: actions/checkout@v2.5.0
 
+      # Set up JDK 20 environment
       - name: Set up JDK 20
         uses: actions/setup-java@v2
         with:
           java-version: 20
           distribution: 'adopt'
 
+      # Build the Spring Boot project using Maven
       - name: Build
         run: |
           chmod +x mvnw
           ./mvnw clean install
 
+      # Display build artifacts
       - name: Print Build Artifact Contents
         run: |
           ls -R ./target
 
+      # Get the short commit ID for tagging the Docker image
       - name: Get Commit ID
         id: commit_id
-        run: echo "::set-output name=commit_id::$(git rev-parse --short HEAD)"
+        run: echo "commit_id=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
-      - name: login to docker hub
+      # Login to Docker Hub using credentials stored in GitHub Secrets
+      - name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
-            username: ${{ secrets.DOCKER_USERNAME }}
-            password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: push the docker image to docker hub
+      # Build and push the Docker image to Docker Hub
+      - name: Build and Push Docker Image
         uses: docker/build-push-action@v4
         with:
-             context: .
-             dockerfile: Dockerfile
-             push: true
-             tags: |
-                docker.io/kamil571/turingsec_spring_boot:latest
-                docker.io/kamil571/turingsec_spring_boot:${{ steps.commit_id.outputs.commit_id }}
-#      - name: Build & Push Docker image
-#        uses: docker/build-push-action@v2
-#        with:
-#          push: true
-#          tags: |
-#            docker.io/kamil571/e-commerce_spring_boot_app:latest
-#            docker.io/kamil571/e-commerce_spring_boot_app:${{ steps.commit_id.outputs.commit_id }}
+          context: .
+          dockerfile: Dockerfile
+          push: true
+          tags: |
+            docker.io/kamil571/turingsec_spring_boot:latest
+            docker.io/kamil571/turingsec_spring_boot:${{ env.commit_id }}
+
+      # Drop all tables in AWS RDS PostgreSQL
+      - name: Drop All Tables in AWS RDS
+        run: |
+          psql -h ${{ secrets.RDS_HOST }} -U ${{ secrets.RDS_USER }} -d ${{ secrets.RDS_DB }} -p ${{ secrets.RDS_PORT }} -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+        env:
+          PGPASSWORD: ${{ secrets.RDS_PASSWORD }}
+
+      # Deploy the Docker container to EC2 instance
+      - name: Deploy to EC2
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+          EC2_KEY: ${{ secrets.EC2_KEY }}
+        run: |
+          # Write the EC2 private key to a file
+          echo "${{ secrets.EC2_KEY }}" > ec2_key.pem
+          chmod 600 ec2_key.pem
+
+          # Deploy to EC2 using SSH and Docker commands
+          ssh -i ec2_key.pem -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << 'EOF'
+            # Pull the latest Docker image
+            docker pull docker.io/kamil571/turingsec_spring_boot:latest
+
+            # Stop and remove existing container if it exists
+            docker stop turingSecContainer || true
+            docker rm turingSecContainer || true
+
+            # Run the new Docker container with the required environment variables
+            sudo docker run -d -p 443:8080 \
+              -e SPRING_PROFILES_ACTIVE=prod \
+              -e CERTIFICATE_PATH=/cert_storage/api.turingsec.xyz.p12 \
+              -e KEY_STORE_PASSWORD=turingsec123 \
+              -e APP_ROOT_URL=https://ec2-54-162-60-214.compute-1.amazonaws.com \
+              -e DB_HOST=${{ secrets.RDS_HOST }} \
+              -e DB_PORT=${{ secrets.RDS_PORT }} \
+              -e DB_NAME=${{ secrets.RDS_DB }} \
+              -e DB_USER=${{ secrets.RDS_USER }} \
+              -e DB_PASSWORD=${{ secrets.RDS_PASSWORD }} \
+              --name turingSecContainer \
+              -v turingsec_cert_volume:/cert_storage \
+              docker.io/kamil571/turingsec_spring_boot:latest
+          EOF
