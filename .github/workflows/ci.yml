@@ -10,41 +10,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the code from the repository
       - name: Checkout Repository
         uses: actions/checkout@v2.5.0
 
-      # Set up JDK 20 environment
       - name: Set up JDK 20
         uses: actions/setup-java@v2
         with:
           java-version: 20
           distribution: 'adopt'
 
-      # Build the Spring Boot project using Maven
       - name: Build
         run: |
           chmod +x mvnw
           ./mvnw clean install
 
-      # Display build artifacts
       - name: Print Build Artifact Contents
         run: |
           ls -R ./target
 
-      # Get the short commit ID for tagging the Docker image
       - name: Get Commit ID
         id: commit_id
         run: echo "commit_id=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
-      # Login to Docker Hub using credentials stored in GitHub Secrets
       - name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Build and push the Docker image to Docker Hub
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v4
         with:
@@ -55,26 +48,22 @@ jobs:
             docker.io/kamil571/turingsec_spring_boot:latest
             docker.io/kamil571/turingsec_spring_boot:${{ env.commit_id }}
 
-      # Drop all tables in AWS RDS PostgreSQL
       - name: Drop All Tables in AWS RDS
         run: |
           psql -h ${{ secrets.RDS_HOST }} -U ${{ secrets.RDS_USER }} -d ${{ secrets.RDS_DB }} -p ${{ secrets.RDS_PORT }} -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
         env:
           PGPASSWORD: ${{ secrets.RDS_PASSWORD }}
 
-      # Deploy the Docker container to EC2 instance
+      - name: Decode EC2 Key
+        run: |
+          echo "${{ secrets.EC2_KEY_BASE64 }}" | base64 --decode > ec2_key.pem
+          chmod 400 ec2_key.pem
+
       - name: Deploy to EC2
         env:
           EC2_HOST: ${{ secrets.EC2_HOST }}
           EC2_USER: ${{ secrets.EC2_USER }}
-          EC2_KEY: |
-              ${{ secrets.EC2_KEY }}
         run: |
-          # Write the EC2 private key to a file
-          echo "${{ secrets.EC2_KEY }}" > ec2_key.pem
-          chmod 400 ec2_key.pem
-
-          # Deploy to EC2 using SSH and Docker commands
           ssh -i ec2_key.pem -o StrictHostKeyChecking=no -t -t $EC2_USER@$EC2_HOST << 'EOF'
             # Pull the latest Docker image
             docker pull docker.io/kamil571/turingsec_spring_boot:latest
