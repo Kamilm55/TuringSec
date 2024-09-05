@@ -74,7 +74,9 @@ jobs:
           chmod 600 ec2_key.pem
 
           # Deploy to EC2 using SSH and Docker commands
-          ssh -i ec2_key.pem -o StrictHostKeyChecking=no -t $EC2_USER@$EC2_HOST << 'EOF'
+          ssh -i ec2_key.pem -o StrictHostKeyChecking=no $EC2_USER@$EC2_HOST << EOF
+            set -e  # Exit immediately if a command exits with a non-zero status
+
             # Pull the latest Docker image
             docker pull docker.io/kamil571/turingsec_spring_boot:latest
 
