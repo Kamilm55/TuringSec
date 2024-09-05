@@ -72,7 +72,7 @@ jobs:
         run: |
           # Write the EC2 private key to a file
           echo "${{ secrets.EC2_KEY }}" > ec2_key.pem
-          chmod 600 ec2_key.pem
+          chmod 400 ec2_key.pem
 
           # Deploy to EC2 using SSH and Docker commands
           ssh -i ec2_key.pem -o StrictHostKeyChecking=no -t -t $EC2_USER@$EC2_HOST << 'EOF'
