@@ -54,10 +54,10 @@ jobs:
         env:
           PGPASSWORD: ${{ secrets.RDS_PASSWORD }}
 
-      - name: Decode EC2 Key
-        run: |
-          echo "${{ secrets.EC2_KEY}}" | base64 --decode > ec2_key.pem
-          chmod 600 ec2_key.pem
+#      - name: Decode EC2 Key
+#        run: |
+#          echo "${{ secrets.EC2_KEY}}" |  > ec2_key.pem
+#          chmod 600 ec2_key.pem
 
       - name: Build & Deploy
         env:
