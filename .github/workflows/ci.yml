@@ -56,32 +56,28 @@ jobs:
 
       - name: Set up SSH key
         run: |
-          echo "Environment Variables:"
-          echo "EC2_HOST=${{ secrets.EC2_HOST }}"
-
-          echo "Checking .ssh directory..."
           mkdir -p ~/.ssh
-          ls -ld ~/.ssh || echo "Directory ~/.ssh does not exist"
-          ls -l ~/.ssh || echo "Failed to list contents of ~/.ssh"
+          echo "Directory ~/.ssh created or already exists"
 
           echo "Setting up SSH key..."
           echo "${{ secrets.EC2_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ls -l ~/.ssh/id_rsa || echo "File ~/.ssh/id_rsa does not exist"
-          cat ~/.ssh/id_rsa || echo "Failed to read ~/.ssh/id_rsa"
+          ls -l ~/.ssh/id_rsa
 
-          echo "Checking known_hosts file..."
-          ls -l ~/.ssh/known_hosts || echo "File ~/.ssh/known_hosts does not exist"
+          echo "Adding EC2 host to known_hosts..."
+          ssh-keyscan -p 22 ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+          echo "Contents of ~/.ssh/known_hosts:"
           cat ~/.ssh/known_hosts || echo "Failed to read ~/.ssh/known_hosts"
 
-          echo "Adding host to known_hosts..."
-          ssh-keyscan -p 22 ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts || echo "Failed to run ssh-keyscan"
-          cat ~/.ssh/known_hosts || echo "Failed to read ~/.ssh/known_hosts"
-
-          echo "System Information:"
-          uname -a
-          df -h
-          free -m
+          echo "Verifying known_hosts file..."
+          if [ -f ~/.ssh/known_hosts ]; then
+            echo "File ~/.ssh/known_hosts exists"
+            ls -l ~/.ssh/known_hosts
+            cat ~/.ssh/known_hosts
+            chmod 644 ~/.ssh/known_hosts
+          else
+            echo "File ~/.ssh/known_hosts does not exist"
+          fi
       
 
       - name: Deploy to server
