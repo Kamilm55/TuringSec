@@ -56,12 +56,26 @@ jobs:
 
       - name: Set up SSH key
         run: |
+#          Print environment variables for debugging
             env
+            
+            # Create the .ssh directory
             mkdir -p ~/.ssh
+            
+            # Debugging: Check if the private key is being correctly handled
+            echo "Setting up SSH key..."
             echo "${{ secrets.EC2_KEY }}" > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
+            
+            # Debugging: Verify SSH key file
+            ls -l ~/.ssh/id_rsa
+            
+            # Add the host to known_hosts
+            echo "Adding host to known_hosts..."
             ssh-keyscan -p 22 ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
-#            sudo apt-get install sshpass
+            
+            # Debugging: Verify known_hosts file
+            cat ~/.ssh/known_hosts
 
       - name: Deploy to server
         run: |
