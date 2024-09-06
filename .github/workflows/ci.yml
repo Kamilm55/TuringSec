@@ -60,8 +60,8 @@ jobs:
             mkdir -p ~/.ssh
             echo "${{ secrets.EC2_KEY }}" > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
-            ssh-keyscan -p 22 ${{ secrets.$EC2_HOST }} >> ~/.ssh/known_hosts
-            sudo apt-get install sshpass
+            ssh-keyscan -p 22 ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+#            sudo apt-get install sshpass
 
       - name: Deploy to server
         run: |
