@@ -78,13 +78,36 @@ jobs:
           else
             echo "File ~/.ssh/known_hosts does not exist"
           fi
-      
 
       - name: Deploy to server
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
         run: |
           ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -v "${{ secrets.EC2_USER }}"@"${{ secrets.EC2_HOST }}" << 'ENDSSH'
-          echo "test"
+        #   Pull the latest Docker image
+            sudo docker pull docker.io/kamil571/turingsec_spring_boot:latest
+
+            # Stop and remove existing container if it exists
+            sudo docker stop turingSecContainer || true
+            sudo docker rm turingSecContainer || true
+
+            # Run the new Docker container with the required environment variables
+            sudo docker run -d -p 443:8080 \
+              -e SPRING_PROFILES_ACTIVE=prod \
+              -e CERTIFICATE_PATH=${{ secrets.CERTIFICATE_PATH }} \
+              -e KEY_STORE_PASSWORD=${{ secrets.KEY_STORE_PASSWORD }} \
+              -e APP_ROOT_URL=${{ secrets.APP_ROOT_URL }} \
+              -e DB_HOST=${{ secrets.RDS_HOST }} \
+              -e DB_PORT=${{ secrets.RDS_PORT }} \
+              -e DB_NAME=${{ secrets.RDS_DB }} \
+              -e DB_USER=${{ secrets.RDS_USER }} \
+              -e DB_PASSWORD=${{ secrets.RDS_PASSWORD }} \
+              --name turingSecContainer \
+              -v turingsec_cert_volume:/cert_storage \
+              docker.io/kamil571/turingsec_spring_boot:latest
           ENDSSH
+
 
 #      - name: Deploy to EC2
 #        env:
@@ -93,26 +116,26 @@ jobs:
 #        run: |
 #          ssh -i ec2_key.pem -o StrictHostKeyChecking=no -t -t $EC2_USER@$EC2_HOST << 'EOF'
 #            # Pull the latest Docker image
-#            sudo docker pull docker.io/kamil571/turingsec_spring_boot:latest
-#
-#            # Stop and remove existing container if it exists
-#            sudo docker stop turingSecContainer || true
-#            sudo docker rm turingSecContainer || true
-#
-#            # Run the new Docker container with the required environment variables
-#            sudo docker run -d -p 443:8080 \
-#              -e SPRING_PROFILES_ACTIVE=prod \
-#              -e CERTIFICATE_PATH=${{ secrets.CERTIFICATE_PATH }} \
-#              -e KEY_STORE_PASSWORD=${{ secrets.KEY_STORE_PASSWORD }} \
-#              -e APP_ROOT_URL=${{ secrets.APP_ROOT_URL }} \
-#              -e DB_HOST=${{ secrets.RDS_HOST }} \
-#              -e DB_PORT=${{ secrets.RDS_PORT }} \
-#              -e DB_NAME=${{ secrets.RDS_DB }} \
-#              -e DB_USER=${{ secrets.RDS_USER }} \
-#              -e DB_PASSWORD=${{ secrets.RDS_PASSWORD }} \
-#              --name turingSecContainer \
-#              -v turingsec_cert_volume:/cert_storage \
-#              docker.io/kamil571/turingsec_spring_boot:latest
+##            sudo docker pull docker.io/kamil571/turingsec_spring_boot:latest
+##
+##            # Stop and remove existing container if it exists
+##            sudo docker stop turingSecContainer || true
+##            sudo docker rm turingSecContainer || true
+##
+##            # Run the new Docker container with the required environment variables
+##            sudo docker run -d -p 443:8080 \
+##              -e SPRING_PROFILES_ACTIVE=prod \
+##              -e CERTIFICATE_PATH=${{ secrets.CERTIFICATE_PATH }} \
+##              -e KEY_STORE_PASSWORD=${{ secrets.KEY_STORE_PASSWORD }} \
+##              -e APP_ROOT_URL=${{ secrets.APP_ROOT_URL }} \
+##              -e DB_HOST=${{ secrets.RDS_HOST }} \
+##              -e DB_PORT=${{ secrets.RDS_PORT }} \
+##              -e DB_NAME=${{ secrets.RDS_DB }} \
+##              -e DB_USER=${{ secrets.RDS_USER }} \
+##              -e DB_PASSWORD=${{ secrets.RDS_PASSWORD }} \
+##              --name turingSecContainer \
+##              -v turingsec_cert_volume:/cert_storage \
+##              docker.io/kamil571/turingsec_spring_boot:latest
 #          EOF
 
 # https://medium.com/@balazskocsis/deploying-to-a-server-with-github-actions-a-deep-dive-e8558e83a4d7
