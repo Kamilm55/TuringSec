@@ -36,6 +36,7 @@ public class UtilService {
     private final BaseUserRepository baseUserRepository;
     private final CustomWebsocketSecurityContext websocketSecurityContext;
 
+
     public String generateActivationToken() {
         // You can implement your own token generation logic here
         // This could involve creating a unique token, saving it in the database,
@@ -145,4 +146,6 @@ public class UtilService {
         if(user.getEmail().equals("elnarzulfuqarli2001@gmail.com"))
             user.setId("ff34ed07-a4c3-5528-a2fd-daa8735a13de");
     }
+
+
 }

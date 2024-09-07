@@ -10,11 +10,13 @@ import com.turingSecApp.turingSec.model.entities.report.Report;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.CompanyRepository;
+import com.turingSecApp.turingSec.model.repository.UserRepository;
 import com.turingSecApp.turingSec.model.repository.program.ProgramRepository;
 import com.turingSecApp.turingSec.model.repository.reportMessage.BaseMessageInReportRepository;
 import com.turingSecApp.turingSec.payload.message.StringMessageInReportPayload;
 import com.turingSecApp.turingSec.response.message.StringMessageInReportDTO;
 import com.turingSecApp.turingSec.service.interfaces.ICommonMessageInReportService;
+import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.StringMessageInReportMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +33,7 @@ public class CommonMessageInReportService implements ICommonMessageInReportServi
     private final BaseMessageInReportRepository baseMessageInReportRepository;
     private final CompanyRepository companyRepository;
     private final ProgramRepository programRepository;
+    private final UserRepository userRepository;
 
     @Override
     public void checkUserOrCompanyReport(Object authenticatedUser, Long reportId) {
@@ -84,15 +87,15 @@ public class CommonMessageInReportService implements ICommonMessageInReportServi
         StringMessageInReportDTO dtoEagerFields = StringMessageInReportMapper.INSTANCE.toDTOEagerFields(savedMsg);
 
         // Fetch with query to avoid lazyInit exception
+        UserEntity userOfReport = userRepository.findByReportsContains(savedMsg.getReport());
         Program programEntityForCompany = programRepository.findByReportsContains(savedMsg.getReport())
                 .orElseThrow(() -> new ResourceNotFoundException("Program not found with this report:" + savedMsg.getReport()));
         CompanyEntity companyEntityForProgram = companyRepository.findByBugBountyProgramsContains(programEntityForCompany)
                 .orElseThrow(() -> new ResourceNotFoundException("Company not found with this program:" + programEntityForCompany));
 
-        // Set programId to DTO
+        // Set lazy entity id to DTO explicitly
+        dtoEagerFields.setUserId(userOfReport.getId());
         dtoEagerFields.setProgramId(programEntityForCompany.getId());
-
-        // Set companyId to DTO
         dtoEagerFields.setCompanyId(companyEntityForProgram.getId());
 
         return dtoEagerFields;
