@@ -87,7 +87,8 @@ public class CommonMessageInReportService implements ICommonMessageInReportServi
         StringMessageInReportDTO dtoEagerFields = StringMessageInReportMapper.INSTANCE.toDTOEagerFields(savedMsg);
 
         // Fetch with query to avoid lazyInit exception
-        UserEntity userOfReport = userRepository.findByReportsContains(savedMsg.getReport());
+        UserEntity userOfReport = userRepository.findByReportsContains(savedMsg.getReport())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with this report:" + savedMsg.getReport()));;
         Program programEntityForCompany = programRepository.findByReportsContains(savedMsg.getReport())
                 .orElseThrow(() -> new ResourceNotFoundException("Program not found with this report:" + savedMsg.getReport()));
         CompanyEntity companyEntityForProgram = companyRepository.findByBugBountyProgramsContains(programEntityForCompany)
