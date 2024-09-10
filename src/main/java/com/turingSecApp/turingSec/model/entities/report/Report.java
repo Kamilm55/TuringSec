@@ -64,8 +64,10 @@ public class Report {
     @OneToMany(mappedBy = "bugBountyReport", cascade = CascadeType.ALL/*,orphanRemoval = true*/)
     private List<CollaboratorEntity> collaborators = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
     private REPORTSTATUSFORUSER statusForUser;
 
+    @Enumerated(EnumType.STRING)
     private REPORTSTATUSFORCOMPANY statusForCompany;
 
     @ManyToOne(fetch = FetchType.LAZY)
