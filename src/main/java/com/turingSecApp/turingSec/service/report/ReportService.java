@@ -48,6 +48,7 @@ import java.util.stream.Stream;
 
 import static com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORCOMPANY.*;
 import static com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORUSER.*;
+import static com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORUSER.SUBMITTED;
 
 
 @Service

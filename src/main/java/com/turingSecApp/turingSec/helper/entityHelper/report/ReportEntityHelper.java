@@ -111,7 +111,7 @@ public class ReportEntityHelper implements IReportEntityHelper {
 
         // Set Status for reports
         report.setStatusForUser(SUBMITTED);
-        report.setStatusForCompany(UNREVIEWED);
+        report.setStatusForCompany(REPORTSTATUSFORCOMPANY.SUBMITTED);
     }
 
     @Override
