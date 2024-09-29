@@ -17,7 +17,7 @@ import java.util.List;
 @Entity
 @DiscriminatorValue("USER")
 @Table(name = "users")
-public class UserEntity extends BaseUser {
+public class  UserEntity extends BaseUser {
     private String username;
 
     @Column(name = "activation_token")
