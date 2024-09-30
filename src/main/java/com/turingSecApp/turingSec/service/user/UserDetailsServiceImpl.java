@@ -28,6 +28,13 @@ import java.util.UUID;
 public class UserDetailsServiceImpl implements UserDetailsService {
     private final BaseUserRepository baseUserRepository;
     private final UtilService utilService;
+
+    private UUID id;
+
+    public UUID getId() {
+        return id;
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         String uuidOfBaseUserAsUsername = username;

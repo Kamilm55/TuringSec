@@ -3,6 +3,9 @@ package com.turingSecApp.turingSec.controller;
 
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.exception.custom.InvalidTokenException;
+import com.turingSecApp.turingSec.model.entities.user.BaseUser;
+import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
+import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.payload.user.*;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.response.program.ProgramDTO;
@@ -10,9 +13,12 @@ import com.turingSecApp.turingSec.response.user.AuthResponse;
 import com.turingSecApp.turingSec.response.user.UserDTO;
 import com.turingSecApp.turingSec.response.user.UserHackerDTO;
 import com.turingSecApp.turingSec.service.interfaces.IUserService;
+import com.turingSecApp.turingSec.util.mapper.UserMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -59,11 +65,11 @@ public class UserController {
     }
 
     @PutMapping("/update-profile")
-    public BaseResponse<UserHackerDTO> updateProfile(@RequestBody @Valid UserUpdateRequest profileUpdateRequest) {
+    public BaseResponse<UserHackerDTO> updateProfile(@RequestBody UserUpdateRequest profileUpdateRequest) {
         UserHackerDTO updateProfile = userService.updateProfile(profileUpdateRequest);
-
         return BaseResponse.success(updateProfile);
     }
+
 
     @GetMapping("/users/{userId}")
     public BaseResponse<UserDTO> getUserById(@PathVariable String userId) {

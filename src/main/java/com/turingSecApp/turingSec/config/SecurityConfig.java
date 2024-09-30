@@ -135,7 +135,8 @@ public class SecurityConfig {
                             .requestMatchers("/api/companies/register").anonymous()
                             .requestMatchers("/api/companies/login").anonymous()
                             .requestMatchers("/api/companies/current-user").hasRole("COMPANY") // only company
-                            .requestMatchers("/api/companies/**").permitAll();
+                            .requestMatchers("/api/companies/**").permitAll()
+                            .requestMatchers(array).permitAll();
 
                     // Hacker Controller
                     request.requestMatchers("/api/hacker/{id}").permitAll();
@@ -178,5 +179,13 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+    static String[] array= new String[]{
+            "/v3/api-docs/**",      // OpenAPI üçün
+            "/swagger-ui/**",       // Swagger UI üçün
+            "/swagger-ui.html",     // Swagger əsas səhifəsi üçün
+            "/swagger-resources/**",// Swagger resursları üçün
+            "/webjars/**"
+    };
 
 }

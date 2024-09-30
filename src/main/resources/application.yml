@@ -11,7 +11,7 @@
         max-request-size: 700MB
     jpa:
       hibernate:
-        ddl-auto: update # it can be changes create-drop || update
+        ddl-auto: create # it can be changes create-drop || update
       properties:
         hibernate:
           format_sql: true

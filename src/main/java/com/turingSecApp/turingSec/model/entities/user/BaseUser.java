@@ -41,6 +41,7 @@ public class BaseUser {
     private String password;
     private boolean activated;
     private String country;
+    private String city;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "user_roles",
@@ -60,6 +61,7 @@ public class BaseUser {
                         (this.country != null ? this.country : "") +
                         (this.first_name != null ? this.first_name : "") +
                         (this.last_name != null ? this.last_name : "") +
+                        (this.city != null ? this.city : "") +
                         System.currentTimeMillis();
                 UUID uuid = generator.generate(uniqueName);
                 System.out.println("Generated UUIDv5 for base user id: " + uuid.toString());

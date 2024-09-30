@@ -12,10 +12,10 @@ app:
 
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
-    driverClassName: org.postgresql.Driver
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+      url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}?currentSchema=turing_sec
+      driverClassName: org.postgresql.Driver
+      username: ${DB_USER}
+      password: ${DB_PASSWORD}
 
 # For testing with a local PostgreSQL database , first you should open docker
 # Uncomment and use the following line:

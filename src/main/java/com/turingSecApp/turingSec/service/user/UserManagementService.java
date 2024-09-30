@@ -171,7 +171,21 @@ public class UserManagementService {
         UserEntity userEntity = (UserEntity) userFactory.getAuthenticatedBaseUser();
         log.info(String.format("User with id: %s , username: %s updated info. User info before update: %s, \n  hacker info before update: %s",userEntity.getId().toString(),userEntity.getUsername(),userEntity,userEntity.getHacker()));
 
-        userEntityHelper.updateUserProfile(userEntity, userUpdateRequest);
+        if (userUpdateRequest.getFirstName() != null && !userUpdateRequest.getFirstName().isEmpty()) {
+            userEntity.setFirst_name(userUpdateRequest.getFirstName());
+        }
+        if (userUpdateRequest.getLastName() != null && !userUpdateRequest.getLastName().isEmpty()) {
+            userEntity.setLast_name(userUpdateRequest.getLastName());
+        }
+        if (userUpdateRequest.getCountry() != null && !userUpdateRequest.getCountry().isEmpty()) {
+            userEntity.setCountry(userUpdateRequest.getCountry());
+        }
+        if (userUpdateRequest.getUsername() != null && !userUpdateRequest.getUsername().isEmpty()) {
+            userEntity.setUsername(userUpdateRequest.getUsername());
+        }
+        if (userUpdateRequest.getCity() != null && !userUpdateRequest.getCity().isEmpty()) {
+            userEntity.setCity(userUpdateRequest.getCity());
+        }
 
         HackerEntity hackerEntity = hackerRepository.findByUser(userEntity);
 
@@ -179,7 +193,6 @@ public class UserManagementService {
             userEntityHelper.updateHackerProfile(hackerEntity, userUpdateRequest);
             hackerRepository.save(hackerEntity);
         }
-
         UserEntity savedUser = userRepository.save(userEntity);
 
         log.info(String.format("User with id: %s , username: %s updated info. New user info after update: %s , \n New hacker info after update: %s",savedUser.getId().toString(),savedUser.getUsername(),savedUser,savedUser.getHacker()));
