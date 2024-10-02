@@ -12,6 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @Data
 @Table(name = "hackers")
+@Builder
 public class HackerEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

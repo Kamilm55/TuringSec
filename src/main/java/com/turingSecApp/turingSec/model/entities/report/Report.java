@@ -34,6 +34,7 @@ public class Report {
 
     //@Column(updatable = false, nullable = false, unique = true) //todo: @PrePersist not work in prod
     private String room;
+  //  private REPORTSTATUSFORUSER reportstatusforuser;
 
     @Embedded
     private ReportWeakness weakness;

@@ -58,12 +58,18 @@ public class UserEntityHelper implements IUserEntityHelper{
         UserEntity fetchedUser = findUserByUsername(user);
 
         // Create and set basic fields
-        HackerEntity hackerEntity = new HackerEntity();
-        hackerEntity.setFirst_name(fetchedUser.getFirst_name());
-        hackerEntity.setLast_name(fetchedUser.getLast_name());
-        hackerEntity.setCountry(fetchedUser.getCountry());
-
-        return hackerEntity;
+//        HackerEntity hackerEntity = new HackerEntity();
+//        hackerEntity.setFirst_name(fetchedUser.getFirst_name());
+//        hackerEntity.setLast_name(fetchedUser.getLast_name());
+//        hackerEntity.setCountry(fetchedUser.getCountry());
+//
+//        return hackerEntity;
+        return HackerEntity
+                .builder()
+                .first_name(fetchedUser.getFirst_name())
+                .last_name(fetchedUser.getLast_name())
+                .country(fetchedUser.getLast_name())
+                .build();
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.turingSecApp.turingSec.exception.custom.ReportNotFoundException;
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORCOMPANY;
 import com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORUSER;
+import com.turingSecApp.turingSec.model.entities.role.Role;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.report.ReportCVSS;
 import com.turingSecApp.turingSec.model.entities.report.Report;
@@ -23,6 +24,7 @@ import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
 import com.turingSecApp.turingSec.response.report.ReportsByUserDTO;
 import com.turingSecApp.turingSec.response.report.ReportsByUserWithCompDTO;
 import com.turingSecApp.turingSec.response.user.UserDTO;
+import com.turingSecApp.turingSec.service.EmailNotificationService;
 import com.turingSecApp.turingSec.service.interfaces.IReportService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import com.turingSecApp.turingSec.util.GlobalConstants;
@@ -37,6 +39,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.naming.spi.StateFactory;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -50,6 +53,7 @@ import static com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATU
 @RequiredArgsConstructor
 @Slf4j
 public class ReportService implements IReportService {
+    private final EmailNotificationService emailNotificationService;
     private final ReportRepository bugBountyReportRepository;
     private final ReportManualRepository reportManualRepository;
     private final ReportCVSSRepository reportCVSSRepository;
@@ -57,7 +61,7 @@ public class ReportService implements IReportService {
     private final IReportEntityHelper reportEntityHelper;
     private final ReportMediaService reportMediaService;
     private final GlobalConstants globalConstants;
-    private  final ReportUtilService reportUtilService;
+    private final ReportUtilService reportUtilService;
 
     private final ProgramRepository programRepository;
     private final UserRepository userRepository;
@@ -65,8 +69,9 @@ public class ReportService implements IReportService {
 
     @Override
     public Report getBugBountyReportById(Long id) {
-       return bugBountyReportRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Report not found with id:" + id));
+        return bugBountyReportRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Report not found with id:" + id));
     }
+
     @Override
     public ReportManual submitManualReportForTest(List<MultipartFile> files, ReportManualPayload reportPayload, Long bugBountyProgramId) throws IOException {
         // Fetch the BugBountyProgramEntity from the repository
@@ -88,11 +93,12 @@ public class ReportService implements IReportService {
 
         ///
         // Set child reference type fields with the relation
-        ReportManual savedReport = (ReportManual) reportEntityHelper.setChildReferenceFieldsFromPayload(reportPayload,savedReport1);
+        ReportManual savedReport = (ReportManual) reportEntityHelper.setChildReferenceFieldsFromPayload(reportPayload, savedReport1);
 
         return savedReport;
 
     }
+
     @Override
     public ReportManual submitManualReport(List<MultipartFile> files, UserDetails userDetails, ReportManualPayload reportPayload, Long bugBountyProgramId) throws IOException {
         // Check the authenticated hacker
@@ -117,7 +123,7 @@ public class ReportService implements IReportService {
         setAttachmentsToReportIfFilesExist(files, userDetails, savedReport1);
         ///
         // Set child reference type fields with the relation
-        ReportManual savedReport = (ReportManual) reportEntityHelper.setChildReferenceFieldsFromPayload(reportPayload,savedReport1);
+        ReportManual savedReport = (ReportManual) reportEntityHelper.setChildReferenceFieldsFromPayload(reportPayload, savedReport1);
 
         return savedReport;
 
@@ -128,8 +134,8 @@ public class ReportService implements IReportService {
         //todo: check report belongs to this user?
 
         // Call the service method to save the video
-        if (files!=null){
-            if(!files.isEmpty())
+        if (files != null) {
+            if (!files.isEmpty())
                 reportMediaService.saveFiles(files, report.getId());
         }
     }
@@ -141,7 +147,7 @@ public class ReportService implements IReportService {
     }
 
     @Override
-    public ReportCVSS submitCVSSReport(List<MultipartFile> files, UserDetails userDetails,ReportCVSSPayload reportPayload, Long bugBountyProgramId) throws IOException {
+    public ReportCVSS submitCVSSReport(List<MultipartFile> files, UserDetails userDetails, ReportCVSSPayload reportPayload, Long bugBountyProgramId) throws IOException {
         // Check the authenticated hacker
         UserEntity authenticatedUser = utilService.getAuthenticatedHackerWithHTTP();
 
@@ -165,7 +171,7 @@ public class ReportService implements IReportService {
         setAttachmentsToReportIfFilesExist(files, userDetails, savedReport1);
         ///
         // Set child reference type fields with the relation
-        ReportCVSS savedReport = (ReportCVSS) reportEntityHelper.setChildReferenceFieldsFromPayload(reportPayload,savedReport1);
+        ReportCVSS savedReport = (ReportCVSS) reportEntityHelper.setChildReferenceFieldsFromPayload(reportPayload, savedReport1);
 
         return /*ReportMapper.INSTANCE.toDTO(savedReport)*/savedReport;
     }
@@ -182,6 +188,7 @@ public class ReportService implements IReportService {
 
         return reports;
     }
+
     @Override
     public List<Report> getReportsByUserId(Long userId) {
         UserEntity user = userRepository.findById(userId)
@@ -194,6 +201,7 @@ public class ReportService implements IReportService {
 
         return reports;
     }
+
     public List<Report> getAllReports() {
         List<Report> all = bugBountyReportRepository.findAll();
 
@@ -202,6 +210,7 @@ public class ReportService implements IReportService {
 
         return all;
     }
+
     @Override
     public Report reviewReportByCompany(Long id) {
         return updateReportStatus(id, REVIEWED, UNDER_REVIEW);
@@ -256,6 +265,7 @@ public class ReportService implements IReportService {
         }
         return userReports;
     }
+
     private List<Report> getReportsForStatus(REPORTSTATUSFORCOMPANY status, CompanyEntity company) {
         List<Report> userReports;
         if (status == null) {
@@ -317,7 +327,11 @@ public class ReportService implements IReportService {
         report.setStatusForCompany(companyStatus);
         report.setStatusForUser(userStatus);
 
-        return bugBountyReportRepository.save(report);
+        Report updateReport = bugBountyReportRepository.save(report);
+        sendStatusChangeEmailForUser(updateReport);
+
+        return updateReport;
+
     }
 
 
@@ -326,11 +340,13 @@ public class ReportService implements IReportService {
             throw new ReportNotFoundException("There is no report with user/company id: " + userId);
         }
     }
+
     private void checkEmpty(List<Report> reports) {
         if (reports.isEmpty()) {
             throw new ReportNotFoundException("There is no report");
         }
     }
+
     @Override
     @Transactional
     public void deleteBugBountyReport(Long id) {
@@ -349,6 +365,7 @@ public class ReportService implements IReportService {
 
         bugBountyReportRepository.delete(updatedReport);
     }
+
     private Map<UserDTO, List<Report>> groupReportsByUser(List<Report> userReports) {
         return userReports.stream()
                 .collect(Collectors.groupingBy(report ->
@@ -371,7 +388,6 @@ public class ReportService implements IReportService {
                 })
                 .collect(Collectors.toList());
     }
-
 
 
     private Map<Long, String> fetchUserImgUrls(Map<UserDTO, List<Report>> reportsByUser) {
@@ -401,6 +417,127 @@ public class ReportService implements IReportService {
 
     private String getUserImgUrl(UserDTO userDTO) {
         return globalConstants.ROOT_LINK + "/api/background-image-for-hacker/download/" + userDTO.getHackerId();
+    }
+    private void sendStatusChangeEmailForUser(Report report) {
+        String to = report.getUser().getEmail();
+        String subject = "The status of your report has changed";
+        // List<Report> reports = report.getUser().getReports();
+        String body;
+        if (report.getStatusForUser().equals(SUBMITTED)) {
+            body = String.format("Hello %s,\n" +
+                            "\n" +
+                            "Thank you for submitting your report to [Platform Name]. We have successfully received it and it is now in our system. The security team will review your report shortly.\n" +
+                            "\n" +
+                            "Stay tuned for updates!\n" +
+                            "\n" +
+                            "Best regards,\n" +
+                            "TuringSec",
+                    report.getUser().getUsername(),
+                    report.getId());
+        } else if (report.getStatusForUser().equals(UNDER_REVIEW)) {
+            body = String.format(
+                    "Hello %s,\n" +
+                            "We wanted to let you know that your report, \"%d\", has moved to the Under Review stage. \n" +
+                            "The security team is currently analyzing your findings.\n" +
+                            "We'll keep you updated as they progress.\n" +
+                            "Best regards,\n" +
+                            "TuringSec",
+                    report.getUser().getUsername(),
+                    report.getId()
+            );
+
+        } else if (report.getStatusForUser().equals(ACCEPTED)) {
+            //
+            body = String.format(
+                    " Hello %s,\n" +
+                            "\n" +
+                            "    Great news! The security team has accepted your report, \"%d\". Thank you for your valuable contribution to making [Platform Name] more secure.\n" +
+                            "\n" +
+                            "    You'll receive further details about your reward soon.\n" +
+                            "\n" +
+                            "    Best regards,\n" +
+                            "   TuringSec",
+                    report.getUser().getUsername(),
+                    report.getId()
+            );
+
+
+        } else {
+            body = String.format(
+                    "  Hello %s,\n" +
+                            "\n" +
+                            "    Thank you for submitting your report, \"%s\". After careful review, the security team has determined that your report did not meet the criteria for acceptance.\n" +
+                            "\n" +
+                            "    We appreciate your effort and encourage you to continue contributing to our platform.\n" +
+                            "\n" +
+                            "    Best regards,\n" +
+                            "    TuringSec",
+                    report.getUser().getUsername(),
+                    report.getId().toString()
+            );
+
+        }
+
+        emailNotificationService.sendEmail(to, subject, body);
+    }
+
+    private void sendStatusChangeEmailForCompany(Report report) {
+        String to = report.getUser().getEmail();
+        String subject = "The status of your report has changed";
+        List<Report> reports = report.getUser().getReports();
+        String body;
+
+        if (report.getStatusForUser().equals(SUBMITTED)) {
+            body = String.format("Hello %s,\n" +
+                            "\n" +
+                            "    A new report titled \"%s\" has been submitted to [Platform Name]. The security team should begin reviewing the report shortly.\n" +
+                            "\n" +
+                            "    We'll keep you informed as we make progress.\n" +
+                            "\n" +
+                            "    Best regards,  \n" +
+                            "    [Your Platform's Team]",
+                    report.getUser().getUsername(),
+                    report.getId().toString());
+
+        } else if (report.getStatusForUser().equals(UNDER_REVIEW)) {
+
+            body = String.format("   Hello %s,\n" +
+                            "\n" +
+                            "    The report titled \"%s\" has moved to the Under Review stage. The security team must currently analyzing the findings submitted by the hacker.\n" +
+                            "\n" +
+                            "    We'll provide updates as the review progresses.\n" +
+                            "\n" +
+                            "    Best regards,  \n" +
+                            "    [Your Platform's Team]",
+                    report.getUser().getUsername(),
+                    report.getId().toString());
+
+        } else if (report.getStatusForUser().equals(ACCEPTED)) {
+            body = String.format("Hello  %s,\n" +
+                            "\n" +
+                            "    The security team has accepted the report titled \"%s\"  . The next step is to resolve the payment process.\n" +
+                            "\n" +
+                            "    Please review the details and let us know if any further steps are required.\n" +
+                            "\n" +
+                            "    Best regards,  \n" +
+                            "    [Your Platform's Team]",
+                    report.getUser().getUsername(),
+                    report.getId().toString());
+        } else {
+            body = String.format(" Hello %s,\n" +
+                            "\n" +
+                            "    The security team has reviewed the report titled \"%s\" on your company's page and determined that it does not meet the criteria for acceptance.\n" +
+                            "\n" +
+                            "    You can view the details and rationale on your page. We appreciate your attention and will notify you of any future reports that may be relevant.\n" +
+                            "\n" +
+                            "    Best regards,  \n" +
+                            "    [Your Platform's Team]",
+
+                    report.getUser().getUsername(),
+                    report.getId().toString());
+        }
+
+        emailNotificationService.sendEmail(to, subject, body);
     }
 
 
