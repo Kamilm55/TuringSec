@@ -25,6 +25,7 @@ import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
 import com.turingSecApp.turingSec.response.report.ReportsByUserDTO;
 import com.turingSecApp.turingSec.response.report.ReportsByUserWithCompDTO;
 import com.turingSecApp.turingSec.response.user.UserDTO;
+import com.turingSecApp.turingSec.service.interfaces.INotificationService;
 import com.turingSecApp.turingSec.service.interfaces.IReportService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
 import com.turingSecApp.turingSec.service.user.factory.UserFactory;
@@ -64,6 +65,8 @@ public class ReportService implements IReportService {
     private final ReportMediaService reportMediaService;
     private final GlobalConstants globalConstants;
     private  final ReportUtilService reportUtilService;
+
+    private final INotificationService notificationService;
 
     private final ProgramRepository programRepository;
     private final UserRepository userRepository;
@@ -214,6 +217,10 @@ public class ReportService implements IReportService {
 
         report.setStatusForCompany(companyStatus);
         report.setStatusForUser(userStatus);
+
+        UserEntity reportOwner = report.getUser();
+        String message = String.format("Your report with ID %d has been %s by the company.", id, userStatus.name().toLowerCase());
+        notificationService.sendNotification(reportOwner, message, "REPORT_STATUS_UPDATE");
 
         return bugBountyReportRepository.save(report);
     }

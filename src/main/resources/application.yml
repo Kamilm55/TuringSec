@@ -26,6 +26,7 @@
       properties:
         mail.smtp.auth: true
         mail.smtp.starttls.enable: true
+        mail.smtp.starttls.required: true # tsl verification
   
   logging:
     level:
