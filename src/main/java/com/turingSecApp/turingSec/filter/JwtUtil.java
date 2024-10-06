@@ -5,6 +5,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -15,11 +16,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 public class JwtUtil {
     private final String jwtSecret = "5B25B75FB86EFF6FBF1C96AFC7A1BGYWSUWHSDawdsadwasdwaWTFQTFSYQGYTWtrtrfgrYTGHYUSGQUHUHUDQJ";
     private final int jwtExpiration = (3600 * 1000) * 24 * 3; // 3 days
 
     public String generateToken(UserDetails userDetails) {
+        log.info("userdetails username {}",userDetails.getUsername());
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpiration);
 

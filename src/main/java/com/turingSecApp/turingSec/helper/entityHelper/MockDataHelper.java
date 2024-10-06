@@ -56,7 +56,7 @@ public class MockDataHelper {
         insertAdmins();
         insertProgram();
 
-        insertReports();
+        //insertReports();
 
         mockData.setInsertedMockNumber(1);
         mockDataRepository.save(mockData); // save mock data in table with value 1
