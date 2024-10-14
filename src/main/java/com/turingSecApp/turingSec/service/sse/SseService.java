@@ -30,20 +30,22 @@ public class SseService implements ISseService {
 
     public SseEmitter addEmitter()
     {
-        log.info("Creating emitter for user");
         UserEntity regularUser = (UserEntity) userFactory.getAuthenticatedBaseUser();
         UserEntity user = utilService.findUserById(regularUser.getId());
 
-        SseEmitter emitter = new SseEmitter();
-        emitters.put(user.getId(), emitter); //Creating emitter for specific user id, and putting it to the map
+        if(emitters.get(user.getId()) == null){
+            SseEmitter newEmitter = new SseEmitter();
+            emitters.put(user.getId(), newEmitter); //Creating emitter for specific user id, and putting it to the map
+        }
+
+        SseEmitter emitter = emitters.get(user.getId()); //Finding exact Hacker emitter
         emitter.onCompletion(() -> emitters.remove(user.getId()));
         emitter.onTimeout(() -> emitters.remove(user.getId()));
         return emitter;
     }
 
     public void notifyUserStatusChange(Notification notification) {
-        UserEntity regularUser = (UserEntity) userFactory.getAuthenticatedBaseUser();
-        UserEntity user = utilService.findUserById(regularUser.getId());
+        UserEntity user = notification.getUser();
 
         SseEmitter emitter = emitters.get(user.getId()); //Finding exact user emitter
         if (emitter != null) {
@@ -52,7 +54,20 @@ public class SseService implements ISseService {
             } catch (IOException e) {
                 emitters.remove(user.getId());
             }
+            log.info("Sending real time updates to user");
         }
-        log.info("Sending real time updates to user");
+        else {
+            try {
+                log.info("Emitter was not found with hacker id: "+user.getHacker().getId());
+                SseEmitter newEmitter = new SseEmitter();
+                emitters.put(user.getId(), newEmitter);
+                newEmitter.send(SseEmitter.event().data(notification));
+
+            }catch (IOException e){
+                emitters.remove(user.getId());
+            }
+            log.info("Sending real time updates to user after creating new emitter");
+        }
+
     }
 }
