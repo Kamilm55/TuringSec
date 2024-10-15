@@ -17,6 +17,7 @@ import java.util.List;
 public class NotificationController {
 
     private final INotificationService notificationService;
+
     @GetMapping
     public BaseResponse<List<NotificationDto>> getNotifications() {
         return BaseResponse.success(notificationService.getAllNotificationsByUser());

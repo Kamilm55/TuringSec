@@ -6,6 +6,6 @@ import com.turingSecApp.turingSec.response.message.NotificationDto;
 import java.util.List;
 
 public interface INotificationService {
-    public void sendNotification(UserEntity user, String message, String type);
+    public void saveNotification(UserEntity user, String message, String type);
     public List<NotificationDto> getAllNotificationsByUser();
 }

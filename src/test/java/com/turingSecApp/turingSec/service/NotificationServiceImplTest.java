@@ -4,7 +4,9 @@ import com.turingSecApp.turingSec.model.entities.message.Notification;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.NotificationRepository;
 import com.turingSecApp.turingSec.response.message.NotificationDto;
+import com.turingSecApp.turingSec.service.interfaces.ISseService;
 import com.turingSecApp.turingSec.service.user.factory.UserFactory;
+import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.NotificationMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,20 +28,29 @@ import static org.mockito.Mockito.*;
 
 public class NotificationServiceImplTest {
 
-    @Mock
-    private NotificationRepository notificationRepository;
+        @Mock
+        private NotificationRepository notificationRepository;
 
-    @Mock
-    private UserFactory userFactory;
+        @Mock
+        private UserFactory userFactory;
 
-    @InjectMocks
-    private NotificationService notificationService;
+        @Mock
+        private UtilService utilService;
 
-    private UserEntity user;
-    private Notification notification;
+        @Mock
+        private ISseService sseService;
 
-    @BeforeEach
-    void setup(){
+        @Mock
+        private NotificationMapper notificationMapper;
+
+        @InjectMocks
+        private NotificationService notificationService;
+
+        private UserEntity user;
+        private Notification notification;
+
+        @BeforeEach
+        void setup(){
         MockitoAnnotations.openMocks(this);
 
         user = new UserEntity();
@@ -52,32 +63,31 @@ public class NotificationServiceImplTest {
                 .sendTime(LocalDateTime.now())
                 .user(user)
                 .build();
-
     }
 
-    @Test
-    void testSendNotification(){
-        notificationService.sendNotification(user,"Test Notification","info");
+        @Test
+        void testSaveNotification() {
+        notificationService.saveNotification(user, "Test Notification", "info");
 
         verify(notificationRepository, times(1)).save(any(Notification.class));
+        verify(sseService, times(1)).notifyUserStatusChange(any(Notification.class));
     }
 
-    @Test
-    void testGetAllNotificationByUser(){
+        @Test
+        void testGetAllNotificationsByUser() {
         when(userFactory.getAuthenticatedBaseUser()).thenReturn(user);
+        when(utilService.findUserById(any())).thenReturn(user);
         when(notificationRepository.findNotificationsByUser(user)).thenReturn(Collections.singletonList(notification));
 
         NotificationDto notificationDto = new NotificationDto();
         notificationDto.setId(1L);
-        notificationDto.setMessage("Test msg");
-
-        NotificationMapper mapper = mock(NotificationMapper.class);
-        when(mapper.notificationToNotificationDto(notification)).thenReturn(notificationDto);
+        notificationDto.setMessage("Test message");
+        when(notificationMapper.notificationToNotificationDto(notification)).thenReturn(notificationDto);
 
         List<NotificationDto> notifications = notificationService.getAllNotificationsByUser();
 
         assertNotNull(notifications);
-        assertEquals(1,notifications.size());
+        assertEquals(1, notifications.size());
         assertEquals("Test message", notifications.get(0).getMessage());
 
         verify(notificationRepository, times(1)).findNotificationsByUser(user);

@@ -220,7 +220,7 @@ public class ReportService implements IReportService {
 
         UserEntity reportOwner = report.getUser();
         String message = String.format("Your report with ID %d has been %s by the company.", id, userStatus.name().toLowerCase());
-        notificationService.sendNotification(reportOwner, message, "REPORT_STATUS_UPDATE");
+        notificationService.saveNotification(reportOwner, message, "REPORT_STATUS_UPDATE");
 
         return bugBountyReportRepository.save(report);
     }

@@ -30,6 +30,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+import javax.ws.rs.GET;
+
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -79,7 +81,6 @@ public class SecurityConfig {
 
                     // Spring Security uses Ant-style path matching, where "/api/base-users/{baseUserId}" is treated as a pattern with a placeholder ({baseUserId}), often matching any single segment within that path (e.g., /api/base-users/123).
                     // The pattern "/api/base-users/current-user" is a specific literal match. It matches exactly and only /api/base-users/current-user
-
                     request.requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll();
 
                     // CSRF controller
