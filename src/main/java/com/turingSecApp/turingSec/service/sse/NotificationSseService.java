@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 @RequiredArgsConstructor
 @Service
 @Slf4j
-public class NotificationNotificationSseService implements INotificationSseService {
+public class NotificationSseService implements INotificationSseService {
     private final UserFactory userFactory;
     private final UtilService utilService;
 
