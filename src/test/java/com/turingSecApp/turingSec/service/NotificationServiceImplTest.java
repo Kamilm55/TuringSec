@@ -4,7 +4,7 @@ import com.turingSecApp.turingSec.model.entities.message.Notification;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.NotificationRepository;
 import com.turingSecApp.turingSec.response.message.NotificationDto;
-import com.turingSecApp.turingSec.service.interfaces.ISseService;
+import com.turingSecApp.turingSec.service.interfaces.INotificationSseService;
 import com.turingSecApp.turingSec.service.user.factory.UserFactory;
 import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.NotificationMapper;
@@ -38,7 +38,7 @@ public class NotificationServiceImplTest {
         private UtilService utilService;
 
         @Mock
-        private ISseService sseService;
+        private INotificationSseService sseService;
 
         @Mock
         private NotificationMapper notificationMapper;
