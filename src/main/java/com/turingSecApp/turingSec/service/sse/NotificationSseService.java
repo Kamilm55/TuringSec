@@ -39,7 +39,7 @@ public class NotificationSseService implements INotificationSseService {
         String userId = notification.getUser().getId();
         SseEmitter emitter = emitters.get(userId); //Finding exact user emitter
 
-        if(emitter == null){
+        if(emitter != null){
             sendNotification(emitter, notification, userId);
         }
         else{
