@@ -25,6 +25,7 @@ import com.turingSecApp.turingSec.payload.report.ReportManualPayload;
 import com.turingSecApp.turingSec.response.report.ReportsByUserDTO;
 import com.turingSecApp.turingSec.response.report.ReportsByUserWithCompDTO;
 import com.turingSecApp.turingSec.response.user.UserDTO;
+import com.turingSecApp.turingSec.service.EmailNotificationService;
 import com.turingSecApp.turingSec.service.interfaces.INotificationService;
 import com.turingSecApp.turingSec.service.interfaces.IReportService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
@@ -56,6 +57,7 @@ import static com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATU
 @RequiredArgsConstructor
 @Slf4j
 public class ReportService implements IReportService {
+    private final EmailNotificationService emailNotificationSevice;
     private final UserFactory userFactory;
     private final ReportRepository bugBountyReportRepository;
     private final ReportManualRepository reportManualRepository;
@@ -410,6 +412,126 @@ public class ReportService implements IReportService {
     private String getUserImgUrl(UserDTO userDTO) {
         return globalConstants.ROOT_LINK + "/api/background-image-for-hacker/download/" + userDTO.getHackerId();
     }
+    private void sendStatusChangeEmailForUser(Report report) {
+        String to = report.getUser().getEmail();
+        String subject = "The status of your report has changed";
+        // List<Report> reports = report.getUser().getReports();
+        String body;
+        if (report.getStatusForUser().equals(SUBMITTED)) {
+            body = String.format("Hello %s,\n" +
+                            "\n" +
+                            "Thank you for submitting your report to [Platform Name]. We have successfully received it and it is now in our system. The security team will review your report shortly.\n" +
+                            "\n" +
+                            "Stay tuned for updates!\n" +
+                            "\n" +
+                            "Best regards,\n" +
+                            "TuringSec",
+                    report.getUser().getUsername(),
+                    report.getId());
+        } else if (report.getStatusForUser().equals(UNDER_REVIEW)) {
+            body = String.format(
+                    "Hello %s,\n" +
+                            "We wanted to let you know that your report, \"%d\", has moved to the Under Review stage. \n" +
+                            "The security team is currently analyzing your findings.\n" +
+                            "We'll keep you updated as they progress.\n" +
+                            "Best regards,\n" +
+                            "TuringSec",
+                    report.getUser().getUsername(),
+                    report.getId()
+            );
 
+        } else if (report.getStatusForUser().equals(ACCEPTED)) {
+            //
+            body = String.format(
+                    " Hello %s,\n" +
+                            "\n" +
+                            "    Great news! The security team has accepted your report, \"%d\". Thank you for your valuable contribution to making [Platform Name] more secure.\n" +
+                            "\n" +
+                            "    You'll receive further details about your reward soon.\n" +
+                            "\n" +
+                            "    Best regards,\n" +
+                            "   TuringSec",
+                    report.getUser().getUsername(),
+                    report.getId()
+            );
+
+
+        } else {
+            body = String.format(
+                    "  Hello %s,\n" +
+                            "\n" +
+                            "    Thank you for submitting your report, \"%s\". After careful review, the security team has determined that your report did not meet the criteria for acceptance.\n" +
+                            "\n" +
+                            "    We appreciate your effort and encourage you to continue contributing to our platform.\n" +
+                            "\n" +
+                            "    Best regards,\n" +
+                            "    TuringSec",
+                    report.getUser().getUsername(),
+                    report.getId().toString()
+            );
+
+        }
+
+        emailNotificationService.sendEmail(to, subject, body);
+    }
+
+    private void sendStatusChangeEmailForCompany(Report report) {
+        String to = report.getUser().getEmail();
+        String subject = "The status of your report has changed";
+        List<Report> reports = report.getUser().getReports();
+        String body;
+
+        if (report.getStatusForUser().equals(SUBMITTED)) {
+            body = String.format("Hello %s,\n" +
+                            "\n" +
+                            "    A new report titled \"%s\" has been submitted to [Platform Name]. The security team should begin reviewing the report shortly.\n" +
+                            "\n" +
+                            "    We'll keep you informed as we make progress.\n" +
+                            "\n" +
+                            "    Best regards,  \n" +
+                            "    [Your Platform's Team]",
+                    report.getUser().getUsername(),
+                    report.getId().toString());
+
+        } else if (report.getStatusForUser().equals(UNDER_REVIEW)) {
+
+            body = String.format("   Hello %s,\n" +
+                            "\n" +
+                            "    The report titled \"%s\" has moved to the Under Review stage. The security team must currently analyzing the findings submitted by the hacker.\n" +
+                            "\n" +
+                            "    We'll provide updates as the review progresses.\n" +
+                            "\n" +
+                            "    Best regards,  \n" +
+                            "    [Your Platform's Team]",
+                    report.getUser().getUsername(),
+                    report.getId().toString());
+
+        } else if (report.getStatusForUser().equals(ACCEPTED)) {
+            body = String.format("Hello  %s,\n" +
+                            "\n" +
+                            "    The security team has accepted the report titled \"%s\"  . The next step is to resolve the payment process.\n" +
+                            "\n" +
+                            "    Please review the details and let us know if any further steps are required.\n" +
+                            "\n" +
+                            "    Best regards,  \n" +
+                            "    [Your Platform's Team]",
+                    report.getUser().getUsername(),
+                    report.getId().toString());
+        } else {
+            body = String.format(" Hello %s,\n" +
+                            "\n" +
+                            "    The security team has reviewed the report titled \"%s\" on your company's page and determined that it does not meet the criteria for acceptance.\n" +
+                            "\n" +
+                            "    You can view the details and rationale on your page. We appreciate your attention and will notify you of any future reports that may be relevant.\n" +
+                            "\n" +
+                            "    Best regards,  \n" +
+                            "    [Your Platform's Team]",
+
+                    report.getUser().getUsername(),
+                    report.getId().toString());
+        }
+
+        emailNotificationSevice.sendEmail(to, subject, body);
+    }
 
 }
