@@ -5,13 +5,12 @@ import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.NotificationRepository;
 import com.turingSecApp.turingSec.response.message.NotificationDto;
 import com.turingSecApp.turingSec.service.interfaces.INotificationService;
-import com.turingSecApp.turingSec.service.interfaces.ISseService;
+import com.turingSecApp.turingSec.service.interfaces.INotificationSseService;
 import com.turingSecApp.turingSec.service.user.factory.UserFactory;
 import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.NotificationMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -26,7 +25,7 @@ public class NotificationService implements INotificationService {
     private final NotificationRepository notificationRepository;
     private final UserFactory userFactory;
     private final UtilService utilService;
-    private final ISseService sseService;
+    private final INotificationSseService sseService;
 
     @Override
     public void saveNotification(UserEntity user, String message, String type) {
