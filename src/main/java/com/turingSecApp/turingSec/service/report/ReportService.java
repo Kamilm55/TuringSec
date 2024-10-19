@@ -472,7 +472,7 @@ public class ReportService implements IReportService {
 
         }
 
-        emailNotificationService.sendEmail(to, subject, body);
+        emailNotificationSevice.sendEmail(to, subject, body);
     }
 
     private void sendStatusChangeEmailForCompany(Report report) {
