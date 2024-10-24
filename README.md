@@ -3,7 +3,7 @@
 ## Overview
 This project aims to facilitate communication between Companies and Hackers. 
 In this app there are 3 roles `(HACKER, COMPANY, ADMIN)`. 
-They can send reports if any bugs are detected. Every company can send programs for hiring hackers, etc. The app is in progress...(There will be more features )
+They can send reports if any bugs are detected. Every company can send programs for hiring hackers, etc. The app is in progress...(There will be more features)
 
 
 > [!IMPORTANT]
