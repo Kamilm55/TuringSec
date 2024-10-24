@@ -49,6 +49,7 @@ public class NotificationService implements INotificationService {
          List<Notification> notifications = notificationRepository.findNotificationsByUser(user);
          List<NotificationDto> notificationDtos =notifications.stream().map(NotificationMapper.INSTANCE::notificationToNotificationDto).collect(Collectors.toList());
         log.info("Retrieving all notifications related to user with id : " +user.getId());
+
         return notificationDtos;
     }
 }
