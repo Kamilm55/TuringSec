@@ -167,6 +167,7 @@ public class SecurityConfig {
                             .requestMatchers("/api/bug-bounty-reports/**").authenticated()
                             ;
 
+                    // Notification
                     request.requestMatchers("/api/notification").hasRole("HACKER")
                             .requestMatchers("/api/sse/notifications").hasRole("HACKER");
 

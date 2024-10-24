@@ -92,12 +92,13 @@ public class NotificationSseService implements INotificationSseService {
                 }
             }
         }
-        if(notifications==null) {
-            try {
+        if(notifications==null){
+            try{
                 emitter.send(SseEmitter.event().data("There is no new notification"));
-            } catch (IOException e) {
+            }catch (IOException e ){
                 emitters.remove(userId);
             }
+
         }
     }
 }
