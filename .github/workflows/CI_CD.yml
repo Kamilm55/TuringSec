@@ -48,60 +48,60 @@ jobs:
             docker.io/kamil571/turingsec_spring_boot:latest
             docker.io/kamil571/turingsec_spring_boot:${{ env.commit_id }}
 
-      - name: Drop All Tables in AWS RDS
-        run: |
-          psql -h ${{ secrets.RDS_HOST }} -U ${{ secrets.RDS_USER }} -d ${{ secrets.RDS_DB }} -p ${{ secrets.RDS_PORT }} -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
-        env:
-          PGPASSWORD: ${{ secrets.RDS_PASSWORD }}
-
-      - name: Set up SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "Directory ~/.ssh created or already exists"
-
-          echo "Setting up SSH key..."
-          echo "${{ secrets.EC2_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ls -l ~/.ssh/id_rsa
-
-          echo "Adding EC2 host to known_hosts..."
-          ssh-keyscan -p 22 ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
-          echo "Contents of ~/.ssh/known_hosts:"
-          cat ~/.ssh/known_hosts || echo "Failed to read ~/.ssh/known_hosts"
-
-          echo "Verifying known_hosts file..."
-          if [ -f ~/.ssh/known_hosts ]; then
-            echo "File ~/.ssh/known_hosts exists"
-            ls -l ~/.ssh/known_hosts
-            cat ~/.ssh/known_hosts
-            chmod 644 ~/.ssh/known_hosts
-          else
-            echo "File ~/.ssh/known_hosts does not exist"
-          fi
-
-      - name: Deploy to server
-        env:
-          EC2_HOST: ${{ secrets.EC2_HOST }}
-          EC2_USER: ${{ secrets.EC2_USER }}
-        run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -v "${{ secrets.EC2_USER }}"@"${{ secrets.EC2_HOST }}" << 'ENDSSH'
-    
-            sudo docker pull docker.io/kamil571/turingsec_spring_boot:latest
-
-            sudo docker stop turingSecContainer || true
-            sudo docker rm turingSecContainer || true
-
-            sudo docker run -d -p 443:8080 \
-              -e SPRING_PROFILES_ACTIVE=prod \
-              -e CERTIFICATE_PATH=${{ secrets.CERTIFICATE_PATH }} \
-              -e KEY_STORE_PASSWORD=${{ secrets.KEY_STORE_PASSWORD }} \
-              -e APP_ROOT_URL=${{ secrets.APP_ROOT_URL }} \
-              -e DB_HOST=${{ secrets.RDS_HOST }} \
-              -e DB_PORT=${{ secrets.RDS_PORT }} \
-              -e DB_NAME=${{ secrets.RDS_DB }} \
-              -e DB_USER=${{ secrets.RDS_USER }} \
-              -e DB_PASSWORD=${{ secrets.RDS_PASSWORD }} \
-              --name turingSecContainer \
-              -v turingsec_cert_volume:/cert_storage \
-              docker.io/kamil571/turingsec_spring_boot:latest
-          ENDSSH
+#      - name: Drop All Tables in AWS RDS
+#        run: |
+#          psql -h ${{ secrets.RDS_HOST }} -U ${{ secrets.RDS_USER }} -d ${{ secrets.RDS_DB }} -p ${{ secrets.RDS_PORT }} -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public;"
+#        env:
+#          PGPASSWORD: ${{ secrets.RDS_PASSWORD }}
+#
+#      - name: Set up SSH key
+#        run: |
+#          mkdir -p ~/.ssh
+#          echo "Directory ~/.ssh created or already exists"
+#
+#          echo "Setting up SSH key..."
+#          echo "${{ secrets.EC2_KEY }}" > ~/.ssh/id_rsa
+#          chmod 600 ~/.ssh/id_rsa
+#          ls -l ~/.ssh/id_rsa
+#
+#          echo "Adding EC2 host to known_hosts..."
+#          ssh-keyscan -p 22 ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+#          echo "Contents of ~/.ssh/known_hosts:"
+#          cat ~/.ssh/known_hosts || echo "Failed to read ~/.ssh/known_hosts"
+#
+#          echo "Verifying known_hosts file..."
+#          if [ -f ~/.ssh/known_hosts ]; then
+#            echo "File ~/.ssh/known_hosts exists"
+#            ls -l ~/.ssh/known_hosts
+#            cat ~/.ssh/known_hosts
+#            chmod 644 ~/.ssh/known_hosts
+#          else
+#            echo "File ~/.ssh/known_hosts does not exist"
+#          fi
+#
+#      - name: Deploy to server
+#        env:
+#          EC2_HOST: ${{ secrets.EC2_HOST }}
+#          EC2_USER: ${{ secrets.EC2_USER }}
+#        run: |
+#          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -v "${{ secrets.EC2_USER }}"@"${{ secrets.EC2_HOST }}" << 'ENDSSH'
+#
+#            sudo docker pull docker.io/kamil571/turingsec_spring_boot:latest
+#
+#            sudo docker stop turingSecContainer || true
+#            sudo docker rm turingSecContainer || true
+#
+#            sudo docker run -d -p 443:8080 \
+#              -e SPRING_PROFILES_ACTIVE=prod \
+#              -e CERTIFICATE_PATH=${{ secrets.CERTIFICATE_PATH }} \
+#              -e KEY_STORE_PASSWORD=${{ secrets.KEY_STORE_PASSWORD }} \
+#              -e APP_ROOT_URL=${{ secrets.APP_ROOT_URL }} \
+#              -e DB_HOST=${{ secrets.RDS_HOST }} \
+#              -e DB_PORT=${{ secrets.RDS_PORT }} \
+#              -e DB_NAME=${{ secrets.RDS_DB }} \
+#              -e DB_USER=${{ secrets.RDS_USER }} \
+#              -e DB_PASSWORD=${{ secrets.RDS_PASSWORD }} \
+#              --name turingSecContainer \
+#              -v turingsec_cert_volume:/cert_storage \
+#              docker.io/kamil571/turingsec_spring_boot:latest
+#          ENDSSH
