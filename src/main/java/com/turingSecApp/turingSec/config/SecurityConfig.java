@@ -168,7 +168,8 @@ public class SecurityConfig {
                             ;
 
                     // Notification
-                    request.requestMatchers("/api/notification").hasRole("HACKER")
+                    request.requestMatchers(HttpMethod.OPTIONS,"/api/**").hasRole("HACKER")
+                            .requestMatchers("/api/notification").hasRole("HACKER")
                             .requestMatchers("/api/sse/notifications").hasRole("HACKER");
 
                     // Message in Report Controller
