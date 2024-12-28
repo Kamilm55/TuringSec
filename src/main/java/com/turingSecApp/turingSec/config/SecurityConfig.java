@@ -86,6 +86,9 @@ public class SecurityConfig {
                     // CSRF controller
                     request.requestMatchers("/api/csrf/**").authenticated();
 
+                    //CORS and preflight
+                    request.requestMatchers(HttpMethod.OPTIONS,"/**").permitAll();
+
                     // Socket
                     request.requestMatchers("/ws/**").permitAll();
 
