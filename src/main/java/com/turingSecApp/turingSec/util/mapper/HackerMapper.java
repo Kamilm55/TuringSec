@@ -13,6 +13,7 @@ public interface HackerMapper {
     HackerMapper INSTANCE = Mappers.getMapper(HackerMapper.class);
     @Mappings({
             @Mapping(target = "userId", source = "hackerEntity.user.id"),
+            @Mapping(target = "username", source = "username")
             // set bg img id and img id explicitly
     })
     HackerDTO convert(HackerEntity hackerEntity);
