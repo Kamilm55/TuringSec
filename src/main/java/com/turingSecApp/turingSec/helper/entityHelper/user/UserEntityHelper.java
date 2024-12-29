@@ -62,6 +62,7 @@ public class UserEntityHelper implements IUserEntityHelper{
 
         // Create and set basic fields
         HackerEntity hackerEntity = new HackerEntity();
+        hackerEntity.setUsername(fetchedUser.getUsername());
         hackerEntity.setFirst_name(fetchedUser.getFirst_name());
         hackerEntity.setLast_name(fetchedUser.getLast_name());
         hackerEntity.setCountry(fetchedUser.getCountry());

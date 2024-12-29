@@ -18,6 +18,7 @@ public class HackerEntity {
     @JsonIgnore
 
     private Long id;
+    private String username;
     private String first_name;
     private String last_name;
     private boolean has_background_pic;
