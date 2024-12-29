@@ -1,7 +1,10 @@
 package com.turingSecApp.turingSec.controller;
 
 import com.turingSecApp.turingSec.payload.company.CompanyLoginPayload;
+import com.turingSecApp.turingSec.payload.company.CompanyUpdateRequest;
 import com.turingSecApp.turingSec.payload.company.RegisterCompanyPayload;
+import com.turingSecApp.turingSec.payload.user.ChangeEmailRequest;
+import com.turingSecApp.turingSec.payload.user.ChangePasswordRequest;
 import com.turingSecApp.turingSec.response.company.CompanyResponse;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.interfaces.ICompanyService;
@@ -48,5 +51,26 @@ public class CompanyController {
        return BaseResponse.success(companyService.getCurrentUser());
     }
 
+    @PatchMapping("/change-password")
+    public BaseResponse<?> changePassword(@Valid @RequestBody ChangePasswordRequest request) {
+        companyService.changePassword(request);
+        return BaseResponse.success(null,"Password updated successfully");
+    }
 
+    @PatchMapping("/change-email")
+    public BaseResponse<?>  changeEmail(@Valid @RequestBody ChangeEmailRequest request) {
+        companyService.changeEmail(request);
+        return BaseResponse.success(null,"Email updated successfully");
+    }
+
+    @PutMapping("/update-profile")
+    public BaseResponse<CompanyResponse> updateProfile( @Valid @RequestBody CompanyUpdateRequest companyUpdateRequest) {
+        return BaseResponse.success(companyService.updateCompany(companyUpdateRequest));
+    }
+
+    @PatchMapping("/close-account")
+    public BaseResponse<?> closeAccount(){
+        companyService.closeAccount();
+        return BaseResponse.success(null,"Account deleted successfully");
+    }
 }

@@ -1,22 +1,24 @@
 package com.turingSecApp.turingSec.service;
 
-import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
-import com.turingSecApp.turingSec.model.enums.Role;
 import com.turingSecApp.turingSec.model.repository.AdminRepository;
+import com.turingSecApp.turingSec.model.repository.BaseUserRepository;
 import com.turingSecApp.turingSec.model.repository.CompanyRepository;
 import com.turingSecApp.turingSec.exception.custom.EmailAlreadyExistsException;
 import com.turingSecApp.turingSec.filter.JwtUtil;
 import com.turingSecApp.turingSec.payload.company.CompanyLoginPayload;
+import com.turingSecApp.turingSec.payload.company.CompanyUpdateRequest;
 import com.turingSecApp.turingSec.payload.company.RegisterCompanyPayload;
+import com.turingSecApp.turingSec.payload.user.ChangeEmailRequest;
+import com.turingSecApp.turingSec.payload.user.ChangePasswordRequest;
 import com.turingSecApp.turingSec.response.company.CompanyResponse;
 import com.turingSecApp.turingSec.service.interfaces.ICompanyService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
-import com.turingSecApp.turingSec.service.user.UserService;
 import com.turingSecApp.turingSec.service.user.factory.UserFactory;
 import com.turingSecApp.turingSec.util.UtilService;
 import com.turingSecApp.turingSec.util.mapper.CompanyMapper;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -33,7 +35,6 @@ import static com.turingSecApp.turingSec.model.enums.Role.ROLE_COMPANY;
 @RequiredArgsConstructor
 @Slf4j
 public class CompanyService implements ICompanyService {
-    private final UserService userService;
     private final UserFactory userFactory;
     private final EmailNotificationService EmailNotificationService;
     private final PasswordEncoder passwordEncoder;
@@ -42,6 +43,7 @@ public class CompanyService implements ICompanyService {
     private final CompanyRepository companyRepository;
 
     private final AdminRepository adminRepository;
+    private final BaseUserRepository baseUserRepository;
 
     @Override
     public void registerCompany(RegisterCompanyPayload companyPayload) {
@@ -59,6 +61,7 @@ public class CompanyService implements ICompanyService {
         // Notify admins for approval
         notifyAdminsForApproval(savedCompany);
     }
+
     // Method to check if the company email is unique
     private void checkCompanyEmailUnique(String email) {
         if (companyRepository.findByEmail(email) != null) {
@@ -84,7 +87,7 @@ public class CompanyService implements ICompanyService {
     @Override
     public Map<String, String> loginCompany(CompanyLoginPayload companyLoginPayload) {
         // Check if the input is an email
-        CompanyEntity companyEntity = companyRepository.findByEmail(companyLoginPayload.getEmail());
+        CompanyEntity companyEntity = companyRepository.findByEmailAndActivated(companyLoginPayload.getEmail(), true);
         // Authenticate user if found
         if (companyEntity != null && passwordEncoder.matches(companyLoginPayload.getPassword(), companyEntity.getPassword())) {
             // Generate token using the user details
@@ -102,6 +105,7 @@ public class CompanyService implements ICompanyService {
             throw new BadCredentialsException("Invalid username/email or password.");
         }
     }
+
     @Override
     public List<CompanyResponse> getAllCompanies() {
         List<CompanyEntity> companyEntities = companyRepository.findAll();
@@ -120,7 +124,6 @@ public class CompanyService implements ICompanyService {
         CompanyEntity company = (CompanyEntity) userFactory.getAuthenticatedBaseUser();
         return CompanyMapper.INSTANCE.convertToResponse(company);
     }
-
 
     // Utils
     private void notifyAdminsForApproval(CompanyEntity company) {
@@ -145,6 +148,56 @@ public class CompanyService implements ICompanyService {
         }
     }
 
+
+    @Override
+    @Transactional
+    public void changePassword(ChangePasswordRequest request) {
+        CompanyEntity company = (CompanyEntity) userFactory.getAuthenticatedBaseUser();
+
+        if (!passwordEncoder.matches(request.getCurrentPassword(), company.getPassword())) {
+            throw new BadCredentialsException("Incorrect current password");
+        }
+        if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
+            throw new BadCredentialsException("Failed to change password: New password and confirm new password don't match");
+        }
+        company.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        companyRepository.save(company);
+        log.info("Password successfully changed");
+    }
+
+    @Override
+    @Transactional
+    public void changeEmail(ChangeEmailRequest request) {
+        CompanyEntity company = (CompanyEntity) userFactory.getAuthenticatedBaseUser();
+        if (!passwordEncoder.matches(request.getPassword(), company.getPassword())) {
+            log.warn("Failed to change email of company with ID {}: Incorrect password entered", company.getId());
+            throw new BadCredentialsException("INCORRECT_PASSWORD");
+        }
+        if (baseUserRepository.findByEmail(request.getNewEmail()) != null) {
+            log.warn("Failed to change email of company with ID {}: Email {} is already used.", request.getNewEmail(), company.getId());
+            throw new EmailAlreadyExistsException("EMAIL_ALREADY_USED");
+        }
+        company.setEmail(request.getNewEmail());
+        companyRepository.save(company);
+        log.info("Email for company changed successfully.");
+    }
+
+    @Override
+    @Transactional
+    public CompanyResponse updateCompany(CompanyUpdateRequest companyUpdateRequest) {
+        CompanyEntity company = (CompanyEntity) userFactory.getAuthenticatedBaseUser();
+        CompanyMapper.INSTANCE.mapForUpdate(company, companyUpdateRequest);
+        companyRepository.save(company);
+        log.info("Company with ID {} successfully updated", company.getId());
+        return CompanyMapper.INSTANCE.convertToResponse(company);
+    }
+
+    @Override
+    public void closeAccount() {
+        CompanyEntity company = (CompanyEntity) userFactory.getAuthenticatedBaseUser();
+        company.setActivated(false);
+        companyRepository.save(company);
+    }
 
 
 }

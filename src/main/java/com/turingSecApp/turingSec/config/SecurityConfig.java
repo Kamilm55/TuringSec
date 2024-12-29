@@ -93,7 +93,7 @@ public class SecurityConfig {
                     request.requestMatchers("/ws/**").permitAll();
 
                     // Media controller
-                    request.requestMatchers("/api/background-image-for-hacker/**", "/api/image-for-hacker/**", "/api/report-media/**").permitAll();//.authenticated();
+                    request.requestMatchers("/api/background-image-for-hacker/**","/api/background-image-for-company/**", "/api/image-for-hacker/**","/api/image-for-company/**", "/api/report-media/**").permitAll();//.authenticated();
 
                     // h2 console
                     request.requestMatchers("/h2-console/**").permitAll(); // permits access to all URLs starting with /h2-console/ without authentication.
