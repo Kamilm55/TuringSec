@@ -2,6 +2,7 @@ package com.turingSecApp.turingSec.util;
 
 import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
+import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.service.user.factory.UserFactory;
@@ -34,5 +35,11 @@ public class MediaUtilService {
             throw new UserNotFoundException("Hacker ID not found for the authenticated user!");
         }
         return hackerEntity.getId();
+    }
+
+    public String validateAndGetCompany(UserDetails userDetails){
+        validateUserDetails(userDetails);
+        CompanyEntity companyEntity = (CompanyEntity) userFactory.getAuthenticatedBaseUser();
+        return companyEntity.getId();
     }
 }

@@ -21,7 +21,11 @@ public class CompanyEntity extends BaseUser {
     private String message;
     private String company_name;
     private String job_title;
-
+    private boolean has_background_pic;
+    private boolean has_profile_pic;
+    private String bio;
+    private String linkedin;
+    private String twitter;
     private String assets;//no need for this field
 
     @OneToMany(mappedBy = "company", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
