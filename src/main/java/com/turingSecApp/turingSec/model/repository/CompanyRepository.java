@@ -13,9 +13,8 @@ import java.util.UUID;
 @Repository
 public interface CompanyRepository extends JpaRepository<CompanyEntity, UUID> {
     CompanyEntity findByEmail(String email);
-    Optional<CompanyEntity> findByBugBountyProgramsContains(Program program);
 
-    CompanyEntity findByEmailAndActivated(String email, boolean b);
+    Optional<CompanyEntity> findByBugBountyProgramsContains(Program program);
 
 //    Optional<CompanyEntity> findByEmail(String email);
 

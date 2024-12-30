@@ -87,7 +87,7 @@ public class CompanyService implements ICompanyService {
     @Override
     public Map<String, String> loginCompany(CompanyLoginPayload companyLoginPayload) {
         // Check if the input is an email
-        CompanyEntity companyEntity = companyRepository.findByEmailAndActivated(companyLoginPayload.getEmail(), true);
+        CompanyEntity companyEntity = companyRepository.findByEmail(companyLoginPayload.getEmail());
         // Authenticate user if found
         if (companyEntity != null && passwordEncoder.matches(companyLoginPayload.getPassword(), companyEntity.getPassword())) {
             // Generate token using the user details
