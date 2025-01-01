@@ -1,5 +1,6 @@
 package com.turingSecApp.turingSec.service.report;
 
+import com.turingSecApp.turingSec.config.websocket.decorator.CustomWebSocketHandlerDecorator;
 import com.turingSecApp.turingSec.exception.custom.ReportNotFoundException;
 import com.turingSecApp.turingSec.model.entities.program.Program;
 import com.turingSecApp.turingSec.model.entities.report.enums.REPORTSTATUSFORCOMPANY;
@@ -10,6 +11,7 @@ import com.turingSecApp.turingSec.model.entities.report.ReportCVSS;
 import com.turingSecApp.turingSec.model.entities.report.Report;
 import com.turingSecApp.turingSec.model.entities.report.ReportManual;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
+import com.turingSecApp.turingSec.model.enums.EmailTemplate;
 import com.turingSecApp.turingSec.model.repository.*;
 import com.turingSecApp.turingSec.model.repository.program.ProgramRepository;
 import com.turingSecApp.turingSec.model.repository.report.ReportCVSSRepository;
@@ -26,6 +28,7 @@ import com.turingSecApp.turingSec.response.report.ReportsByUserDTO;
 import com.turingSecApp.turingSec.response.report.ReportsByUserWithCompDTO;
 import com.turingSecApp.turingSec.response.user.UserDTO;
 import com.turingSecApp.turingSec.service.EmailNotificationService;
+import com.turingSecApp.turingSec.service.EmailService;
 import com.turingSecApp.turingSec.service.interfaces.INotificationService;
 import com.turingSecApp.turingSec.service.interfaces.IReportService;
 import com.turingSecApp.turingSec.service.user.CustomUserDetails;
@@ -35,6 +38,8 @@ import com.turingSecApp.turingSec.util.ReportUtilService;
 import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -67,12 +72,15 @@ public class ReportService implements IReportService {
     private final ReportMediaService reportMediaService;
     private final GlobalConstants globalConstants;
     private  final ReportUtilService reportUtilService;
+    private final EmailService emailService;
 
     private final INotificationService notificationService;
 
     private final ProgramRepository programRepository;
     private final UserRepository userRepository;
     private final CompanyRepository companyRepository;
+
+    private static final Logger logger = LoggerFactory.getLogger(ReportService.class);
 
     @Override
     public Report getBugBountyReportById(Long id) {
@@ -128,6 +136,14 @@ public class ReportService implements IReportService {
         ///
         // Set child reference type fields with the relation
         ReportManual savedReport = (ReportManual) reportEntityHelper.setChildReferenceFieldsFromPayload(reportPayload,savedReport1);
+
+        Map<String, String> hackerPlaceholders = Map.of(
+                "hackerName", report.getUser().getUsername(),
+                "reportTitle", report.getReportTemplate(),
+                "platformName", "Turingsec",
+                "platformTeam", "Turingsec Team"
+        );
+        emailService.sendEmail(report.getUser().getEmail(), EmailTemplate.HACKER_SUBMITTED, hackerPlaceholders);
 
         return savedReport;
 
@@ -223,6 +239,32 @@ public class ReportService implements IReportService {
         UserEntity reportOwner = report.getUser();
         String message = String.format("Your report with ID %d has been %s by the company.", id, userStatus.name().toLowerCase());
         notificationService.saveNotification(reportOwner, message, "REPORT_STATUS_UPDATE");
+
+        if(userStatus.equals(REJECTED)) {
+            Map<String, String> hackerPlaceholders = Map.of(
+                    "hackerName", report.getUser().getUsername(),
+                    "reportTitle", report.getReportTemplate(),
+                    "platformName", "Turingsec",
+                    "platformTeam", "Turingsec Team"
+            );
+            emailService.sendEmail(report.getUser().getEmail(), EmailTemplate.HACKER_REJECTED, hackerPlaceholders);
+        } else if(userStatus.equals(ACCEPTED)) {
+            Map<String, String> hackerPlaceholders = Map.of(
+                    "hackerName", report.getUser().getUsername(),
+                    "reportTitle", report.getReportTemplate(),
+                    "platformName", "Turingsec",
+                    "platformTeam", "Turingsec Team"
+            );
+            emailService.sendEmail(report.getUser().getEmail(), EmailTemplate.HACKER_ACCEPTED, hackerPlaceholders);
+        } else if(userStatus.equals(UNDER_REVIEW)) {
+            Map<String, String> hackerPlaceholders = Map.of(
+                    "hackerName", report.getUser().getUsername(),
+                    "reportTitle", report.getReportTemplate(),
+                    "platformName", "Turingsec",
+                    "platformTeam", "Turingsec Team"
+            );
+            emailService.sendEmail(report.getUser().getEmail(), EmailTemplate.HACKER_UNDER_REVIEW, hackerPlaceholders);
+        }
 
         return bugBountyReportRepository.save(report);
     }
