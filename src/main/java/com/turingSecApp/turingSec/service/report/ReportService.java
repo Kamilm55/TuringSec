@@ -109,6 +109,14 @@ public class ReportService implements IReportService {
         // Set child reference type fields with the relation
         ReportManual savedReport = (ReportManual) reportEntityHelper.setChildReferenceFieldsFromPayload(reportPayload,savedReport1);
 
+        Map<String, String> hackerPlaceholders = Map.of(
+                "hackerName", report.getUser().getUsername(),
+                "reportTitle", report.getReportTemplate(),
+                "platformName", "Turingsec",
+                "platformTeam", "Turingsec Team"
+        );
+        emailService.sendEmail(report.getUser().getEmail(), EmailTemplate.HACKER_SUBMITTED, hackerPlaceholders);
+
         return savedReport;
 
     }
@@ -144,6 +152,18 @@ public class ReportService implements IReportService {
                 "platformTeam", "Turingsec Team"
         );
         emailService.sendEmail(report.getUser().getEmail(), EmailTemplate.HACKER_SUBMITTED, hackerPlaceholders);
+
+        Optional<CompanyEntity> companyEntity = companyRepository.findByBugBountyProgramsContains(program);
+        
+        if(companyEntity.isPresent()) {
+            Map<String, String> company = Map.of(
+                    "companyName", companyEntity.get().getCompany_name(),
+                    "reportTitle", report.getReportTemplate(),
+                    "platformName", "Turingsec",
+                    "platformTeam", "Turingsec Team"
+            );
+            emailService.sendEmail(companyEntity.get().getEmail(), EmailTemplate.COMPANY_SUBMITTED, company);
+        }
 
         return savedReport;
 
@@ -192,6 +212,26 @@ public class ReportService implements IReportService {
         ///
         // Set child reference type fields with the relation
         ReportCVSS savedReport = (ReportCVSS) reportEntityHelper.setChildReferenceFieldsFromPayload(reportPayload,savedReport1);
+
+        Map<String, String> hackerPlaceholders = Map.of(
+                "hackerName", report.getUser().getUsername(),
+                "reportTitle", report.getReportTemplate(),
+                "platformName", "Turingsec",
+                "platformTeam", "Turingsec Team"
+        );
+        emailService.sendEmail(report.getUser().getEmail(), EmailTemplate.HACKER_SUBMITTED, hackerPlaceholders);
+
+        Optional<CompanyEntity> companyEntity = companyRepository.findByBugBountyProgramsContains(program);
+
+        if(companyEntity.isPresent()) {
+            Map<String, String> company = Map.of(
+                    "companyName", companyEntity.get().getCompany_name(),
+                    "reportTitle", report.getReportTemplate(),
+                    "platformName", "Turingsec",
+                    "platformTeam", "Turingsec Team"
+            );
+            emailService.sendEmail(companyEntity.get().getEmail(), EmailTemplate.COMPANY_SUBMITTED, company);
+        }
 
         return /*ReportMapper.INSTANCE.toDTO(savedReport)*/savedReport;
     }
@@ -248,6 +288,14 @@ public class ReportService implements IReportService {
                     "platformTeam", "Turingsec Team"
             );
             emailService.sendEmail(report.getUser().getEmail(), EmailTemplate.HACKER_REJECTED, hackerPlaceholders);
+
+            Map<String, String> company = Map.of(
+                    "companyName", authenticatedCompany.getCompany_name(),
+                    "reportTitle", report.getReportTemplate(),
+                    "platformName", "Turingsec",
+                    "platformTeam", "Turingsec Team"
+            );
+            emailService.sendEmail(authenticatedCompany.getEmail(), EmailTemplate.COMPANY_REJECTED, company);
         } else if(userStatus.equals(ACCEPTED)) {
             Map<String, String> hackerPlaceholders = Map.of(
                     "hackerName", report.getUser().getUsername(),
@@ -256,6 +304,14 @@ public class ReportService implements IReportService {
                     "platformTeam", "Turingsec Team"
             );
             emailService.sendEmail(report.getUser().getEmail(), EmailTemplate.HACKER_ACCEPTED, hackerPlaceholders);
+
+            Map<String, String> company = Map.of(
+                    "companyName", authenticatedCompany.getCompany_name(),
+                    "reportTitle", report.getReportTemplate(),
+                    "platformName", "Turingsec",
+                    "platformTeam", "Turingsec Team"
+            );
+            emailService.sendEmail(authenticatedCompany.getEmail(), EmailTemplate.COMPANY_ACCEPTED, company);
         } else if(userStatus.equals(UNDER_REVIEW)) {
             Map<String, String> hackerPlaceholders = Map.of(
                     "hackerName", report.getUser().getUsername(),
@@ -264,6 +320,14 @@ public class ReportService implements IReportService {
                     "platformTeam", "Turingsec Team"
             );
             emailService.sendEmail(report.getUser().getEmail(), EmailTemplate.HACKER_UNDER_REVIEW, hackerPlaceholders);
+
+            Map<String, String> company = Map.of(
+                    "companyName", authenticatedCompany.getCompany_name(),
+                    "reportTitle", report.getReportTemplate(),
+                    "platformName", "Turingsec",
+                    "platformTeam", "Turingsec Team"
+            );
+            emailService.sendEmail(authenticatedCompany.getEmail(), EmailTemplate.COMPANY_UNDER_REVIEW, company);
         }
 
         return bugBountyReportRepository.save(report);
