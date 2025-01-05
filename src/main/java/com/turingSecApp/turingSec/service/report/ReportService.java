@@ -213,6 +213,26 @@ public class ReportService implements IReportService {
         // Set child reference type fields with the relation
         ReportCVSS savedReport = (ReportCVSS) reportEntityHelper.setChildReferenceFieldsFromPayload(reportPayload,savedReport1);
 
+        Map<String, String> hackerPlaceholders = Map.of(
+                "hackerName", report.getUser().getUsername(),
+                "reportTitle", report.getReportTemplate(),
+                "platformName", "Turingsec",
+                "platformTeam", "Turingsec Team"
+        );
+        emailService.sendEmail(report.getUser().getEmail(), EmailTemplate.HACKER_SUBMITTED, hackerPlaceholders);
+
+        Optional<CompanyEntity> companyEntity = companyRepository.findByBugBountyProgramsContains(program);
+
+        if(companyEntity.isPresent()) {
+            Map<String, String> company = Map.of(
+                    "companyName", companyEntity.get().getCompany_name(),
+                    "reportTitle", report.getReportTemplate(),
+                    "platformName", "Turingsec",
+                    "platformTeam", "Turingsec Team"
+            );
+            emailService.sendEmail(companyEntity.get().getEmail(), EmailTemplate.COMPANY_SUBMITTED, company);
+        }
+
         return /*ReportMapper.INSTANCE.toDTO(savedReport)*/savedReport;
     }
 
