@@ -4,7 +4,10 @@ import com.turingSecApp.turingSec.config.websocket.security.CustomWebsocketSecur
 import com.turingSecApp.turingSec.exception.custom.UnauthorizedException;
 import com.turingSecApp.turingSec.exception.custom.UserNotFoundException;
 import com.turingSecApp.turingSec.model.entities.user.BaseUser;
+import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
 import com.turingSecApp.turingSec.model.repository.BaseUserRepository;
+import com.turingSecApp.turingSec.model.repository.HackerRepository;
+import com.turingSecApp.turingSec.model.repository.UserRepository;
 import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +26,8 @@ public class UserFactory {
     private final BaseUserRepository baseUserRepository;
     private final CustomWebsocketSecurityContext websocketSecurityContext;
     private final UtilService utilService;
+    private final UserRepository userRepository;
+    private final HackerRepository hackerRepository;
 
     // Method to retrieve authenticated BaseUser
     public BaseUser getAuthenticatedBaseUser() {
@@ -51,6 +56,17 @@ public class UserFactory {
         if (authentication != null && authentication.isAuthenticated()) {
             String baseUserId = authentication.getName();
             return baseUserRepository.findById(utilService.convertToUUID(baseUserId))
+                    .orElseThrow(() -> new UserNotFoundException("BaseUser with baseUserId " + baseUserId + " not found"));
+        } else {
+            throw new UnauthorizedException();
+        }
+    }
+
+    public HackerEntity getAuthenticatedHacker() {
+        Authentication authentication = getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            String baseUserId = authentication.getName();
+            return hackerRepository.findByUserId(utilService.convertToUUID(baseUserId))
                     .orElseThrow(() -> new UserNotFoundException("BaseUser with baseUserId " + baseUserId + " not found"));
         } else {
             throw new UnauthorizedException();
