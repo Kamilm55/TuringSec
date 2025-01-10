@@ -47,6 +47,7 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
         return new CustomAuthenticationEntryPoint();
@@ -58,8 +59,9 @@ public class SecurityConfig {
         repository.setHeaderName("X-CSRF-TOKEN");
         return repository;
     }
+
     @Bean
-    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http , JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 // Apply CSRF protection selectively to STOMP endpoints
@@ -68,7 +70,7 @@ public class SecurityConfig {
 //                )
                 .headers(AbstractHttpConfigurer::disable)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling( (exception)->
+                .exceptionHandling((exception) ->
                         exception.authenticationEntryPoint(authenticationEntryPoint())
                 )
                 .authorizeHttpRequests(request -> {
@@ -87,13 +89,13 @@ public class SecurityConfig {
                     request.requestMatchers("/api/csrf/**").authenticated();
 
                     //CORS and preflight
-                    request.requestMatchers(HttpMethod.OPTIONS,"/**").permitAll();
+                    request.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
 
                     // Socket
                     request.requestMatchers("/ws/**").permitAll();
 
                     // Media controller
-                    request.requestMatchers("/api/background-image-for-hacker/**","/api/background-image-for-company/**", "/api/image-for-hacker/**","/api/image-for-company/**", "/api/report-media/**").permitAll();//.authenticated();
+                    request.requestMatchers("/api/background-image-for-hacker/**", "/api/background-image-for-company/**", "/api/image-for-hacker/**", "/api/image-for-company/**", "/api/report-media/**").permitAll();//.authenticated();
 
                     // h2 console
                     request.requestMatchers("/h2-console/**").permitAll(); // permits access to all URLs starting with /h2-console/ without authentication.
@@ -104,7 +106,7 @@ public class SecurityConfig {
                     // Bug Bounty Program Controller
                     request
                             .requestMatchers("/api/bug-bounty-programs").hasRole("COMPANY")
-                            .requestMatchers(HttpMethod.DELETE,"/api/bug-bounty-programs/**").hasRole("COMPANY")
+                            .requestMatchers(HttpMethod.DELETE, "/api/bug-bounty-programs/**").hasRole("COMPANY")
                             .requestMatchers("/api/bug-bounty-programs/**").permitAll();
 
 
@@ -153,8 +155,8 @@ public class SecurityConfig {
                     // Bug Bounty Report Controller
                     request
 
-                            .requestMatchers(HttpMethod.POST,"/api/bug-bounty-reports/**").hasRole("HACKER")
-                            .requestMatchers(HttpMethod.PUT,"/api/bug-bounty-reports/**").hasRole("HACKER")
+                            .requestMatchers(HttpMethod.POST, "/api/bug-bounty-reports/**").hasRole("HACKER")
+                            .requestMatchers(HttpMethod.PUT, "/api/bug-bounty-reports/**").hasRole("HACKER")
 
                             .requestMatchers("/api/bug-bounty-reports/user").hasRole("HACKER")
                             .requestMatchers("/api/bug-bounty-reports/company").hasRole("COMPANY")
@@ -168,21 +170,25 @@ public class SecurityConfig {
                             .requestMatchers("/api/bug-bounty-reports/date-range/user").hasRole(Role.ROLE_HACKER.getValue())
                             .requestMatchers("/api/bug-bounty-reports/{id}").authenticated()
                             .requestMatchers("/api/bug-bounty-reports/**").authenticated()
-                            ;
+                    ;
 
                     // Notification
-                    request.requestMatchers(HttpMethod.OPTIONS,"/api/**").hasRole("HACKER")
+                    request.requestMatchers(HttpMethod.OPTIONS, "/api/**").hasRole("HACKER")
                             .requestMatchers("/api/notification").hasRole("HACKER")
                             .requestMatchers("/api/sse/notifications").hasRole("HACKER");
 
                     // Message in Report Controller
                     request
-                            .requestMatchers("/api/messagesInReport").hasAnyRole("HACKER","COMPANY")
-                            .requestMatchers("/api/messagesInReport/{id}").hasAnyRole("HACKER","COMPANY")
+                            .requestMatchers("/api/messagesInReport").hasAnyRole("HACKER", "COMPANY")
+                            .requestMatchers("/api/messagesInReport/{id}").hasAnyRole("HACKER", "COMPANY")
                             .requestMatchers("/api/messagesInReport/report/{id}/admin").hasRole("ADMIN")
                             .requestMatchers("/api/messagesInReport/message/{id}/admin").hasRole("ADMIN");
+
+                    // Card Controller
+                    request
+                            .requestMatchers("/cards/**").hasRole("HACKER");
                 })
-                .sessionManagement(sm->sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 //                .httpBasic(Customizer.withDefaults());
 
         return http.build();
