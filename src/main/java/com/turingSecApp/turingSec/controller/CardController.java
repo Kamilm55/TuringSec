@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/cards")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequiredArgsConstructor
 public class CardController {
     private final ICardService paymentService;
