@@ -1,6 +1,5 @@
 package com.turingSecApp.turingSec.controller;
 
-import com.turingSecApp.turingSec.model.entities.user.BaseUser;
 import com.turingSecApp.turingSec.response.BaseUserDTO;
 import com.turingSecApp.turingSec.response.base.BaseResponse;
 import com.turingSecApp.turingSec.service.interfaces.IBaseUserService;
