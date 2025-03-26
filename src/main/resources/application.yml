@@ -1,33 +1,41 @@
-  server:
-    error.include-message: always
-  
-  spring:
-    profiles:
-      active: ${SPRING_PROFILES_ACTIVE:dev} # prod || dev
-    servlet:
-      multipart:
-        enabled: true
-        max-file-size: 300MB
-        max-request-size: 700MB
-    jpa:
+server:
+  error.include-message: always
+
+spring:
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev} # prod || dev
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 300MB
+      max-request-size: 700MB
+  jpa:
+    hibernate:
+      ddl-auto: update # it can be changes create-drop || update
+    properties:
       hibernate:
-        ddl-auto: update # it can be changes create-drop || update
-      properties:
-        hibernate:
-          format_sql: true
-    liquibase:
-      change-log: classpath:liquibase/changelog-master.yml
-      enabled: false
-    mail:
-      host: smtp.gmail.com
-      port: 587
-      username: kamilmmmdov2905@gmail.com
-      password: ocmf dzzn some axso
-      properties:
-        mail.smtp.auth: true
-        mail.smtp.starttls.enable: true
-        mail.smtp.starttls.required: true # tsl verification
-  
-  logging:
-    level:
-      org.springframework.security: DEBUG
+        format_sql: true
+  liquibase:
+    change-log: classpath:liquibase/changelog-master.yml
+    enabled: false
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: kamilmmmdov2905@gmail.com
+    password: ocmf dzzn some axso
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true # tsl verification
+
+logging:
+  level:
+    feign: debug
+    org.springframework.security: DEBUG
+#      root: debug
+
+location:
+  api:
+    url: https://api.countrystatecity.in/v1
+    key: ZENjZENuYmxha2R0SFgzNE56OElGanI3QkRjR043RlhGQ0ZyUzJ2ag==
+

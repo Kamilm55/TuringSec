@@ -4,13 +4,12 @@ import com.turingSecApp.turingSec.exception.custom.ResourceNotFoundException;
 import com.turingSecApp.turingSec.model.entities.payment.Card;
 import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
 import com.turingSecApp.turingSec.model.repository.payment.CardRepository;
-import com.turingSecApp.turingSec.model.repository.HackerRepository;
-import com.turingSecApp.turingSec.payload.payment.CardOwnerRequest;
 import com.turingSecApp.turingSec.payload.payment.CardRequest;
 import com.turingSecApp.turingSec.response.payment.CardResponse;
 import com.turingSecApp.turingSec.service.interfaces.ICardService;
 import com.turingSecApp.turingSec.service.user.factory.UserFactory;
 import com.turingSecApp.turingSec.util.mapper.CardMapper;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,6 @@ import java.util.List;
 public class CardService implements ICardService {
     private final CardMapper cardMapper;
     private final CardRepository cardRepository;
-    private final HackerRepository hackerRepository;
     private final UserFactory userFactory;
 
 
@@ -51,36 +49,19 @@ public class CardService implements ICardService {
     }
 
     @Override
-    public CardResponse addCardOwnerInformation(CardOwnerRequest cardOwnerInfo) {
+    @Transactional
+    public CardResponse addCard(CardRequest cardRequest) {
         HackerEntity hacker = userFactory.getAuthenticatedHacker();
-        log.info("Operation of adding payment method started: User try to add card owner information");
-        Card card = Card.builder()
-                .firstName(cardOwnerInfo.getFirstName())
-                .lastName(cardOwnerInfo.getLastName())
-                .city(cardOwnerInfo.getCity())
-                .dateOfBirth(cardOwnerInfo.getDateOfBirth())
-                .hacker(hacker)
-                .build();
+        log.info("Operation of adding payment method started");
+        Card card = cardMapper.toEntity(cardRequest);
+        card.setHacker(hacker);
         cardRepository.save(card);
-        log.info("Card owner info added");
+        log.info("Card successfully added");
         return cardMapper.toDto(card);
     }
 
     @Override
-    public CardResponse addCardInformation(CardRequest cardInfoRequest, Long cardId) {
-        HackerEntity hacker = userFactory.getAuthenticatedHacker();
-        log.info("Operation of adding payment method started: User try to add card information");
-        Card card = cardRepository.findByIdAndHacker(cardId, hacker).orElseThrow(() -> {
-            log.warn("Failed to add card information: Card not found");
-            return new ResourceNotFoundException("NOT_FOUND");
-        });
-        cardMapper.mapForUpdate(card, cardInfoRequest);
-        cardRepository.save(card);
-        log.info("Card information successfully added");
-        return cardMapper.toDto(card);
-    }
-
-    @Override
+    @Transactional
     public Void deleteCard(Long id) {
         HackerEntity hacker = userFactory.getAuthenticatedHacker();
         log.info("Operation of deleting payment method started: User try to delete card with ID {}", id);

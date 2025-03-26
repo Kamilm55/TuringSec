@@ -4,6 +4,7 @@ import com.turingSecApp.turingSec.model.entities.user.HackerEntity;
 import com.turingSecApp.turingSec.model.enums.Currency;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 
@@ -11,21 +12,27 @@ import java.time.LocalDate;
 @Table(name = "card")
 @Getter
 @Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class Card {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String firstName;
-    private String lastName;
-    private String city;
-    private LocalDate dateOfBirth;
-    private String iban;
-    private Currency currency;
-    private String nameAccountHolder;
-    private String bankAccountCountry;
+    Long id;
+    String firstName;
+    String lastName;
+    String countryName;
+    Long countryId;
+    String cityName;
+    Long cityId;
+    String address;
+    LocalDate dateOfBirth;
+    String cardNumber;
+    Double balance;
+    Currency currency;
+    String nameAccountHolder;
+    String bankAccountCountryName;
+    Long bankAccountCountryId;
 
     @ManyToOne
     private HackerEntity hacker;
