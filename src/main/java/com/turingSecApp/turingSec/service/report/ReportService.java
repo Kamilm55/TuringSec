@@ -154,7 +154,7 @@ public class ReportService implements IReportService {
         emailService.sendEmail(report.getUser().getEmail(), EmailTemplate.HACKER_SUBMITTED, hackerPlaceholders);
 
         Optional<CompanyEntity> companyEntity = companyRepository.findByBugBountyProgramsContains(program);
-        
+
         if(companyEntity.isPresent()) {
             Map<String, String> company = Map.of(
                     "companyName", companyEntity.get().getCompany_name(),
@@ -359,7 +359,7 @@ public class ReportService implements IReportService {
         // Group reports by user, fetch image URLs, and create DTOs
         return createReportsByUserDTOList(groupReportsByUser(userReports), fetchUserImgUrls(groupReportsByUser(userReports)));
     }
-  
+
     @Override // For admin -> it returns all report by any hackers or company
     public List<Report> getReportDateRange(LocalDate startDate, LocalDate endDate) {
         return filterReportsByDate(getAllReports(), startDate, endDate);
