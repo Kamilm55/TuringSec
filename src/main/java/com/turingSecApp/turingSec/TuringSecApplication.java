@@ -4,25 +4,22 @@ import com.turingSecApp.turingSec.model.entities.user.AdminEntity;
 import com.turingSecApp.turingSec.model.entities.user.CompanyEntity;
 import com.turingSecApp.turingSec.model.entities.user.UserEntity;
 import com.turingSecApp.turingSec.model.repository.*;
-import com.turingSecApp.turingSec.model.repository.report.ReportRepository;
 import com.turingSecApp.turingSec.service.interfaces.IHackerService;
 import com.turingSecApp.turingSec.service.interfaces.IMockDataService;
 import com.turingSecApp.turingSec.service.interfaces.IUserService;
-import com.turingSecApp.turingSec.service.program.ProgramService;
-import com.turingSecApp.turingSec.util.UtilService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.turingSecApp.turingSec", "com.turingSecApp.turingSec.config"})
 @RequiredArgsConstructor
+@EnableFeignClients
 @Slf4j
 public class TuringSecApplication implements CommandLineRunner {
     private final IHackerService hackerService;
@@ -31,14 +28,15 @@ public class TuringSecApplication implements CommandLineRunner {
     private final CompanyRepository companyRepository;
     private final UserRepository userRepository;
     private final AdminRepository adminRepository;
-    private  final IMockDataService mockDataService;
+    private final IMockDataService mockDataService;
+
     public static void main(String[] args) {
         SpringApplication.run(TuringSecApplication.class, args);
     }
 
     @Override
     @Transactional
-    public void run(String... args){
+    public void run(String... args) {
         mockDataService.insertMockData();
 
         UserEntity hacker1 = userRepository.findByEmail("mockhacker1@gmail.com");
