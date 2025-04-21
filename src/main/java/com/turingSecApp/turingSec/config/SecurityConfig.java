@@ -187,19 +187,4 @@ public class SecurityConfig {
 
         return http.build();
     }
-
-    @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-
-        config.setAllowCredentials(true);
-        config.addAllowedOriginPattern("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-        config.addAllowedOrigin("http://localhost:3000");
-
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
-    }
 }
