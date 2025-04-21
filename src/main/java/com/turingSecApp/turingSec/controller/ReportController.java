@@ -43,11 +43,11 @@ public class ReportController {
         return BaseResponse.success(bugBountyReportService.reviewReportByCompany(id));
     }
 
-    @PatchMapping("/{id}/company/accept")
+    @PostMapping("/{id}/company/accept")
     public BaseResponse<Report> acceptReportByCompany(@PathVariable Long id){
         return BaseResponse.success(bugBountyReportService.acceptReportByCompany(id));
     }
-    @PatchMapping("/{id}/company/reject")
+    @PostMapping("/{id}/company/reject")
     public BaseResponse<Report> rejectReportByCompany(@PathVariable Long id){
         return BaseResponse.success(bugBountyReportService.rejectReportByCompany(id));
     }
