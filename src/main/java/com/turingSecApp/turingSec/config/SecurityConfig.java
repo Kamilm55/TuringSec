@@ -23,6 +23,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
+
+
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -38,7 +40,6 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
         return new CustomAuthenticationEntryPoint();
@@ -168,8 +169,8 @@ public class SecurityConfig {
 
                     // Notification
 
-                    request.requestMatchers(HttpMethod.OPTIONS, "/api/**").hasRole("HACKER")
-
+                    request.requestMatchers(HttpMethod.OPTIONS, "/api/**").hasRole("HACKER");
+                    request
                             .requestMatchers("/api/notification").hasRole("HACKER")
                             .requestMatchers("/api/sse/notifications").hasRole("HACKER");
 
@@ -186,22 +187,6 @@ public class SecurityConfig {
                 })
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 //                .httpBasic(Customizer.withDefaults());
-
         return http.build();
-    }
-
-    @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration config = new CorsConfiguration();
-
-        config.setAllowCredentials(true);
-        config.addAllowedOriginPattern("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-        config.addAllowedOrigin("http://localhost:3000");
-
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
     }
 }
