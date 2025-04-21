@@ -170,7 +170,6 @@ public class SecurityConfig {
                     // Notification
 
                     request.requestMatchers(HttpMethod.OPTIONS, "/api/**").hasRole("HACKER");
-
                     request
                             .requestMatchers("/api/notification").hasRole("HACKER")
                             .requestMatchers("/api/sse/notifications").hasRole("HACKER");
