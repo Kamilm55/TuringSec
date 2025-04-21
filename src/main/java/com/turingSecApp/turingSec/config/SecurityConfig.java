@@ -148,12 +148,13 @@ public class SecurityConfig {
                     // Bug Bounty Report Controller
                     request
 
-                            .requestMatchers(HttpMethod.POST, "/api/bug-bounty-reports/**").hasRole("HACKER")
-                            .requestMatchers(HttpMethod.PUT, "/api/bug-bounty-reports/**").hasRole("HACKER")
+
+                            .requestMatchers(HttpMethod.POST,"/api/bug-bounty-reports/**").authenticated()
+                            .requestMatchers(HttpMethod.PUT,"/api/bug-bounty-reports/**").authenticated()
 
                             .requestMatchers("/api/bug-bounty-reports/user").hasRole("HACKER")
                             .requestMatchers("/api/bug-bounty-reports/company").hasRole("COMPANY")
-                            .requestMatchers("/api/bug-bounty-reports/{id}/company/**").hasRole("COMPANY")
+                            .requestMatchers("/api/bug-bounty-reports/*/company/**").authenticated()
 
                             .requestMatchers("/api/bug-bounty-reports/company/{id}/admin").hasRole("ADMIN")
                             .requestMatchers("/api/bug-bounty-reports/user/{id}/admin").hasRole("ADMIN")
@@ -166,7 +167,9 @@ public class SecurityConfig {
                     ;
 
                     // Notification
+
                     request.requestMatchers(HttpMethod.OPTIONS, "/api/**").hasRole("HACKER")
+
                             .requestMatchers("/api/notification").hasRole("HACKER")
                             .requestMatchers("/api/sse/notifications").hasRole("HACKER");
 
@@ -187,4 +190,18 @@ public class SecurityConfig {
         return http.build();
     }
 
+    @Bean
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowCredentials(true);
+        config.addAllowedOriginPattern("*");
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        config.addAllowedOrigin("http://localhost:3000");
+
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
 }
