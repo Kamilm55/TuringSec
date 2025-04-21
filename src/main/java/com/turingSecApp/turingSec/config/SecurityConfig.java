@@ -22,11 +22,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
-import javax.ws.rs.GET;
+
 
 @Configuration
 @RequiredArgsConstructor
@@ -172,7 +169,7 @@ public class SecurityConfig {
 
                     // Notification
 
-                    request.requestMatchers(HttpMethod.OPTIONS, "/api/**").hasRole("HACKER")
+                    request.requestMatchers(HttpMethod.OPTIONS, "/api/**").hasRole("HACKER");
 
                     request
                             .requestMatchers("/api/notification").hasRole("HACKER")
@@ -191,8 +188,6 @@ public class SecurityConfig {
                 })
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 //                .httpBasic(Customizer.withDefaults());
-
         return http.build();
     }
-
 }
