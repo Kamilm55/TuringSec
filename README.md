@@ -16,6 +16,19 @@ In every request I send 2 images, one updates latest version, the other one spec
  </br>I configured swagger in 5000 port you can test this project in your local machine.
 
 
+## Key Features
+
+- **Role-based security** with JWT
+- **Real-time messaging** via WebSockets (STOMP)
+- **Bug report system** with file uploading
+- **REST API** with Swagger 
+- **CI/CD pipeline**: GitHub Actions build the JAR, create Docker images, and push to Docker Hub
+- **Dual Docker image tagging**: `latest` and versioned by Git commit
+- **Email notifications** via `javax.mail`
+- Integrated **PostgreSQL** and **H2** databases
+- Deployed on **AWS EC2** and **RDS**
+
+
 ### Tech Stack:
 
 - Java
@@ -31,3 +44,5 @@ In every request I send 2 images, one updates latest version, the other one spec
 - Mapstruct
 - javax.mail
 - JWT, etc.
+
+

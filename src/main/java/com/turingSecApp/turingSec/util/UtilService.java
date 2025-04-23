@@ -62,8 +62,8 @@ public class UtilService {
 
     public void isUserExistWithEmail(String email) {
 //        System.out.println(email);
-        if (userRepository.findByEmail(email) != null) {
-            throw new EmailAlreadyExistsException("Email is already taken.");
+        if (baseUserRepository.findByEmail(email) != null) {
+            throw new EmailAlreadyExistsException("Email " + email + " is already in use");
         }
     }
 
