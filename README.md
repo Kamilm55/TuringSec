@@ -36,6 +36,14 @@ In every request I send 2 images, one updates latest version, the other one spec
 - **Company and user management** for profile updates and account settings.
 - **Localized data services** for retrieving country and city information via external APIs.
 
+## Design Patterns Used
+
+- **Singleton Pattern**: The `SocketErrorMessageSingleton` class ensures that only one instance of `SocketErrorMessage` is created and shared across the application.
+- **Factory Pattern**: The `UserFactory` class abstracts the creation of `BaseUser` and `HackerEntity` instances based on the authentication context, providing a unified interface for retrieving authenticated users.
+- **Adapter Pattern**: The `StompHeaderAccessorAdapter` and `SimpHeaderAccessorAdapter` classes adapt `StompHeaderAccessor` and `SimpMessageHeaderAccessor` objects to a common interface (`CustomHeaderAccessor`), allowing them to be used interchangeably in WebSocket processing.
+- **Builder Pattern (Lombok)**: The Builder pattern is used via Lombok’s `@Builder` annotation to simplify the construction of complex objects with readable and maintainable code.
+
+
 ### Tech Stack:
 
 - Java
