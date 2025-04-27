@@ -52,6 +52,8 @@ In every request I send 2 images, one updates latest version, the other one spec
 - javax.mail
 - JWT, etc.
 
+### Entity Relationship Diagram:
+![ER Diagram](TuringSec-db.png)
 ## Controllers
 
 ### AdminController
