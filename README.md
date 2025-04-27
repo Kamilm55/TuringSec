@@ -44,7 +44,7 @@ In every request I send 2 images, one updates latest version, the other one spec
 - **Builder Pattern (Lombok)**: The Builder pattern is used via Lombok’s `@Builder` annotation to simplify the construction of complex objects with readable and maintainable code.
 
 
-### Tech Stack:
+### Tech Stack
 
 - Java
 - Spring Boot
@@ -60,8 +60,9 @@ In every request I send 2 images, one updates latest version, the other one spec
 - javax.mail
 - JWT, etc.
 
-### Entity Relationship Diagram:
+### Entity Relationship Diagram
 ![ER Diagram](TuringSec-db.png)
+
 ## Controllers
 
 ### AdminController
