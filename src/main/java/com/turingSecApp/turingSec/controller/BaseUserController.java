@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 public class BaseUserController {
     private final IBaseUserService baseUserService;
 
-    // todo: change to base user dto
     @GetMapping("/current-user")
     public BaseResponse<BaseUserDTO> getCurrentUser() {
         return BaseResponse.success(baseUserService.getCurrentUser());
